@@ -1,11 +1,12 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router";
 import { useQuery } from '@tanstack/react-query';
 import ProductsList from './components/ProductsList';
+import ProductPage from "./pages/ProductPage/ProductPage";
 import { Product } from './types/Product';
 
 const fetchProducts = async (): Promise<Product[]> => {
   const response = await fetch(`${process.env.REACT_APP_API_URL}/shop/products?itemsPerPage=4`);
-
   if (!response.ok) {
     throw new Error('Problem z pobieraniem produktów');
   }
@@ -28,6 +29,12 @@ const App: React.FC = () => {
         {isError && <div className="text-danger text-center">Błąd: {error.message}</div>}
 
         {products && <ProductsList products={products} />}
+
+        <Router>
+          <Routes>
+            <Route path="/product" element={<ProductPage />} />
+          </Routes>
+        </Router>
       </div>
   );
 };
