@@ -5,7 +5,7 @@ import {Product} from "../types/Product";
 import Layout from '../layouts/Default';
 
 const fetchProducts = async (): Promise<Product[]> => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/shop/products?itemsPerPage=9`);
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/products?itemsPerPage=9`);
     if (!response.ok) {
         throw new Error('Problem z pobieraniem produktów');
     }

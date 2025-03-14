@@ -8,7 +8,7 @@ import { formatPrice } from "../utils/price";
 const token = 'fmWuOg5LGEIga_ddr4zgitRz_3f04kMcqtTMBweB8DIqSlLJ4A86eOQluWmX28dT';
 
 const fetchCart = async (): Promise<any> => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/shop/orders/${token}`);
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${token}`);
     if (!response.ok) {
         throw new Error('Problem z pobieraniem produktów');
     }
@@ -19,12 +19,12 @@ const fetchCart = async (): Promise<any> => {
 };
 
 const removeCartItem = async (id: number) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/shop/orders/${token}/items/${id}`, { method: "DELETE" });
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${token}/items/${id}`, { method: "DELETE" });
     if (!response.ok) throw new Error("Nie udało się usunąć produktu z koszyka");
 };
 
 const updateCartItem = async ({ id, quantity }: { id: number; quantity: number }) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/shop/orders/${token}/items/${id}}`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${token}/items/${id}}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/merge-patch+json" },
         body: JSON.stringify({ 'quantity': quantity })
