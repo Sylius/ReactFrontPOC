@@ -1,0 +1,61 @@
+a {
+  text-underline-offset: 0.25em;
+
+  &.link-reset {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: #22B99AFF;
+    }
+  }
+}
+
+.icon {
+  height: 28px;
+  width: 28px;
+
+  &-xs {
+    height: 16px;
+    width: 16px;
+  }
+
+  &-sm {
+    height: 20px;
+    width: 20px;
+  }
+
+  &-md {
+    height: 24px;
+    width: 24px;
+  }
+
+  &-lg {
+    height: 32px;
+    width: 32px;
+  }
+
+  &-xl {
+    height: 40px;
+    width: 40px;
+  }
+
+  & > * {
+    stroke-width: 1.1;
+  }
+
+  &-xs, &-sm, &-md {
+    & > * {
+      stroke-width: 2;
+    }
+  }
+}
+
+.btn-icon {
+  display: inline-flex!important;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: center;
+  padding-left: 1.4rem;
+  padding-right: 1.6rem;
+}
