@@ -4,11 +4,10 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import ProductRow from '../components/product/ProductRow';
 import { OrderItem } from "../types/Order";
 import { formatPrice } from "../utils/price";
+import {Link} from "react-router";
 
-const token = 'fmWuOg5LGEIga_ddr4zgitRz_3f04kMcqtTMBweB8DIqSlLJ4A86eOQluWmX28dT';
-
-const fetchCart = async (): Promise<any> => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${token}`);
+const fetchCart = async (): Promise<OrderItem> => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${process.env.REACT_APP_ORDER_TOKEN}`);
     if (!response.ok) {
         throw new Error('Problem z pobieraniem produktów');
     }
@@ -19,12 +18,12 @@ const fetchCart = async (): Promise<any> => {
 };
 
 const removeCartItem = async (id: number) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${token}/items/${id}`, { method: "DELETE" });
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${process.env.REACT_APP_ORDER_TOKEN}/items/${id}`, { method: "DELETE" });
     if (!response.ok) throw new Error("Nie udało się usunąć produktu z koszyka");
 };
 
 const updateCartItem = async ({ id, quantity }: { id: number; quantity: number }) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${token}/items/${id}}`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${process.env.REACT_APP_ORDER_TOKEN}/items/${id}}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/merge-patch+json" },
         body: JSON.stringify({ 'quantity': quantity })
@@ -128,7 +127,9 @@ const CartPage: React.FC = () => {
                                 <div className="h5">Order total:</div>
                                 <div className="ms-auto h5 text-end">${formatPrice(order?.total)}</div>
                             </div>
-
+                        </div>
+                        <div className="d-flex">
+                            <Link to="/checkout/address" className="btn btn-primary flex-grow-1">Checkout</Link>
                         </div>
                     </div>
                 </div>
