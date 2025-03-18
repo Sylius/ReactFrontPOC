@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 
-import ProductPage from "./pages/ProductPage/ProductPage";
+import ProductPage from "./pages/ProductPage";
+import ProductList from './pages/ProductList';
 import Homepage from './pages/Homepage';
 import CartPage from './pages/CartPage';
-
 import './assets/scss/main.scss';
 
 const App: React.FC = () => {
@@ -12,7 +12,7 @@ const App: React.FC = () => {
     <Router>
         <Routes>
             <Route path="/" element={<Homepage />} />
-            <Route path="/product" element={<ProductPage />} />
+            <Route path="/products" element={<ProductList />} />
             <Route path="/cart" element={<CartPage />} />
         </Routes>
     </Router>
