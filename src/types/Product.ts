@@ -1,19 +1,17 @@
 export interface Product {
     id: number;
+    slug: string;
     name: string;
-    variants: Variant[];
+    description: string;
+    variants: string[]; // 🔥 Teraz to tablica URL-i, a nie pełne obiekty!
     images: Image[];
 }
 
-export interface Variant {
+// 🔹 Nowy interfejs dla szczegółów wariantu
+export interface ProductVariantDetails {
     id: number;
     price: number;
-    channelPricings: {
-        [channelCode: string]: {
-            price: number;
-            channelCode: string;
-        };
-    };
+    code: string;
 }
 
 export interface Image {

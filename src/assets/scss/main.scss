@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+* {
+  font-family: 'Inter', Arial, sans-serif;
+}
 a {
   text-underline-offset: 0.25em;
 
@@ -58,4 +62,31 @@ a {
   justify-content: center;
   padding-left: 1.4rem;
   padding-right: 1.6rem;
+}
+.breadcrumb {
+
+  &-item {
+    &::before {
+      color: #adb5bd !important;
+    }
+    a{
+      text-decoration: none;
+    }
+  }
+}
+.products-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  grid-gap: 3rem 2rem;
+}
+
+.pagination{
+ .page-item{
+   border: none;
+   padding: 6px 12px;
+   background-color: unset;
+   &.current {
+     color: #22B99AFF;
+   }
+ }
 }
