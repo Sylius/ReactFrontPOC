@@ -2,6 +2,15 @@
 * {
   font-family: 'Inter', Arial, sans-serif;
 }
+
+* {
+  --bs-nav-link-color: #212529;
+  --bs-link-hover-color: #1b947b;
+  --bs-nav-link-hover-color: var(--bs-link-hover-color);
+  --bs-link-color-rgb: 34, 185, 154;
+  --bs-link-hover-color-rgb: 27, 148, 123;
+}
+
 a {
   text-underline-offset: 0.25em;
 
