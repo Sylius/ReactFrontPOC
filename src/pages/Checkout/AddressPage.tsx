@@ -2,6 +2,7 @@ import React, {useState} from "react";
 
 import CheckoutLayout from '../../layouts/Checkout';
 import {AddressInterface} from "../../types/Order";
+import {useNavigate} from "react-router-dom";
 
 const AddressPage: React.FC = () => {
     const [billingAddress, setBillingAddress] = useState<AddressInterface>({
@@ -17,6 +18,8 @@ const AddressPage: React.FC = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [email, setEmail] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const navigate = useNavigate()
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -53,7 +56,7 @@ const AddressPage: React.FC = () => {
                 throw new Error("Failed to submit order");
             }
 
-            alert("Order submitted successfully!");
+            navigate('/checkout/select-shipping');
         } catch (error) {
             console.error("Error submitting order:", error);
         } finally {

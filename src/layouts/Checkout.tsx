@@ -1,7 +1,6 @@
 import React from 'react';
 import Header from './../components/layout/checkout/Header';
 import Sidebar from './../components/layout/checkout/Sidebar';
-import {OrderProvider} from "../context/OrderContext";
 
 // @ts-ignore
 const CheckoutLayout = ({ children }) => {
@@ -12,10 +11,8 @@ const CheckoutLayout = ({ children }) => {
                 <div className="flex-grow-1 d-flex align-items-stretch">
                     <div className="container">
                         <div className="row h-100">
-                            <OrderProvider>
-                                { children }
-                                <Sidebar />
-                            </OrderProvider>
+                            { children }
+                            <Sidebar />
                         </div>
                     </div>
                 </div>
