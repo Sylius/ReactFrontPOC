@@ -47,7 +47,7 @@ const PaymentPage: React.FC = () => {
                 throw new Error("Nie udało się wysłać metody dostawy");
             }
 
-            alert("Order submitted successfully");
+            navigate("/checkout/complete");
         } catch (error) {
             console.error("Error submitting order:", error);
         } finally {

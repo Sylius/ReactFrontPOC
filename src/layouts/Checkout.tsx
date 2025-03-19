@@ -2,8 +2,13 @@ import React from 'react';
 import Header from './../components/layout/checkout/Header';
 import Sidebar from './../components/layout/checkout/Sidebar';
 
-// @ts-ignore
-const CheckoutLayout = ({ children }) => {
+interface CheckoutLayoutProps {
+    children: any;
+    sidebarOn?: boolean;
+}
+
+
+const CheckoutLayout: React.FC<CheckoutLayoutProps> = ({ children, sidebarOn = true }) => {
     return (
         <>
             <div className="d-flex flex-column min-vh-100 overflow-hidden">
@@ -12,7 +17,7 @@ const CheckoutLayout = ({ children }) => {
                     <div className="container">
                         <div className="row h-100">
                             { children }
-                            <Sidebar />
+                            { sidebarOn && <Sidebar /> }
                         </div>
                     </div>
                 </div>

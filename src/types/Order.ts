@@ -1,3 +1,5 @@
+import {OneOf} from "../../schema/schema";
+
 export interface OrderItem {
     variant: string;
     productName?: string | null;
@@ -26,4 +28,17 @@ export interface AddressInterface {
     updatedAt?: string | null;
     id?: number;
     customer?: string | null;
+}
+
+export interface Payment {
+    "@id"?: string;
+    "@type"?: string;
+    id?: number;
+    method?: string | null;
+}
+
+export interface Shipment {
+    "@id"?: string;
+    "@type"?: string;
+    method?: string;
 }

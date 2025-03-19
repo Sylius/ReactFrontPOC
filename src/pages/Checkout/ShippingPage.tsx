@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 
 import CheckoutLayout from '../../layouts/Checkout';
 import {Link} from "react-router";

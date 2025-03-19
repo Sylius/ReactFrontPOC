@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from '../layouts/Default';
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import ProductRow from '../components/product/ProductRow';
+import ProductRow from '../components/cart/ProductRow';
 import { OrderItem } from "../types/Order";
 import { formatPrice } from "../utils/price";
 import {Link} from "react-router";
