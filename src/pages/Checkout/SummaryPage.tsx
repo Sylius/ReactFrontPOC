@@ -33,7 +33,7 @@ const SummaryPage: React.FC = () => {
                 throw new Error("Failed to submit order");
             }
 
-            navigate('/');
+            navigate('/order/thank-you');
         } catch (error) {
             console.error("Error submitting order:", error);
         } finally {
