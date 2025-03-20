@@ -1,7 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router';
+import {useOrder} from "../../context/OrderContext";
+import {formatPrice} from "../../utils/price";
 
 const Header =  () => {
+    const { order } = useOrder();
+
     return (
         <div className="border-bottom py-4">
             <div className="container">
@@ -70,11 +74,6 @@ const Header =  () => {
                          id="live-3283976089-0"
                          data-live-props-value="{&quot;cart&quot;:null,&quot;hookableMetadata&quot;:{&quot;renderedBy&quot;:&quot;sylius_shop.base.header.content&quot;,&quot;configuration&quot;:&quot;[]&quot;,&quot;prefixes&quot;:[&quot;sylius_shop.homepage.index.header.content&quot;,&quot;sylius_shop.base.header.content&quot;]},&quot;template&quot;:&quot;@SyliusShop\/shared\/components\/header\/cart.html.twig&quot;,&quot;@attributes&quot;:{&quot;id&quot;:&quot;live-3283976089-0&quot;},&quot;@checksum&quot;:&quot;A\/wFpwghMT1N4zipsyyCK80KlKkntZV2R57jmGDzxAU=&quot;}">
                         <Link to="/cart">
-                            <div data-loading="" style={{display: 'none'}}>
-                                <div className="sylius-shop-loader">
-                                    {/*<img src="/build/shop/images/loader.0488c2fc.gif" alt="Loading" loading="lazy"/>*/}
-                                </div>
-                            </div>
                             <div>
                                 <button className="btn btn-icon btn-transparent px-0 position-relative"
                                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
@@ -88,6 +87,7 @@ const Header =  () => {
                                             <path d="M9 11V6a3 3 0 0 1 6 0v5"></path>
                                         </g>
                                     </svg>
+                                    ${ formatPrice(order.total) }
                                 </button>
                             </div>
                         </Link>
