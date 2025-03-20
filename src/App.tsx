@@ -8,6 +8,7 @@ import AddressPage from "./pages/Checkout/AddressPage";
 import ShippingPage from "./pages/Checkout/ShippingPage";
 import PaymentPage from "./pages/Checkout/PaymentPage";
 import SummaryPage from "./pages/Checkout/SummaryPage";
+import ThankYouPage from "./pages/Checkout/ThankYouPage";
 
 import './assets/scss/main.scss';
 import {OrderProvider} from "./context/OrderContext";
@@ -23,6 +24,7 @@ const App: React.FC = () => {
             <Route path="/checkout/select-shipping" element={<OrderProvider><ShippingPage /></OrderProvider>} />
             <Route path="/checkout/select-payment" element={<OrderProvider><PaymentPage /></OrderProvider>} />
             <Route path="/checkout/complete" element={<OrderProvider><SummaryPage /></OrderProvider>} />
+            <Route path="/order/thank-you" element={<ThankYouPage />} />
         </Routes>
     </Router>
   );
