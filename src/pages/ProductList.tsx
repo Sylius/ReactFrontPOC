@@ -13,7 +13,7 @@ const ProductList: React.FC = () => {
     const [variantsData, setVariantsData] = useState<{ [productId: number]: ProductVariantDetails | null }>({});
 
     const fetchProducts = async (page: number): Promise<Product[]> => {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/shop/products?itemsPerPage=9&page=${page}`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}api/v2/shop/products?itemsPerPage=9&page=${page}`);
         if (!response.ok) {
             throw new Error('Problem z pobieraniem produktów');
         }
@@ -29,7 +29,7 @@ const ProductList: React.FC = () => {
 
     const fetchVariantDetails = async (variantUrl: string):Promise<ProductVariantDetails | null> => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}${variantUrl.replace('/api/v2', '')}`);
+            const response = await fetch(`${process.env.REACT_APP_API_URL}${variantUrl}`);
             if (!response.ok) throw new Error("Nie udało się pobrać wariantu");
 
             return await response.json();
