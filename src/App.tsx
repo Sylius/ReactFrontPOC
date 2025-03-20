@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 
+import ProductPage from "./pages/ProductPage";
 import ProductList from './pages/ProductList';
 import Homepage from './pages/Homepage';
 import CartPage from './pages/CartPage';
@@ -25,6 +26,7 @@ const App: React.FC = () => {
             <Route path="/checkout/select-payment" element={<OrderProvider><PaymentPage /></OrderProvider>} />
             <Route path="/checkout/complete" element={<OrderProvider><SummaryPage /></OrderProvider>} />
             <Route path="/order/thank-you" element={<ThankYouPage />} />
+            <Route path="/product/:code" element={<ProductPage />} />
         </Routes>
     </Router>
   );

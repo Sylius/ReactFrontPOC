@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../layouts/Default';
 import { Product, ProductVariantDetails } from '../types/Product';
 import Breadcrumbs from "../components/Breadcrumbs";
@@ -13,7 +14,7 @@ const ProductList: React.FC = () => {
     const [variantsData, setVariantsData] = useState<{ [productId: number]: ProductVariantDetails | null }>({});
 
     const fetchProducts = async (page: number): Promise<Product[]> => {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}api/v2/shop/products?itemsPerPage=9&page=${page}`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/products?itemsPerPage=9&page=${page}`);
         if (!response.ok) {
             throw new Error('Problem z pobieraniem produktów');
         }
@@ -100,15 +101,15 @@ const ProductList: React.FC = () => {
                                         <input type="text" placeholder='Value' className='form-control-sm form-control'/>
                                         <button className='btn btn btn-outline-secondary btn-sm' type='submit'>
                                             <svg viewBox='0 0 24 24' className='icon'>
-                                                <path fill="none" stroke="currentColor" stroke-linecap="round"
-                                                      stroke-linejoin="round" stroke-width="2"
+                                                <path fill="none" stroke="currentColor" strokeLinecap="round"
+                                                      strokeLinejoin="round" strokeWidth="2"
                                                       d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6"></path>
                                             </svg>
                                         </button>
                                         <a href="#" className="btn btn btn-outline-secondary btn-sm">
                                             <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
-                                                <path fill="none" stroke="currentColor" stroke-linecap="round"
-                                                      stroke-linejoin="round" stroke-width="2"
+                                                <path fill="none" stroke="currentColor" strokeLinecap="round"
+                                                      strokeLinejoin="round" strokeWidth="2"
                                                       d="M18 6L6 18M6 6l12 12"></path>
                                             </svg>
                                         </a>
@@ -134,7 +135,7 @@ const ProductList: React.FC = () => {
                         <div className="products-grid">
                             {products.map(product => (
                                 <div key={product.id}>
-                                    <a href={`/product/${product.slug}`} className="link-reset">
+                                    <Link to={`/product/${product.code}`} className="link-reset">
                                         <div className="mb-4">
                                             <div className="overflow-auto bg-light rounded-3">
                                                 <img
@@ -145,7 +146,7 @@ const ProductList: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="h6 text-break">{product.name}</div>
-                                    </a>
+                                    </Link>
                                     <div>
                                         {variantsData[product.id] ? (
                                             <>
@@ -162,9 +163,7 @@ const ProductList: React.FC = () => {
                                 </div>
                             ))}
                         </div>
-                        {/* Paginacja */}
                         <div className="pagination justify-content-center mt-4">
-                            {/* Poprzednia strona */}
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
@@ -173,7 +172,6 @@ const ProductList: React.FC = () => {
                                 Poprzednia
                             </button>
 
-                            {/* Numerowane strony */}
                             {[...Array(totalPages)].map((_, index) => (
                                 <button
                                     key={index + 1}
@@ -185,7 +183,6 @@ const ProductList: React.FC = () => {
                                 </button>
                             ))}
 
-                            {/* Następna strona */}
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === totalPages}
@@ -196,8 +193,6 @@ const ProductList: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </Layout>
     );
