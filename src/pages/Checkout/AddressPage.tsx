@@ -3,6 +3,8 @@ import React, {useState} from "react";
 import CheckoutLayout from '../../layouts/Checkout';
 import {AddressInterface} from "../../types/Order";
 import {useNavigate} from "react-router-dom";
+import {Link} from "react-router";
+import Steps from "../../components/checkout/Steps";
 
 const AddressPage: React.FC = () => {
     const [billingAddress, setBillingAddress] = useState<AddressInterface>({
@@ -36,7 +38,7 @@ const AddressPage: React.FC = () => {
         setErrors({});
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${process.env.REACT_APP_ORDER_TOKEN}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem("orderToken")}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ billingAddress, email, shippingAddress: billingAddress, couponCode: null })
@@ -68,22 +70,7 @@ const AddressPage: React.FC = () => {
         <CheckoutLayout>
             <div className="col-12 col-lg-7 pt-4 pb-5">
                 <div className="pe-lg-6">
-                    <div className="steps steps-address mb-5">
-                        <div className="steps-item steps-item-active">
-                            <a href="/en_US/checkout/address">
-                                Address
-                            </a>
-                        </div>
-                        <div className="steps-item steps-item-disabled">
-                            Shipping
-                        </div>
-                        <div className="steps-item steps-item-disabled">
-                            Payment
-                        </div>
-                        <div className="steps-item steps-item-disabled">
-                            Complete
-                        </div>
-                    </div>
+                    <Steps activeStep="address"/>
 
                     <div data-controller="live" data-live-name-value="sylius_shop:checkout:address:form"
                          data-live-url-value="/en_US/_components/sylius_shop:checkout:address:form"
@@ -261,13 +248,13 @@ const AddressPage: React.FC = () => {
 
 
                             <div className="d-flex justify-content-between flex-column flex-sm-row gap-2">
-                                <a className="btn btn-light btn-icon" href="/en_US/">
+                                <Link className="btn btn-light btn-icon" to="/">
                                     <svg viewBox="0 0 24 24" className="icon icon-sm flex-shrink-0" aria-hidden="true">
                                         <path fill="none" stroke="currentColor" strokeLinecap="round"
                                               strokeLinejoin="round" strokeWidth="2" d="m15 6l-6 6l6 6"></path>
                                     </svg>
                                     Back to store
-                                </a>
+                                </Link>
 
                                 <button type="submit" className="btn btn-primary btn-icon" disabled={isSubmitting}>
                                     Next <svg viewBox="0 0 24 24" className="icon icon-sm" aria-hidden="true">

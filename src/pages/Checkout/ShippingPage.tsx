@@ -6,6 +6,7 @@ import {useOrder} from "../../context/OrderContext";
 import {useQuery} from "@tanstack/react-query";
 import { formatPrice } from "../../utils/price";
 import {useNavigate} from "react-router-dom";
+import Steps from "../../components/checkout/Steps";
 
 const ShippingPage: React.FC = () => {
 
@@ -13,7 +14,7 @@ const ShippingPage: React.FC = () => {
     const navigate = useNavigate()
 
     const fetchShippingMethodsFromAPI = async (): Promise<any> => {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${process.env.REACT_APP_ORDER_TOKEN}/shipments/${order?.shipments[0].id}/methods`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem("orderToken")}/shipments/${order?.shipments[0].id}/methods`);
         if (!response.ok) {
             throw new Error('Problem z pobieraniem metod dostawy');
         }
@@ -34,7 +35,7 @@ const ShippingPage: React.FC = () => {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${process.env.REACT_APP_ORDER_TOKEN}/shipments/${order.shipments[0].id}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem("orderToken")}/shipments/${order.shipments[0].id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/merge-patch+json" },
                 body: JSON.stringify({ shippingMethod })
@@ -57,25 +58,7 @@ const ShippingPage: React.FC = () => {
         <CheckoutLayout>
             <div className="col-12 col-lg-7 pt-4 pb-5">
                 <div className="pe-lg-6">
-                    <div className="steps steps-select_shipping mb-5">
-                        <div className="steps-item steps-item-completed">
-                            <a href="/en_US/checkout/address">
-                                Address
-                            </a>
-                        </div>
-                        <div className="steps-item steps-item-active">
-                            <a href="/en_US/checkout/select-shipping">
-                                Shipping
-                            </a>
-                        </div>
-                        <div className="steps-item steps-item-disabled">
-                            Payment
-                        </div>
-                        <div className="steps-item steps-item-disabled">
-                            Complete
-                        </div>
-                    </div>
-
+                    <Steps activeStep="shipping"/>
 
                     <div>
                         <form name="sylius_shop_checkout_select_shipping" method="post"

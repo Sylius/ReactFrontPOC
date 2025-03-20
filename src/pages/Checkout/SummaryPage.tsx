@@ -9,6 +9,7 @@ import ProductRow from "../../components/order/ProductRow";
 import {OrderItem} from "../../types/Order";
 import { formatPrice } from "../../utils/price";
 import {useNavigate} from "react-router-dom";
+import Steps from "../../components/checkout/Steps";
 
 const SummaryPage: React.FC = () => {
 
@@ -23,7 +24,7 @@ const SummaryPage: React.FC = () => {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${process.env.REACT_APP_ORDER_TOKEN}/complete`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem("orderToken")}/complete`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/merge-patch+json" },
                 body: JSON.stringify({ notes: extraNotes })
@@ -33,6 +34,7 @@ const SummaryPage: React.FC = () => {
                 throw new Error("Failed to submit order");
             }
 
+            localStorage.removeItem("orderToken");
             navigate('/order/thank-you');
         } catch (error) {
             console.error("Error submitting order:", error);
@@ -49,29 +51,7 @@ const SummaryPage: React.FC = () => {
         <CheckoutLayout sidebarOn={false}>
             <div className="col pt-4 pb-5">
                 <div className="mx-auto">
-
-                    <div className="steps steps-complete mb-5">
-                        <div className="steps-item steps-item-completed">
-                            <a href="/en_US/checkout/address">
-                                Address
-                            </a>
-                        </div>
-                        <div className="steps-item steps-item-completed">
-                            <a href="/en_US/checkout/select-shipping">
-                                Shipping
-                            </a>
-                        </div>
-                        <div className="steps-item steps-item-completed">
-                            <a href="/en_US/checkout/select-payment">
-                                Payment
-                            </a>
-                        </div>
-                        <div className="steps-item steps-item-active">
-                            <a href="/en_US/checkout/complete">
-                                Complete
-                            </a>
-                        </div>
-                    </div>
+                    <Steps activeStep="complete"/>
 
                     <h1 className="h5 mb-4">Summary of your order</h1>
 

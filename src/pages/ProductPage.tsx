@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import Layout from '../layouts/Default';
-import { useParams } from "react-router-dom";
+import {useParams} from "react-router-dom";
 import Breadcrumbs from "../components/Breadcrumbs";
 import BootstrapAccordion from "../components/Accordion";
 import {formatPrice} from "../utils/price";
+import {useOrder} from "../context/OrderContext";
 
 const ProductPage: React.FC = () => {
+    const { fetchOrder } = useOrder();
+
     const { code } = useParams<{ code: string }>();
     const [product, setProduct] = useState<{
         name: string;
@@ -24,9 +27,7 @@ const ProductPage: React.FC = () => {
             const response = await fetch(`${process.env.REACT_APP_API_URL}${variantUrl}`);
             if (!response.ok) throw new Error("Nie udało się pobrać wariantu");
 
-            const variantData = await response.json();
-
-            return variantData;
+            return await response.json();
         } catch (error) {
             console.error("Błąd pobierania wariantu:", error);
             return null;
@@ -81,7 +82,7 @@ const ProductPage: React.FC = () => {
                 throw new Error("Failed to create order");
             }
 
-            alert('Product added to cart');
+            fetchOrder();
         } catch (err) {
             console.error((err as Error).message);
         } finally {

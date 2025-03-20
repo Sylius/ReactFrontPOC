@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 
 import ProductPage from "./pages/ProductPage";
@@ -17,17 +17,19 @@ import {OrderProvider} from "./context/OrderContext";
 const App: React.FC = () => {
     return (
     <Router>
-        <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/products" element={<ProductList />} />
-            <Route path="/cart" element={<OrderProvider><CartPage /></OrderProvider>} />
-            <Route path="/checkout/address" element={<OrderProvider><AddressPage /></OrderProvider>} />
-            <Route path="/checkout/select-shipping" element={<OrderProvider><ShippingPage /></OrderProvider>} />
-            <Route path="/checkout/select-payment" element={<OrderProvider><PaymentPage /></OrderProvider>} />
-            <Route path="/checkout/complete" element={<OrderProvider><SummaryPage /></OrderProvider>} />
-            <Route path="/order/thank-you" element={<ThankYouPage />} />
-            <Route path="/product/:code" element={<ProductPage />} />
-        </Routes>
+        <OrderProvider>
+            <Routes>
+                <Route path="/" element={<Homepage />} />
+                <Route path="/products" element={<ProductList />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/checkout/address" element={<AddressPage />} />
+                <Route path="/checkout/select-shipping" element={<ShippingPage />} />
+                <Route path="/checkout/select-payment" element={<PaymentPage />} />
+                <Route path="/checkout/complete" element={<SummaryPage />} />
+                <Route path="/order/thank-you" element={<ThankYouPage />} />
+                <Route path="/product/:code" element={<ProductPage />} />
+            </Routes>
+        </OrderProvider>
     </Router>
   );
 };
