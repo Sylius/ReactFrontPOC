@@ -6,6 +6,7 @@ interface OrderContextType {
     fetchOrder: () => void;
     updateOrderItem: (id: number, quantity: number) => void;
     removeOrderItem: (id: number) => void;
+    isFetching: boolean;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -17,8 +18,6 @@ const fetchOrderFromAPI = async (): Promise<any> => {
     }
 
     const data = await response.json();
-
-    console.log(data);
 
     return data['hydra:member'] || data;
 };
@@ -38,7 +37,7 @@ const removeOrderItemAPI = async (id: number) => {
 };
 
 export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { data: order, refetch } = useQuery({ queryKey: ["order"], queryFn: fetchOrderFromAPI });
+    const { data: order, refetch, isFetching } = useQuery({ queryKey: ["order"], queryFn: fetchOrderFromAPI });
     const updateMutation = useMutation({ mutationFn: updateOrderItemAPI, onSuccess: () => refetch() });
     const removeMutation = useMutation({ mutationFn: removeOrderItemAPI, onSuccess: () => refetch() });
 
@@ -51,7 +50,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     return (
-        <OrderContext.Provider value={{ order: order || [], fetchOrder: refetch, updateOrderItem, removeOrderItem }}>
+        <OrderContext.Provider value={{ order: order || [], fetchOrder: refetch, updateOrderItem, removeOrderItem, isFetching }}>
             {children}
         </OrderContext.Provider>
     );

@@ -20,8 +20,6 @@ const PaymentPage: React.FC = () => {
 
         const data = await response.json();
 
-        console.log(data)
-
         return data['hydra:member'] || data;
     };
 

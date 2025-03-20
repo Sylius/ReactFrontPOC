@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import CheckoutLayout from '../../layouts/Checkout';
 import {useOrder} from "../../context/OrderContext";
@@ -12,7 +12,7 @@ import {useNavigate} from "react-router-dom";
 
 const SummaryPage: React.FC = () => {
 
-    const { order } = useOrder();
+    const { order, fetchOrder } = useOrder();
     const navigate = useNavigate()
 
     const [ extraNotes, setExtraNotes ] = useState<string>('');
@@ -40,6 +40,10 @@ const SummaryPage: React.FC = () => {
             setIsSubmitting(false);
         }
     };
+
+    useEffect(() => {
+        fetchOrder();
+    }, [fetchOrder]);
 
     return (
         <CheckoutLayout sidebarOn={false}>
