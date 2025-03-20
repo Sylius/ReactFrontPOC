@@ -15,8 +15,79 @@ const ProductPage: React.FC = () => {
     } | null>(null);
     const [variant, setVariant] = useState<any | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isAddToCartLoading, setIsAddToCartLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
+
+    const fetchVariantDetails = async (variantUrl: string) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}${variantUrl}`);
+            if (!response.ok) throw new Error("Nie udało się pobrać wariantu");
+
+            const variantData = await response.json();
+
+            return variantData;
+        } catch (error) {
+            console.error("Błąd pobierania wariantu:", error);
+            return null;
+        }
+    };
+
+    const fetchProduct = async () => {
+        const apiUrl = `${process.env.REACT_APP_API_URL}/api/v2/shop/products/${code}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error(`Błąd pobierania produktu: ${response.status}`);
+
+            const data = await response.json();
+
+            setProduct({
+                name: data.name,
+                description: data.description || "Brak opisu",
+                shortDescription: data.shortDescription || "Brak krótkiego opisu",
+                imageUrl: data.images?.[0]?.path || "https://via.placeholder.com/400"
+            });
+
+            const variantUrl = data.defaultVariant;
+            const variantData = await fetchVariantDetails(variantUrl);
+            if (variantData) {
+                setVariant(variantData);
+            }
+        } catch (err: any) {
+            console.error("Błąd pobierania produktu:", err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAddToCart = async () => {
+        setIsAddToCartLoading(true);
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    productVariant: variant.code,
+                    quantity
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to create order");
+            }
+
+            alert('Product added to cart');
+        } catch (err) {
+            console.error((err as Error).message);
+        } finally {
+            setIsAddToCartLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (!code) {
@@ -24,51 +95,6 @@ const ProductPage: React.FC = () => {
             setLoading(false);
             return;
         }
-
-        const fetchVariantDetails = async (variantUrl: string) => {
-            try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}${variantUrl}`);
-                if (!response.ok) throw new Error("Nie udało się pobrać wariantu");
-
-                const variantData = await response.json();
-
-                return variantData;
-            } catch (error) {
-                console.error("Błąd pobierania wariantu:", error);
-                return null;
-            }
-        };
-
-        const fetchProduct = async () => {
-            const apiUrl = `http://127.0.0.1:8000/api/v2/shop/products/${code}`;
-
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error(`Błąd pobierania produktu: ${response.status}`);
-
-                const data = await response.json();
-
-                setProduct({
-                    name: data.name,
-                    description: data.description || "Brak opisu",
-                    shortDescription: data.shortDescription || "Brak krótkiego opisu",
-                    imageUrl: data.images?.[0]?.path || "https://via.placeholder.com/400"
-                });
-
-                if (data.variants.length > 0) {
-                    const variantUrl = data.variants[0];
-                    const variantData = await fetchVariantDetails(variantUrl);
-                    if (variantData) {
-                        setVariant(variantData);
-                    }
-                }
-            } catch (err: any) {
-                console.error("Błąd pobierania produktu:", err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
 
         fetchProduct();
     }, [code]);
@@ -111,7 +137,7 @@ const ProductPage: React.FC = () => {
                             <div className="mb-2">
                                 <div className="d-flex gap-3 align-items-center">
                                     <div className="fs-3">
-                                        {variant?.price ? `$ ${formatPrice(variant.price)}` : "Brak ceny"}
+                                        {variant?.price ? `$${formatPrice(variant.price)}` : "Brak ceny"}
                                     </div>
                                 </div>
                             </div>
@@ -129,7 +155,7 @@ const ProductPage: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="mb-3">
-                                        <button type="button" className="btn btn-success px-4 py-2">Add to cart</button>
+                                        <button type="button" className="btn btn-success px-4 py-2" onClick={handleAddToCart} disabled={isAddToCartLoading}>Add to cart</button>
                                     </div>
                                 </form>
                             </div>
