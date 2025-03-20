@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../layouts/Default';
 import { Product, ProductVariantDetails } from '../types/Product';
 import Breadcrumbs from "../components/Breadcrumbs";
@@ -13,7 +14,7 @@ const ProductList: React.FC = () => {
     const [variantsData, setVariantsData] = useState<{ [productId: number]: ProductVariantDetails | null }>({});
 
     const fetchProducts = async (page: number): Promise<Product[]> => {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}api/v2/shop/products?itemsPerPage=9&page=${page}`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/products?itemsPerPage=9&page=${page}`);
         if (!response.ok) {
             throw new Error('Problem z pobieraniem produktów');
         }
@@ -134,7 +135,7 @@ const ProductList: React.FC = () => {
                         <div className="products-grid">
                             {products.map(product => (
                                 <div key={product.id}>
-                                    <a href={`/product/${product.slug}`} className="link-reset">
+                                    <Link to={`/product/${product.code}`} className="link-reset">
                                         <div className="mb-4">
                                             <div className="overflow-auto bg-light rounded-3">
                                                 <img
@@ -145,7 +146,7 @@ const ProductList: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="h6 text-break">{product.name}</div>
-                                    </a>
+                                    </Link>
                                     <div>
                                         {variantsData[product.id] ? (
                                             <>

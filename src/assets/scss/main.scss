@@ -9,14 +9,6 @@
   --bs-nav-link-hover-color: var(--bs-link-hover-color);
   --bs-link-color-rgb: 34, 185, 154;
   --bs-link-hover-color-rgb: 27, 148, 123;
-}
-
-* {
-  --bs-nav-link-color: #212529;
-  --bs-link-hover-color: #1b947b;
-  --bs-nav-link-hover-color: var(--bs-link-hover-color);
-  --bs-link-color-rgb: 34, 185, 154;
-  --bs-link-hover-color-rgb: 27, 148, 123;
   --bs-primary: #22B99A;
 }
 
@@ -108,6 +100,20 @@ a {
    }
  }
 }
+.accordion {
+  .accordion-item {
+    border-left: 0;
+    border-radius: 0;
+    border-right: 0;
+    button {
+      background-color: transparent;
+    }
+    .accordion-button:not(.collapsed) {
+      color: unset;
+    }
+  }
+}
+
 
 .btn.btn-primary {
   --bs-btn-color: #000;
