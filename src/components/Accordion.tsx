@@ -2,7 +2,7 @@ import React from "react";
 
 interface AccordionItem {
     title: string;
-    content: React.ReactNode; // ✅ Poprawione typowanie
+    content: React.ReactNode;
 }
 
 interface AccordionProps {

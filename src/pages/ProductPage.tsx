@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from '../layouts/Default';
 import { useParams } from "react-router-dom";
 import Breadcrumbs from "../components/Breadcrumbs";
-import BootstrapAccordion from "../components/Accordion"; // 🔥 Teraz mamy Bootstrapa!
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import BootstrapAccordion from "../components/Accordion";
 import {formatPrice} from "../utils/price";
 
 const ProductPage: React.FC = () => {
@@ -11,7 +10,7 @@ const ProductPage: React.FC = () => {
     const [product, setProduct] = useState<{
         name: string;
         description: string;
-        shortDescription: string;  // 🔥 Dodane!
+        shortDescription: string;
         imageUrl: string;
     } | null>(null);
     const [variant, setVariant] = useState<any | null>(null);
@@ -28,12 +27,10 @@ const ProductPage: React.FC = () => {
 
         const fetchVariantDetails = async (variantUrl: string) => {
             try {
-                console.log("Fetching variant from:", variantUrl);
                 const response = await fetch(`${process.env.REACT_APP_API_URL}${variantUrl}`);
                 if (!response.ok) throw new Error("Nie udało się pobrać wariantu");
 
                 const variantData = await response.json();
-                console.log("Variant data:", variantData);
 
                 return variantData;
             } catch (error) {
@@ -44,19 +41,17 @@ const ProductPage: React.FC = () => {
 
         const fetchProduct = async () => {
             const apiUrl = `http://127.0.0.1:8000/api/v2/shop/products/${code}`;
-            console.log("Fetching product from:", apiUrl);
 
             try {
                 const response = await fetch(apiUrl);
                 if (!response.ok) throw new Error(`Błąd pobierania produktu: ${response.status}`);
 
                 const data = await response.json();
-                console.log("Product data:", data);
 
                 setProduct({
                     name: data.name,
                     description: data.description || "Brak opisu",
-                    shortDescription: data.shortDescription || "Brak krótkiego opisu",  // 🔥 Dodane!
+                    shortDescription: data.shortDescription || "Brak krótkiego opisu",
                     imageUrl: data.images?.[0]?.path || "https://via.placeholder.com/400"
                 });
 
@@ -82,7 +77,6 @@ const ProductPage: React.FC = () => {
     if (error) return <p className="text-center text-danger">Błąd: {error}</p>;
     if (!product) return <p className="text-center text-danger">Błąd: Produkt nie został znaleziony</p>;
 
-    // 🔥 Konfiguracja Accordion
     const accordionItems = [
         { title: "Opis produktu", content: product.description },
         { title: "Atrybuty", content: "Tu będą atrybuty produktu..." },
@@ -105,7 +99,6 @@ const ProductPage: React.FC = () => {
                             <img src={product.imageUrl} alt={product.name} className="img-fluid w-100 h-100 object-fit-cover"/>
                         </div>
                     </div>
-                    {/* 🔥 Bootstrappowy Accordion */}
                     <BootstrapAccordion items={accordionItems} />
                 </div>
 
@@ -140,13 +133,6 @@ const ProductPage: React.FC = () => {
                                     </div>
                                 </form>
                             </div>
-                        </div>
-                        <div className="buttons-container">
-                            <button type="button" className="btn btn-warning px-4 py-2 w-100 mb-1">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
-                                     alt="PayPal" width="70"/>
-                                Checkout
-                            </button>
                         </div>
                         <div className="mb-3">
                             {product.shortDescription ? product.shortDescription : "Brak krótkiego opisu"}

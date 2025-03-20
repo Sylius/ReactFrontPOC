@@ -101,15 +101,15 @@ const ProductList: React.FC = () => {
                                         <input type="text" placeholder='Value' className='form-control-sm form-control'/>
                                         <button className='btn btn btn-outline-secondary btn-sm' type='submit'>
                                             <svg viewBox='0 0 24 24' className='icon'>
-                                                <path fill="none" stroke="currentColor" stroke-linecap="round"
-                                                      stroke-linejoin="round" stroke-width="2"
+                                                <path fill="none" stroke="currentColor" strokeLinecap="round"
+                                                      strokeLinejoin="round" strokeWidth="2"
                                                       d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6"></path>
                                             </svg>
                                         </button>
                                         <a href="#" className="btn btn btn-outline-secondary btn-sm">
                                             <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
-                                                <path fill="none" stroke="currentColor" stroke-linecap="round"
-                                                      stroke-linejoin="round" stroke-width="2"
+                                                <path fill="none" stroke="currentColor" strokeLinecap="round"
+                                                      strokeLinejoin="round" strokeWidth="2"
                                                       d="M18 6L6 18M6 6l12 12"></path>
                                             </svg>
                                         </a>
@@ -163,9 +163,7 @@ const ProductList: React.FC = () => {
                                 </div>
                             ))}
                         </div>
-                        {/* Paginacja */}
                         <div className="pagination justify-content-center mt-4">
-                            {/* Poprzednia strona */}
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
@@ -174,7 +172,6 @@ const ProductList: React.FC = () => {
                                 Poprzednia
                             </button>
 
-                            {/* Numerowane strony */}
                             {[...Array(totalPages)].map((_, index) => (
                                 <button
                                     key={index + 1}
@@ -186,7 +183,6 @@ const ProductList: React.FC = () => {
                                 </button>
                             ))}
 
-                            {/* Następna strona */}
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === totalPages}
@@ -197,8 +193,6 @@ const ProductList: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </Layout>
     );
