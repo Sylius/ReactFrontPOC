@@ -1,24 +1,35 @@
+// src/components/product/ProductCard.tsx
 import React from "react";
-import { Product } from "../types/Product";
+import { Link } from "react-router-dom";
+import { Product, ProductVariantDetails } from "../types/Product";
+import { formatPrice } from "../utils/price";
 
 interface ProductCardProps {
     product: Product;
+    variant: ProductVariantDetails | null;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, variant }) => {
     return (
-        <div className="card">
-            <img
-                src={product.images.length > 0 ? product.images[0].path : "https://via.placeholder.com/300"}
-                className="card-img-top"
-                alt={product.name}
-            />
-            <div className="card-body">
-                <h5 className="card-title">{product.name}</h5>
-                <p className="card-text">ID: {product.id}</p>
-                <a href={`/product/${product.id}`} className="btn btn-primary">
-                    Zobacz więcej
-                </a>
+        <div>
+            <Link to={`/product/${product.code}`} className="link-reset">
+                <div className="mb-4">
+                    <div className="overflow-auto bg-light rounded-3">
+                        <img
+                            src={product.images[0]?.path}
+                            alt={product.name}
+                            className="img-fluid w-100 h-100 object-fit-cover"
+                        />
+                    </div>
+                </div>
+                <div className="h6 text-break">{product.name}</div>
+            </Link>
+            <div>
+                {variant ? (
+                    <span>{variant.price ? `${formatPrice(variant.price)} zł` : "Brak ceny"}</span>
+                ) : (
+                    <span>Ładowanie danych wariantu...</span>
+                )}
             </div>
         </div>
     );

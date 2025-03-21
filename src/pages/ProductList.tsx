@@ -4,6 +4,7 @@ import Layout from '../layouts/Default';
 import { Product, ProductVariantDetails } from '../types/Product';
 import Breadcrumbs from "../components/Breadcrumbs";
 import { formatPrice } from "../utils/price";
+import ProductCard from '../components/ProductCard';
 
 const ProductList: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -134,33 +135,11 @@ const ProductList: React.FC = () => {
 
                         <div className="products-grid">
                             {products.map(product => (
-                                <div key={product.id}>
-                                    <Link to={`/product/${product.code}`} className="link-reset">
-                                        <div className="mb-4">
-                                            <div className="overflow-auto bg-light rounded-3">
-                                                <img
-                                                    src={product.images[0]?.path}
-                                                    alt={product.name}
-                                                    className="img-fluid w-100 h-100 object-fit-cover"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="h6 text-break">{product.name}</div>
-                                    </Link>
-                                    <div>
-                                        {variantsData[product.id] ? (
-                                            <>
-                                                <span>
-                                                    {variantsData[product.id]?.price
-                                                        ? `${formatPrice(variantsData[product.id]?.price)} zł`
-                                                        : "Brak ceny"}
-                                                </span>
-                                            </>
-                                        ) : (
-                                            <span>Ładowanie danych wariantu...</span>
-                                        )}
-                                    </div>
-                                </div>
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    variant={variantsData[product.id]}
+                                />
                             ))}
                         </div>
                         <div className="pagination justify-content-center mt-4">
