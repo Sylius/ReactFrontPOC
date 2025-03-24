@@ -20,7 +20,7 @@ const App: React.FC = () => {
         <OrderProvider>
             <Routes>
                 <Route path="/" element={<Homepage />} />
-                <Route path="/products" element={<ProductList />} />
+                <Route path="/:parentCode/:childCode" element={<ProductList />} />
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/checkout/address" element={<AddressPage />} />
                 <Route path="/checkout/select-shipping" element={<ShippingPage />} />

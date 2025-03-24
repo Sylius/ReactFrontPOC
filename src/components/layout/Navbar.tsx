@@ -85,7 +85,8 @@ const Navbar: React.FC = () => {
 
                                     <div className="dropdown-menu position-absolute">
                                         {childrenMap[taxon.id].map((child) => (
-                                            <Link key={child.id} className="nav-link nav-link-padding" to={`/${child.slug}`}>
+                                            <Link key={child.id} className="nav-link nav-link-padding"
+                                                  to={`/${taxon.code}/${child.code}`}>
                                                 {child.name}
                                             </Link>
                                         ))}
