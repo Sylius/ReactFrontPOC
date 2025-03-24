@@ -1,16 +1,14 @@
 export interface Product {
     id: number;
-    code: string;
     slug: string;
     name: string;
+    code: string;
     description: string;
     shortDescription: string;
-    variants: string[]; // 🔥 Teraz to tablica URL-i, a nie pełne obiekty!
+    variants: string[];
     images: Image[];
 }
 
-
-// 🔹 Nowy interfejs dla szczegółów wariantu
 export interface ProductVariantDetails {
     id: number;
     price: number;
