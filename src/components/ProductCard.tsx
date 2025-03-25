@@ -1,24 +1,58 @@
-import React from "react";
-import { Product } from "../types/Product";
+// src/components/product/ProductCard.tsx
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Product, ProductVariantDetails } from "../types/Product";
+import { formatPrice } from "../utils/price";
 
 interface ProductCardProps {
     product: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+    const [variant, setVariant] = useState<ProductVariantDetails | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const fetchVariant = async () => {
+            if (!product.variants.length) return;
+            try {
+                const res = await fetch(`${process.env.REACT_APP_API_URL}${product.variants[0]}`);
+                if (!res.ok) throw new Error("Błąd pobierania wariantu");
+                const data = await res.json();
+                setVariant(data);
+            } catch (error) {
+                console.error("Błąd ładowania wariantu produktu:", error);
+                setVariant(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchVariant();
+    }, [product]);
+
     return (
-        <div className="card">
-            <img
-                src={product.images.length > 0 ? product.images[0].path : "https://via.placeholder.com/300"}
-                className="card-img-top"
-                alt={product.name}
-            />
-            <div className="card-body">
-                <h5 className="card-title">{product.name}</h5>
-                <p className="card-text">ID: {product.id}</p>
-                <a href={`/product/${product.id}`} className="btn btn-primary">
-                    Zobacz więcej
-                </a>
+        <div>
+            <Link to={`/product/${product.code}`} className="link-reset">
+                <div className="mb-4">
+                    <div className="overflow-auto bg-light rounded-3">
+                        <img
+                            src={product.images[0]?.path}
+                            alt={product.name}
+                            className="img-fluid w-100 h-100 object-fit-cover"
+                        />
+                    </div>
+                </div>
+                <div className="h6 text-break">{product.name}</div>
+            </Link>
+            <div>
+                {loading ? (
+                    <span>Ładowanie ceny...</span>
+                ) : variant?.price ? (
+                    <span>{formatPrice(variant.price)} zł</span>
+                ) : (
+                    <span>Brak ceny</span>
+                )}
             </div>
         </div>
     );
