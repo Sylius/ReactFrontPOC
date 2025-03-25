@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 
 import CheckoutLayout from '../../layouts/Checkout';
 import {Link} from "react-router";
 import {useOrder} from "../../context/OrderContext";
 import {useQuery} from "@tanstack/react-query";
-import { formatPrice } from "../../utils/price";
 import {useNavigate} from "react-router-dom";
 import Steps from "../../components/checkout/Steps";
+import GooglePay from "../../components/checkout/payments/GooglePay";
 
 const PaymentPage: React.FC = () => {
 
@@ -58,7 +58,6 @@ const PaymentPage: React.FC = () => {
         <CheckoutLayout>
             <div className="col-12 col-lg-7 pt-4 pb-5">
                 <div className="pe-lg-6">
-
                     <Steps activeStep="payment"/>
 
                     <div data-controller="live" data-live-name-value="sylius_shop:checkout:payment:form"
@@ -75,13 +74,13 @@ const PaymentPage: React.FC = () => {
                             </h5>
 
                             <div className="mb-5">
-                                { hasErrors &&
+                                {hasErrors &&
                                     <div className="invalid-feedback d-block">
                                         Please select payment method.
                                     </div>
                                 }
-                                { paymentMethods?.map((method: any) => (
-                                    <div className="card bg-body-tertiary border-0 mb-3" key={ method.id }>
+                                {paymentMethods?.map((method: any) => (
+                                    <div className="card bg-body-tertiary border-0 mb-3" key={method.id}>
                                         <label className="card-body">
                                             <div>
                                                 <div className="form-check">
@@ -98,19 +97,20 @@ const PaymentPage: React.FC = () => {
                                                     <label
                                                         className="form-check-label required"
                                                         htmlFor="sylius_shop_checkout_select_payment_payments_0_method_1">
-                                                        { method.name }
+                                                        {method.name}
                                                     </label>
                                                 </div>
                                             </div>
 
                                             <div className="ps-4">
                                                 <small className="text-black-50">
-                                                    { method.description }
+                                                    {method.description}
                                                 </small>
                                             </div>
                                         </label>
                                     </div>
                                 ))}
+                                <GooglePay />
                             </div>
 
 
