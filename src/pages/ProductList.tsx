@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Layout from '../layouts/Default';
-import { Product, ProductVariantDetails } from '../types/Product';
+import { Product } from '../types/Product';
 import Breadcrumbs from "../components/Breadcrumbs";
 import ProductCard from '../components/ProductCard';
 
@@ -23,27 +23,15 @@ const ProductList: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [totalPages, setTotalPages] = useState<number>(1);
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [variantsData, setVariantsData] = useState<{ [productId: number]: ProductVariantDetails | null }>({});
     const [taxonDetails, setTaxonDetails] = useState<TaxonDetails | null>(null);
 
     const fetchProducts = async (page: number, code: string): Promise<Product[]> => {
         const url = `${process.env.REACT_APP_API_URL}/api/v2/shop/products?itemsPerPage=9&page=${page}&productTaxons.taxon.code=${code}`;
-        const response: Response = await fetch(url);
+        const response = await fetch(url);
         const data = await response.json();
         const totalItems = data['hydra:totalItems'] || 0;
         setTotalPages(Math.max(1, Math.ceil(totalItems / 9)));
         return data['hydra:member'] || [];
-    };
-
-    const fetchVariantDetails = async (variantUrl: string): Promise<ProductVariantDetails | null> => {
-        try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}${variantUrl}`);
-            if (!response.ok) throw new Error("Nie udało się pobrać wariantu");
-            return await response.json();
-        } catch (error) {
-            console.error("Błąd pobierania wariantu:", error);
-            return null;
-        }
     };
 
     const fetchTaxonDetails = async (code: string): Promise<TaxonDetails | null> => {
@@ -93,15 +81,6 @@ const ProductList: React.FC = () => {
 
                 setProducts(productsData);
                 setTaxonDetails(taxonData);
-
-                const variantsMap: { [productId: number]: ProductVariantDetails | null } = {};
-                for (const product of productsData) {
-                    if (product.variants.length > 0) {
-                        const variantData = await fetchVariantDetails(product.variants[0]);
-                        variantsMap[product.id] = variantData;
-                    }
-                }
-                setVariantsData(variantsMap);
             } catch (err: any) {
                 setError(err.message);
             } finally {
@@ -132,9 +111,7 @@ const ProductList: React.FC = () => {
                     { label: taxonDetails?.name || childCode || "", url: `/${parentCode}/${childCode}` }
                 ]} />
                 <div className="row mt-5">
-                    <div className="col-12 col-lg-3">
-
-                    </div>
+                    <div className="col-12 col-lg-3">{/* Tu mogą być filtry lub kategorie */}</div>
                     <div className="col-12 col-lg-9">
                         <div className="mb-4">
                             <h1 className="mb-3">{taxonDetails?.name || childCode}</h1>
@@ -146,7 +123,6 @@ const ProductList: React.FC = () => {
                                     <ProductCard
                                         key={product.id}
                                         product={product}
-                                        variant={variantsData[product.id]}
                                     />
                                 ))
                             ) : (

@@ -1,15 +1,36 @@
 // src/components/product/ProductCard.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Product, ProductVariantDetails } from "../types/Product";
 import { formatPrice } from "../utils/price";
 
 interface ProductCardProps {
     product: Product;
-    variant: ProductVariantDetails | null;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, variant }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+    const [variant, setVariant] = useState<ProductVariantDetails | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const fetchVariant = async () => {
+            if (!product.variants.length) return;
+            try {
+                const res = await fetch(`${process.env.REACT_APP_API_URL}${product.variants[0]}`);
+                if (!res.ok) throw new Error("Błąd pobierania wariantu");
+                const data = await res.json();
+                setVariant(data);
+            } catch (error) {
+                console.error("Błąd ładowania wariantu produktu:", error);
+                setVariant(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchVariant();
+    }, [product]);
+
     return (
         <div>
             <Link to={`/product/${product.code}`} className="link-reset">
@@ -25,10 +46,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant }) => {
                 <div className="h6 text-break">{product.name}</div>
             </Link>
             <div>
-                {variant ? (
-                    <span>{variant.price ? `${formatPrice(variant.price)} zł` : "Brak ceny"}</span>
+                {loading ? (
+                    <span>Ładowanie ceny...</span>
+                ) : variant?.price ? (
+                    <span>{formatPrice(variant.price)} zł</span>
                 ) : (
-                    <span>Ładowanie danych wariantu...</span>
+                    <span>Brak ceny</span>
                 )}
             </div>
         </div>
