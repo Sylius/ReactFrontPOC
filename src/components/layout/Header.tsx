@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router';
 import {useOrder} from "../../context/OrderContext";
 import {formatPrice} from "../../utils/price";
+import {useCustomer} from "../../context/CustomerContext";
+import UserNavigation from "./header/UserNavigation";
 
 const Header =  () => {
     const { order } = useOrder();
@@ -30,42 +32,7 @@ const Header =  () => {
                         </Link>
                     </div>
 
-                    <div className="col-auto">
-
-                        <div className="d-flex align-items-center">
-                            <div className="d-lg-none">
-                                <a href="/en_US/login" className="btn btn-icon btn-transparent px-0"
-                                   aria-label="account button">
-                                    <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
-                                        <path fill="none" stroke="currentColor" strokeLinecap="round"
-                                              strokeLinejoin="round" strokeWidth="2"
-                                              d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"></path>
-                                    </svg>
-                                </a>
-                            </div>
-
-                            <div className="d-none d-lg-flex align-items-center gap-2 ps-2">
-                                <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
-                                    <path fill="none" stroke="currentColor" strokeLinecap="round"
-                                          strokeLinejoin="round" strokeWidth="2"
-                                          d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"></path>
-                                </svg>
-
-
-                                <a href="/en_US/login" className="link-reset" id="login-page-button">
-                                    Login
-                                </a>
-
-
-                                <small className="text-black-50 px-1">|</small>
-                                <a href="/en_US/register" className="link-reset" id="register-page-button">
-                                    Register
-                                </a>
-
-                            </div>
-                        </div>
-                    </div>
-
+                    <UserNavigation />
 
                     <div className="col-auto position-relative" data-controller="live"
                          data-live-name-value="sylius_shop:cart:widget"
