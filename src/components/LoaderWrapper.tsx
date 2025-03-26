@@ -1,4 +1,3 @@
-// src/components/LoaderWrapper.tsx
 import React from "react";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -6,9 +5,9 @@ import 'react-loading-skeleton/dist/skeleton.css';
 interface LoaderWrapperProps {
     isLoading: boolean;
     children: React.ReactNode;
-    skeletonCount?: number;     // liczba szkieletów do pokazania (opcjonalne)
-    skeletonHeight?: number;    // wysokość szkieletu (opcjonalne)
-    fullWidth?: boolean;        // czy skeleton ma zajmować 100% szerokości
+    skeletonCount?: number;
+    skeletonHeight?: number;
+    fullWidth?: boolean;
 }
 
 const LoaderWrapper: React.FC<LoaderWrapperProps> = ({
