@@ -4,6 +4,8 @@ import Layout from '../layouts/Default';
 import { Product } from '../types/Product';
 import Breadcrumbs from "../components/Breadcrumbs";
 import ProductCard from '../components/ProductCard';
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 interface TaxonDetails {
     name: string;
@@ -97,7 +99,6 @@ const ProductList: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="text-center">Ładowanie produktów...</div>;
     if (error) return <div className="text-center text-danger">Błąd: {error}</div>;
 
     return (
@@ -114,8 +115,12 @@ const ProductList: React.FC = () => {
                     <div className="col-12 col-lg-3">{/* Tu mogą być filtry lub kategorie */}</div>
                     <div className="col-12 col-lg-9">
                         <div className="mb-4">
-                            <h1 className="mb-3">{taxonDetails?.name || childCode}</h1>
-                            <div>{taxonDetails?.description || "Brak opisu tej kategorii."}</div>
+                            <h1 className="mb-3">
+                                {loading ? <Skeleton /> : (taxonDetails?.name || childCode)}
+                            </h1>
+                            <div>
+                                {loading ? <Skeleton count={2} /> : (taxonDetails?.description || "Brak opisu tej kategorii.")}
+                            </div>
                         </div>
                         <div className="products-grid">
                             {products.length > 0 ? (
@@ -125,7 +130,7 @@ const ProductList: React.FC = () => {
                                         product={product}
                                     />
                                 ))
-                            ) : (
+                            ) : !loading && (
                                 <div className="text-center">Brak produktów w tej kategorii.</div>
                             )}
                         </div>
