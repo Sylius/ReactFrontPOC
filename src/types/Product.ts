@@ -7,12 +7,25 @@ export interface Product {
     shortDescription: string;
     variants: string[];
     images: Image[];
+    options?: string[];
+}
+
+export interface ProductOption {
+    code: string;
+    name: string;
+    values: ProductOptionValue[];
+}
+
+export interface ProductOptionValue {
+    code: string;
+    value: string;
 }
 
 export interface ProductVariantDetails {
     id: number;
     price: number;
     code: string;
+    name?: string;
 }
 
 export interface Image {
