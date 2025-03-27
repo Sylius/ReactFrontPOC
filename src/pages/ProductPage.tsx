@@ -55,7 +55,6 @@ const ProductPage: React.FC = () => {
             .join("&");
 
         const fullUrl = `${baseUrl}?${productParam}&${optionParams}`;
-        console.log("Wywołuję fetchVariantByOptions z URL:", fullUrl);
 
         const res = await fetch(fullUrl);
         const data = await res.json();
@@ -94,7 +93,6 @@ const ProductPage: React.FC = () => {
 
     const handleOptionChange = (optionCode: string, valueCode: string) => {
         const updated = { ...selectedValues, [optionCode]: valueCode };
-        console.log("Zmiana opcji:", updated);
         setSelectedValues(updated);
 
         if (product) {
