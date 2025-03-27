@@ -11,6 +11,7 @@ import PaymentPage from "./pages/Checkout/PaymentPage";
 import SummaryPage from "./pages/Checkout/SummaryPage";
 import ThankYouPage from "./pages/Checkout/ThankYouPage";
 import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/account/DashboardPage";
 
 import './assets/scss/main.scss';
 import {OrderProvider} from "./context/OrderContext";
@@ -32,6 +33,7 @@ const App: React.FC = () => {
                     <Route path="/order/thank-you" element={<ThankYouPage />} />
                     <Route path="/product/:code" element={<ProductPage />} />
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/account/dashboard" element={<DashboardPage />} />
                 </Routes>
             </OrderProvider>
         </CustomerProvider>

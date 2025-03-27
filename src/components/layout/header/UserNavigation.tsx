@@ -49,9 +49,9 @@ const UserNavigation: React.FC = () => {
                         </span>
 
                         <small className="text-black-50 px-1">|</small>
-                        <a href="/en_US/account/dashboard" className="link-reset" id="my-account-button">
+                        <Link to="/account/dashboard" className="link-reset" id="my-account-button">
                             My account
-                        </a>
+                        </Link>
 
                         <small className="text-black-50 px-1">|</small>
                         <button className="btn btn-transparent px-0" id="logout-button" onClick={handleLogout}>
