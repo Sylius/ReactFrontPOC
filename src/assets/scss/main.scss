@@ -320,3 +320,8 @@ input.form-check-input:checked {
     position: relative !important;
   }
 }
+@media (max-width: 990px) {
+  body {
+    overflow: auto !important;
+  }
+}
