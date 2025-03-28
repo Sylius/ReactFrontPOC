@@ -83,7 +83,7 @@ const Navbar: React.FC = () => {
                                         </svg>
                                     </a>
 
-                              <div className="dropdown-menu position-relative position-lg-absolute border-0 border-lg dropdown-custom">
+                                    <div className="dropdown-menu position-absolute border dropdown-custom ">
                                         {childrenMap[taxon.id].map((child) => (
                                             <Link key={child.id} className="nav-link nav-link-padding"
                                                   to={`/${taxon.code}/${child.code}`}>

@@ -314,3 +314,9 @@ input.form-check-input:checked {
 .modal-backdrop {
   display: none !important;
 }
+@media (max-width: 990px) {
+  .dropdown-menu.dropdown-custom {
+    border: none !important;
+    position: relative !important;
+  }
+}
