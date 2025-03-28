@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Sylius Demo",
+  "name": "Sylius React Demo ",
   "icons": [
     {
       "src": "favicon.ico",
@@ -13,6 +13,11 @@
       "sizes": "192x192"
     },
     {
+      "src": "logo280.png",
+      "type": "image/png",
+      "sizes": "280x280"
+    },
+    {
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
@@ -20,6 +25,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#1C997F",
   "background_color": "#ffffff"
 }
