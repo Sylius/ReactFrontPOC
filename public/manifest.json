@@ -8,9 +8,9 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo280.png",
+      "src": "logo192.png",
       "type": "image/png",
-      "sizes": "280x280"
+      "sizes": "192x192"
     }
   ],
   "start_url": ".",
