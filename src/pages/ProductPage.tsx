@@ -26,7 +26,7 @@ const ProductPage: React.FC = () => {
     const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
-    const [showConfirmation, setShowConfirmation] = useState(false); // ✅ nowy stan
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     const fetchOption = async (url: string): Promise<ProductOption> => {
         const res = await fetch(`${process.env.REACT_APP_API_URL}${url}`);
