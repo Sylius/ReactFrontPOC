@@ -54,7 +54,7 @@ const Header =  () => {
                                             <path d="M9 11V6a3 3 0 0 1 6 0v5"></path>
                                         </g>
                                     </svg>
-                                    ${ formatPrice(order.total) }
+                                    <div className="d-none d-md-block">${formatPrice(order.total)} </div>
                                 </button>
                             </div>
                         </Link>
