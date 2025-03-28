@@ -68,8 +68,8 @@ const AddressPage: React.FC = () => {
 
     return (
         <CheckoutLayout>
-            <div className="col-12 col-lg-7 pt-4 pb-5">
-                <div className="pe-lg-6">
+            <div className="col pt-4 pb-5">
+                <div>
                     <Steps activeStep="address"/>
 
                     <div data-controller="live" data-live-name-value="sylius_shop:checkout:address:form"

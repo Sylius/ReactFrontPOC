@@ -63,7 +63,7 @@ const UserNavigation: React.FC = () => {
                 <div className="col-auto">
                     <div className="d-flex align-items-center">
                         <div className="d-lg-none">
-                            <a href="/en_US/login" className="btn btn-icon btn-transparent px-0"
+                            <a href="/login" className="btn btn-icon btn-transparent px-0"
                                aria-label="account button">
                                 <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
                                     <path fill="none" stroke="currentColor" strokeLinecap="round"

@@ -57,10 +57,10 @@ const ShippingPage: React.FC = () => {
     return (
         <CheckoutLayout>
             <div className="col-12 col-lg-7 pt-4 pb-5">
-                <div className="pe-lg-6">
+                <div>
                     <Steps activeStep="shipping"/>
 
-                    <div>
+                    <div className='pe-lg-6'>
                         <form name="sylius_shop_checkout_select_shipping" method="post"
                               noValidate={true} onSubmit={ handleSubmit }>
 

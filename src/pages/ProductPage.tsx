@@ -26,6 +26,7 @@ const ProductPage: React.FC = () => {
     const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     const fetchOption = async (url: string): Promise<ProductOption> => {
         const res = await fetch(`${process.env.REACT_APP_API_URL}${url}`);
@@ -55,7 +56,6 @@ const ProductPage: React.FC = () => {
             .join("&");
 
         const fullUrl = `${baseUrl}?${productParam}&${optionParams}`;
-
         const res = await fetch(fullUrl);
         const data = await res.json();
         setVariant(data["hydra:member"]?.[0] || null);
@@ -114,6 +114,7 @@ const ProductPage: React.FC = () => {
             });
             if (!response.ok) throw new Error("Nie udało się dodać do koszyka");
             fetchOrder();
+            setShowConfirmation(true); // ✅ pokaż komunikat
         } catch (err) {
             console.error(err);
         } finally {
@@ -140,7 +141,6 @@ const ProductPage: React.FC = () => {
             <div className="container mt-4 mb-5">
                 <Breadcrumbs paths={[
                     { label: "Strona główna", url: "/" },
-                    { label: "Produkty", url: "/products" },
                     { label: product?.name || "...", url: `/product/${code}` }
                 ]} />
 
@@ -204,7 +204,20 @@ const ProductPage: React.FC = () => {
                             </div>
 
                             <div className="mb-3">{product?.shortDescription || "Brak krótkiego opisu"}</div>
+
                             <small className="text-body-tertiary">{product?.name.replace(/\s+/g, "_")}</small>
+
+                            {showConfirmation && (
+                                <div className="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                                    Produkt został dodany do koszyka!
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        aria-label="Close"
+                                        onClick={() => setShowConfirmation(false)}
+                                    ></button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

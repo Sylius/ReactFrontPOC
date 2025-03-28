@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 const Footer =  () => {
 return (
     <div className="mt-auto border-top mt-5 py-5">
@@ -35,7 +36,7 @@ return (
                             <a href="https://sylius.com/partner/paypal/" target="_blank"
                                className="d-block border rounded p-2">
                                 <img className="img-fluid" loading="lazy"
-                                     src="/build/shop/images/paypal-logo.88881bcb.svg" width="100%" height="100%"
+                                     src="/paypal-logo.svg" width="100%" height="100%"
                                      alt="PayPal"/>
                             </a>
                         </div>
@@ -43,7 +44,7 @@ return (
                             <a href="https://sylius.com/partner/adyen/" target="_blank"
                                className="d-block border rounded p-2">
                                 <img className="img-fluid" loading="lazy"
-                                     src="/build/shop/images/adyen-logo.23b1b26a.svg" width="100%" height="100%"
+                                     src="/adyen-logo.svg" width="100%" height="100%"
                                      alt="Adyen"/>
                             </a>
                         </div>
@@ -51,7 +52,7 @@ return (
                             <a href="https://sylius.com/partner/mollie/" target="_blank"
                                className="d-block border rounded p-2">
                                 <img className="img-fluid" loading="lazy"
-                                     src="/build/shop/images/mollie-logo.fa881b7d.svg" width="100%" height="100%"
+                                     src="/mollie-logo.svg" width="100%" height="100%"
                                      alt="Mollie"/>
                             </a>
                         </div>
