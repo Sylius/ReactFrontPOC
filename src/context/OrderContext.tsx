@@ -76,6 +76,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     const newToken = await pickupCart();
                     localStorage.setItem("orderToken", newToken);
                     setOrderToken(newToken);
+                    await refetch();
                 } catch (error) {
                     console.error("Error generating order token:", error);
                 }
