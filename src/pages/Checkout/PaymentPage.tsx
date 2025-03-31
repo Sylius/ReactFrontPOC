@@ -10,7 +10,7 @@ import GooglePay from "../../components/checkout/payments/GooglePay";
 
 const PaymentPage: React.FC = () => {
 
-    const { order } = useOrder();
+    const { order, fetchOrder } = useOrder();
     const navigate = useNavigate()
 
     const fetchPaymentMethodsFromAPI = async (): Promise<any> => {
@@ -30,15 +30,15 @@ const PaymentPage: React.FC = () => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const [hasErrors, setHasErrors] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (e?: React.FormEvent) => {
+        e?.preventDefault();
         setIsSubmitting(true);
 
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem("orderToken")}/payments/${order.payments[0].id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/merge-patch+json" },
-                body: JSON.stringify({ paymentMethod })
+                body: JSON.stringify({ paymentMethod: paymentMethod ? paymentMethod : order.payments[0].method }),
             });
 
             if (!response.ok) {
@@ -46,6 +46,7 @@ const PaymentPage: React.FC = () => {
                 throw new Error("Nie udało się wysłać metody dostawy");
             }
 
+            await fetchOrder();
             navigate("/checkout/complete");
         } catch (error) {
             console.error("Error submitting order:", error);
@@ -110,7 +111,7 @@ const PaymentPage: React.FC = () => {
                                         </label>
                                     </div>
                                 ))}
-                                <GooglePay />
+                                <GooglePay submitFunction={handleSubmit} />
                             </div>
 
 

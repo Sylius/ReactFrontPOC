@@ -1,11 +1,13 @@
 import React from "react";
 import {formatPrice} from "../../../utils/price";
 import {useOrder} from "../../../context/OrderContext";
-import {useNavigate} from "react-router-dom";
 
-const GooglePay:React.FC = () => {
+interface GooglePayProps {
+    submitFunction: (e?: React.FormEvent) => Promise<void>;
+}
+
+const GooglePay:React.FC<GooglePayProps> = ({submitFunction}) => {
     const { order } = useOrder();
-    const navigate = useNavigate();
     const pay = async () => {
         const supportedInstruments = [
             {
@@ -62,7 +64,7 @@ const GooglePay:React.FC = () => {
         const response = await request.show();
 
         await response.complete("success");
-        navigate('/checkout/complete');
+        await submitFunction();
     }
 
     return (
