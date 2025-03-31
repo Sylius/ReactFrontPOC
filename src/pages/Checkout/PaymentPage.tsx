@@ -10,7 +10,7 @@ import GooglePay from "../../components/checkout/payments/GooglePay";
 
 const PaymentPage: React.FC = () => {
 
-    const { order } = useOrder();
+    const { order, fetchOrder } = useOrder();
     const navigate = useNavigate()
 
     const fetchPaymentMethodsFromAPI = async (): Promise<any> => {
@@ -38,7 +38,7 @@ const PaymentPage: React.FC = () => {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem("orderToken")}/payments/${order.payments[0].id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/merge-patch+json" },
-                body: JSON.stringify({ paymentMethod: paymentMethod ? paymentMethod : paymentMethods[0].code }),
+                body: JSON.stringify({ paymentMethod: paymentMethod ? paymentMethod : order.payments[0].method }),
             });
 
             if (!response.ok) {
@@ -46,6 +46,7 @@ const PaymentPage: React.FC = () => {
                 throw new Error("Nie udało się wysłać metody dostawy");
             }
 
+            await fetchOrder();
             navigate("/checkout/complete");
         } catch (error) {
             console.error("Error submitting order:", error);
