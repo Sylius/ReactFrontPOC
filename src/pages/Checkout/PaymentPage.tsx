@@ -30,15 +30,15 @@ const PaymentPage: React.FC = () => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const [hasErrors, setHasErrors] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (e?: React.FormEvent) => {
+        e?.preventDefault();
         setIsSubmitting(true);
 
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem("orderToken")}/payments/${order.payments[0].id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/merge-patch+json" },
-                body: JSON.stringify({ paymentMethod })
+                body: JSON.stringify({ paymentMethod: paymentMethod ? paymentMethod : paymentMethods[0].code }),
             });
 
             if (!response.ok) {
@@ -110,7 +110,7 @@ const PaymentPage: React.FC = () => {
                                         </label>
                                     </div>
                                 ))}
-                                <GooglePay />
+                                <GooglePay submitFunction={handleSubmit} />
                             </div>
 
 
