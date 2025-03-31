@@ -57,7 +57,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 {loading ? (
                     <Skeleton width={80} height={20}/>
                 ) : variant?.price ? (
-                    <span>{formatPrice(variant.price)} zł</span>
+                    <span>${formatPrice(variant.price)}</span>
                 ) : (
                     <span>Brak ceny</span>
                 )}
