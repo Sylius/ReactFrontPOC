@@ -114,7 +114,7 @@ const ProductPage: React.FC = () => {
             });
             if (!response.ok) throw new Error("Nie udało się dodać do koszyka");
             fetchOrder();
-            setShowConfirmation(true); // ✅ pokaż komunikat
+            setShowConfirmation(true);
         } catch (err) {
             console.error(err);
         } finally {
@@ -167,7 +167,7 @@ const ProductPage: React.FC = () => {
                             </div>
 
                             <div className="fs-3 mb-3">
-                                {loading ? <Skeleton width={100} /> : variant?.price ? `${formatPrice(variant.price)} zł` : "Brak ceny"}
+                                {loading ? <Skeleton width={100} /> : variant?.price ? `$${formatPrice(variant.price)}` : "Brak ceny"}
                             </div>
 
                             {options.map(option => (
