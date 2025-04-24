@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useLocation } from 'react-router-dom';
 
 interface OrderContextType {
   order: any;
@@ -86,11 +85,35 @@ const removeOrderItemAPI = async (id: number) => {
 export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const [orderToken, setOrderToken] = useState<string | null>(localStorage.getItem('orderToken') ?? null);
+
   const {
     data: order,
     refetch,
     isFetching,
-  } = useQuery({ queryKey: ['order'], queryFn: fetchOrderFromAPI });
+  } = useQuery({ queryKey: ['order'], queryFn: async () => {
+      if (!orderToken) {
+        const newToken = await pickupCart();
+
+        setOrderToken(newToken);
+        localStorage.setItem('orderToken', newToken);
+
+        return fetchOrderFromAPI();
+      }
+
+      try {
+        return await fetchOrderFromAPI();
+      } catch (error) {
+        console.warn('Invalid token, generating a new order...');
+        const newToken = await pickupCart();
+
+        setOrderToken(newToken);
+        localStorage.setItem('orderToken', newToken);
+
+        return fetchOrderFromAPI();
+      }
+    }
+  });
   const updateMutation = useMutation({
     mutationFn: updateOrderItemAPI,
     onSuccess: () => refetch(),
@@ -100,28 +123,11 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({
     onSuccess: () => refetch(),
   });
 
-  const [orderToken, setOrderToken] = useState<string | null>(null);
-  const location = useLocation();
-
   useEffect(() => {
-    const checkAndGenerateOrderToken = async () => {
-      const existingToken = localStorage.getItem('orderToken');
-      if (!existingToken) {
-        try {
-          const newToken = await pickupCart();
-          localStorage.setItem('orderToken', newToken);
-          setOrderToken(newToken);
-          await refetch();
-        } catch (error) {
-          console.error('Error generating order token:', error);
-        }
-      } else {
-        setOrderToken(existingToken);
-      }
-    };
-
-    checkAndGenerateOrderToken();
-  }, [location.pathname]);
+    if (orderToken) {
+      localStorage.setItem('orderToken', orderToken);
+    }
+  }, [orderToken]);
 
   const updateOrderItem = (id: number, quantity: number) => {
     updateMutation.mutate({ id, quantity });
