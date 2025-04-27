@@ -96,7 +96,11 @@ const Navbar: FC = () => {
                   </div>
                 </div>
               ) : (
-                <Link key={taxon.id} className='nav-link' to={`/${taxon.slug}`}>
+                <Link
+                  key={taxon.id}
+                  className='nav-link d-flex align-items-center'
+                  to={`/${taxon.slug}`}
+                >
                   {taxon.name}
                 </Link>
               );

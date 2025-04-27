@@ -36,15 +36,16 @@ const pickupCart = async () => {
   }
 };
 
-const fetchOrderFromAPI = async (): Promise<any> => {
+export const fetchOrderFromAPI = async (): Promise<any> => {
   const response = await apiFetch(`/api/v2/shop/orders/${localStorage.getItem('orderToken')}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
   });
+
   if (!response.ok) {
-    throw new Error('Problem z pobieraniem produktów');
+    throw new Error('Problem fetching products');
   }
 
   const data = await response.json();
@@ -52,7 +53,7 @@ const fetchOrderFromAPI = async (): Promise<any> => {
   return data['hydra:member'] || data;
 };
 
-const updateOrderItemAPI = async ({
+export const updateOrderItemAPI = async ({
   id,
   quantity,
 }: {
@@ -60,22 +61,28 @@ const updateOrderItemAPI = async ({
   quantity: number;
 }) => {
   const response = await apiFetch(
-    `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}}`,
+    `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/merge-patch+json' },
       body: JSON.stringify({ quantity: quantity }),
     },
   );
-  if (!response.ok) throw new Error('Nie udało się zmienić ilości produktu');
+
+  if (!response.ok) {
+    throw new Error('Failed to update the quantity of the product');
+  }
 };
 
-const removeOrderItemAPI = async (id: number) => {
+export const removeOrderItemAPI = async (id: number) => {
   const response = await apiFetch(
     `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
     { method: 'DELETE' },
   );
-  if (!response.ok) throw new Error('Nie udało się usunąć produktu z koszyka');
+
+  if (!response.ok) {
+    throw new Error('Failed to remove item from the cart');
+  }
 };
 
 export const OrderProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -96,23 +103,23 @@ export const OrderProvider: FC<{ children: React.ReactNode }> = ({ children }) =
   const [orderToken, setOrderToken] = useState<string | null>(null);
   const location = useLocation();
 
-  useEffect(() => {
-    const checkAndGenerateOrderToken = async () => {
-      const existingToken = localStorage.getItem('orderToken');
-      if (!existingToken || existingToken === 'undefined') {
-        try {
-          const newToken = await pickupCart();
-          localStorage.setItem('orderToken', newToken);
-          setOrderToken(newToken);
-          await refetch();
-        } catch (error) {
-          console.error('Error generating order token:', error);
-        }
-      } else {
-        setOrderToken(existingToken);
+  const checkAndGenerateOrderToken = async () => {
+    const existingToken = localStorage.getItem('orderToken');
+    if (!existingToken || existingToken === 'undefined') {
+      try {
+        const newToken = await pickupCart();
+        localStorage.setItem('orderToken', newToken);
+        setOrderToken(newToken);
+        await refetch();
+      } catch (error) {
+        console.error('Error generating order token:', error);
       }
-    };
+    } else {
+      setOrderToken(existingToken);
+    }
+  };
 
+  useEffect(() => {
     checkAndGenerateOrderToken();
   }, [location.pathname]);
 

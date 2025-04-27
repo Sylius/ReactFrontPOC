@@ -8,7 +8,7 @@ import { apiFetch } from '@/utils/apiFetch';
 const fetchProducts = async (): Promise<Product[]> => {
   const response = await apiFetch('/api/v2/shop/products?itemsPerPage=8');
   if (!response.ok) {
-    throw new Error('Problem z pobieraniem produktów');
+    throw new Error('Problem fetching products');
   }
 
   const data = await response.json();
@@ -48,9 +48,8 @@ const Homepage: FC = () => {
         </div>
       </div>
       <div className='container mb-5'>
-        {isLoading && <div className='text-center'>Ładowanie produktów...</div>}
-        {isError && <div className='text-danger text-center'>Błąd: {error.message}</div>}
-
+        {isLoading && <div className='text-center'>Loading products...</div>}
+        {isError && <div className='text-danger text-center'>Error: {error.message}</div>}
         {products && <ProductsList products={products} limit={4} name={'Latest deals'} />}
       </div>
       <div className='container mb-5'>

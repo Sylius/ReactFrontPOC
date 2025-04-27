@@ -16,7 +16,7 @@ const PaymentsCard: FC<PaymentsCardProps> = ({ payment, total }) => {
     }
     const response = await apiFetch(payment.method);
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem metody płatności');
+      throw new Error('Problem fetching the payment method');
     }
 
     const data = await response.json();

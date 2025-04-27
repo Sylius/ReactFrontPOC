@@ -65,7 +65,7 @@ const DashboardPage: FC = () => {
                 </a>
 
                 {!customer?.user?.verified && (
-                  <form action='/en_US/verify' method='post'>
+                  <form action='/verify' method='post'>
                     <button
                       className='btn btn-sm btn-icon btn-outline-gray text-primary'
                       type='submit'

@@ -12,7 +12,7 @@ const ProductRow: FC<ProductRowProps> = ({ orderItem }) => {
   const fetchVariant = async (): Promise<any> => {
     const response = await apiFetch(orderItem.variant);
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem wariantu');
+      throw new Error('Problem fetching the variant');
     }
 
     const data = await response.json();
@@ -28,7 +28,7 @@ const ProductRow: FC<ProductRowProps> = ({ orderItem }) => {
   const fetchProduct = async (): Promise<any> => {
     const response = await apiFetch(variant.product);
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem wariantu');
+      throw new Error('Problem fetching the variant');
     }
 
     const data = await response.json();

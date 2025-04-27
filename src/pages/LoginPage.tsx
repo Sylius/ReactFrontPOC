@@ -125,7 +125,7 @@ const LoginPage: FC = () => {
                 </form>
 
                 <div className='d-grid'>
-                  <a className='btn btn-link' href='/en_US/forgotten-password'>
+                  <a className='btn btn-link' href='/forgotten-password'>
                     Forgot password?
                   </a>
                 </div>
@@ -149,7 +149,7 @@ const LoginPage: FC = () => {
                   </svg>
                 </div>
                 <h2>Don't have an account?</h2>
-                <a className='btn btn-link' id='register-here-button' href='/en_US/register'>
+                <a className='btn btn-link' id='register-here-button' href='/register'>
                   Register here
                 </a>
               </div>

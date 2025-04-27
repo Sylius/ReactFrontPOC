@@ -7,11 +7,12 @@ import Layout from '@/layouts/Default';
 import ProductRow from '@/components/cart/ProductRow';
 import { formatPrice } from '@/utils/price';
 import { apiFetch } from '@/utils/apiFetch';
+import { debounce } from '@/utils/debounce';
 
 const fetchCart = async (): Promise<OrderItem> => {
   const response = await apiFetch(`/api/v2/shop/orders/${localStorage.getItem('orderToken')}`);
   if (!response.ok) {
-    throw new Error('Problem z pobieraniem produktów');
+    throw new Error('Problem fetching products');
   }
 
   const data = await response.json();
@@ -24,27 +25,24 @@ const removeCartItem = async (id: number) => {
     `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
     { method: 'DELETE' },
   );
-  if (!response.ok) throw new Error('Nie udało się usunąć produktu z koszyka');
+  if (!response.ok) {
+    throw new Error('Failed to remove the product from the cart');
+  }
 };
 
 const updateCartItem = async ({ id, quantity }: { id: number; quantity: number }) => {
   const response = await apiFetch(
-    `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}}`,
+    `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/merge-patch+json' },
-      body: JSON.stringify({ quantity: quantity }),
+      body: JSON.stringify({ quantity }),
     },
   );
-  if (!response.ok) throw new Error('Nie udało się zmienić ilości produktu');
-};
 
-const debounce = (func: (...args: any[]) => void, delay: number) => {
-  let timer: NodeJS.Timeout;
-  return (...args: any[]) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => func(...args), delay);
-  };
+  if (!response.ok) {
+    throw new Error('Failed to update the product quantity');
+  }
 };
 
 const CartPage: FC = () => {

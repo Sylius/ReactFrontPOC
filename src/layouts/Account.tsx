@@ -44,7 +44,7 @@ const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/en_US/account/profile/edit'
+                href='/account/profile/edit'
               >
                 <svg viewBox='0 0 24 24' className='icon mr-2' aria-hidden='true'>
                   <path
@@ -61,7 +61,7 @@ const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/en_US/account/change-password'
+                href='/account/change-password'
               >
                 <svg viewBox='0 0 24 24' className='icon mr-2' aria-hidden='true'>
                   <g
@@ -80,7 +80,7 @@ const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/en_US/account/address-book/'
+                href='/account/address-book/'
               >
                 <svg viewBox='0 0 24 24' className='icon mr-2' aria-hidden='true'>
                   <path
@@ -97,7 +97,7 @@ const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/en_US/account/orders/'
+                href='/account/orders/'
               >
                 <svg viewBox='0 0 24 24' className='icon mr-2' aria-hidden='true'>
                   <g

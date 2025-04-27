@@ -65,7 +65,7 @@ const ProductList: FC = () => {
         parent: parentData || undefined,
       };
     } catch (err) {
-      console.error('Błąd ładowania danych taxona:', err);
+      console.error('Error loading taxon data:', err);
       return null;
     }
   };
@@ -73,7 +73,7 @@ const ProductList: FC = () => {
   useEffect(() => {
     const loadData = async () => {
       if (!childCode) {
-        setError('Brak kodu taxona w URL');
+        setError('No taxon code in the URL');
         setLoading(false);
         return;
       }
@@ -110,7 +110,7 @@ const ProductList: FC = () => {
       <div className='container mt-4 mb-5'>
         <Breadcrumbs
           paths={[
-            { label: 'Strona główna', url: '/' },
+            { label: 'Home', url: '/' },
             ...(taxonDetails?.parent
               ? [
                   {
@@ -126,7 +126,7 @@ const ProductList: FC = () => {
           ]}
         />
         <div className='row mt-5'>
-          <div className='col-12 col-lg-3'>{/* Tu mogą być filtry lub kategorie */}</div>
+          <div className='col-12 col-lg-3'>{/* Filters or categories can go here */}</div>
           <div className='col-12 col-lg-9'>
             <div className='mb-4'>
               <h1 className='mb-3'>{loading ? <Skeleton /> : taxonDetails?.name || childCode}</h1>
@@ -134,14 +134,16 @@ const ProductList: FC = () => {
                 {loading ? (
                   <Skeleton count={2} />
                 ) : (
-                  taxonDetails?.description || 'Brak opisu tej kategorii.'
+                  taxonDetails?.description || 'No description available for this category.'
                 )}
               </div>
             </div>
             <div className='products-grid'>
               {products.length > 0
                 ? products.map((product) => <ProductCard key={product.id} product={product} />)
-                : !loading && <div className='text-center'>Brak produktów w tej kategorii.</div>}
+                : !loading && (
+                    <div className='text-center'>No products available in this category.</div>
+                  )}
             </div>
             <div className='pagination justify-content-center mt-4'>
               <button
@@ -150,7 +152,7 @@ const ProductList: FC = () => {
                 disabled={currentPage === 1}
                 className='page-item disabled:bg-gray-200'
               >
-                Poprzednia
+                Previous
               </button>
 
               {[...Array(totalPages)].map((_, index) => (
@@ -170,7 +172,7 @@ const ProductList: FC = () => {
                 disabled={currentPage === totalPages}
                 className='page-item rounded disabled:bg-gray-200'
               >
-                Następna
+                Next
               </button>
             </div>
           </div>

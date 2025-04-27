@@ -34,7 +34,7 @@ const UserNavigation: FC = () => {
             <ul className='dropdown-menu dropdown-menu-end'>
               <li>
                 <a
-                  href='/en_US/account/dashboard'
+                  href='/account/dashboard'
                   className='link-reset dropdown-item'
                   id='mobile-my-account-button'
                 >
@@ -42,11 +42,7 @@ const UserNavigation: FC = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href='/en_US/logout'
-                  className='link-reset dropdown-item'
-                  id='mobile-logout-button'
-                >
+                <a href='/logout' className='link-reset dropdown-item' id='mobile-logout-button'>
                   Logout
                 </a>
               </li>
@@ -122,7 +118,7 @@ const UserNavigation: FC = () => {
               </Link>
 
               <small className='text-black-50 px-1'>|</small>
-              <a href='/en_US/register' className='link-reset' id='register-page-button'>
+              <a href='/register' className='link-reset' id='register-page-button'>
                 Register
               </a>
             </div>

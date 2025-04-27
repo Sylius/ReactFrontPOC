@@ -16,7 +16,7 @@ const PaymentPage: FC = () => {
       `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/payments/${order?.payments[0].id}/methods`,
     );
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem metod dostawy');
+      throw new Error('Problem fetching payment methods');
     }
 
     const data = await response.json();
@@ -52,7 +52,7 @@ const PaymentPage: FC = () => {
 
       if (!response.ok) {
         setHasErrors(true);
-        throw new Error('Nie udało się wysłać metody dostawy');
+        throw new Error('Failed to submit the payment method');
       }
 
       await fetchOrder();

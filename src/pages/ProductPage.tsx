@@ -86,7 +86,7 @@ const ProductPage: FC = () => {
         setVariant(variantData);
       }
     } catch (error) {
-      setError(`Błąd podczas ładowania danych produktu: ${error}`);
+      setError(`Error while loading product data: ${error}`);
     } finally {
       setLoading(false);
     }
@@ -116,7 +116,7 @@ const ProductPage: FC = () => {
           }),
         },
       );
-      if (!response.ok) throw new Error('Nie udało się dodać do koszyka');
+      if (!response.ok) throw new Error('Failed to add to cart');
       fetchOrder();
       setShowConfirmation(true);
     } catch (err) {
@@ -132,9 +132,9 @@ const ProductPage: FC = () => {
 
   const accordionItems = product
     ? [
-        { title: 'Opis produktu', content: product.description },
-        { title: 'Atrybuty', content: 'Tu będą atrybuty produktu...' },
-        { title: 'Opinie', content: 'Tu będą recenzje produktu...' },
+        { title: 'Product Description', content: product.description },
+        { title: 'Attributes', content: 'Product attributes will be here...' },
+        { title: 'Reviews', content: 'Product reviews will be here...' },
       ]
     : [];
 
@@ -145,7 +145,7 @@ const ProductPage: FC = () => {
       <div className='container mt-4 mb-5'>
         <Breadcrumbs
           paths={[
-            { label: 'Strona główna', url: '/' },
+            { label: 'Home', url: '/' },
             { label: product?.name || '...', url: `/product/${code}` },
           ]}
         />
@@ -185,7 +185,7 @@ const ProductPage: FC = () => {
                 ) : variant?.price ? (
                   `$${formatPrice(variant.price)}`
                 ) : (
-                  'Brak ceny'
+                  'No price available'
                 )}
               </div>
 
@@ -231,19 +231,21 @@ const ProductPage: FC = () => {
                       onClick={handleAddToCart}
                       disabled={isAddToCartLoading || loading}
                     >
-                      {isAddToCartLoading ? 'Dodawanie...' : 'Add to cart'}
+                      {isAddToCartLoading ? 'Adding...' : 'Add to cart'}
                     </button>
                   </div>
                 </form>
               </div>
 
-              <div className='mb-3'>{product?.shortDescription || 'Brak krótkiego opisu'}</div>
+              <div className='mb-3'>
+                {product?.shortDescription || 'No short description available'}
+              </div>
 
               <small className='text-body-tertiary'>{product?.name.replace(/\s+/g, '_')}</small>
 
               {showConfirmation && (
                 <div className='alert alert-success alert-dismissible fade show mt-3' role='alert'>
-                  Produkt został dodany do koszyka!
+                  Product has been added to the cart!
                   <button
                     type='button'
                     className='btn-close'

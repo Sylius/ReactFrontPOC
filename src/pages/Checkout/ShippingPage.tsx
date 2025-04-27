@@ -16,7 +16,7 @@ const ShippingPage: FC = () => {
       `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/shipments/${order?.shipments[0].id}/methods`,
     );
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem metod dostawy');
+      throw new Error('Problem fetching shipping methods');
     }
 
     const data = await response.json();
