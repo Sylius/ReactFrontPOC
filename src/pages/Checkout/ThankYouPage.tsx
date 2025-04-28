@@ -1,8 +1,14 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Layout from "../../layouts/Default";
+import {useOrder} from "../../context/OrderContext.tsx";
 
 
 const ThankYouPage: React.FC = () => {
+    const { fetchOrder } = useOrder();
+
+    useEffect(() => {
+        fetchOrder();
+    }, []);
 
     return (
         <Layout>
