@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import Steps from '../../components/checkout/Steps';
 
 const SummaryPage: React.FC = () => {
-  const { order, fetchOrder } = useOrder();
+  const { order, fetchOrder, setOrderToken } = useOrder();
   const navigate = useNavigate();
 
   const [extraNotes, setExtraNotes] = useState<string>('');
@@ -38,6 +38,7 @@ const SummaryPage: React.FC = () => {
         throw new Error('Failed to submit order');
       }
 
+      setOrderToken(null);
       localStorage.removeItem('orderToken');
       navigate('/order/thank-you');
     } catch (error) {

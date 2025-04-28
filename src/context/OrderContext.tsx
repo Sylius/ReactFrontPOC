@@ -8,7 +8,7 @@ interface OrderContextType {
   removeOrderItem: (id: number) => void;
   isFetching: boolean;
   orderToken: string | null;
-  setOrderToken: (token: string) => void;
+  setOrderToken: (token: string | null) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
