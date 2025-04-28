@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Taxon, TaxonChild } from '../../types/Taxon';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { IconChevronDown } from '@tabler/icons-react';
 
 const Navbar: React.FC = () => {
   const [taxons, setTaxons] = useState<Taxon[]>([]);
@@ -83,20 +84,7 @@ const Navbar: React.FC = () => {
                     aria-expanded="false"
                   >
                     {taxon.name}
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="icon icon-sm"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="m6 9l6 6l6-6"
-                      />
-                    </svg>
+                    <IconChevronDown stroke={2} size={20} />
                   </a>
 
                   <div className="dropdown-menu position-absolute border dropdown-custom ">

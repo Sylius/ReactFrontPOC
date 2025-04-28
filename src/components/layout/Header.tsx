@@ -2,10 +2,10 @@ import React from 'react';
 import { Link } from 'react-router';
 import {useOrder} from "../../context/OrderContext";
 import {formatPrice} from "../../utils/price";
-import {useCustomer} from "../../context/CustomerContext";
 import UserNavigation from "./header/UserNavigation";
+import {IconMenu2, IconShoppingBag} from "@tabler/icons-react";
 
-const Header =  () => {
+const Header: React.FC =  () => {
     const { order } = useOrder();
 
     return (
@@ -45,31 +45,18 @@ const Header =  () => {
                                 <button className="btn btn-icon btn-transparent px-0 position-relative"
                                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
                                         aria-label="cart button">
-                                    <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
-                                        <g fill="none" stroke="currentColor" strokeLinecap="round"
-                                           strokeLinejoin="round"
-                                           strokeWidth="2">
-                                            <path
-                                                d="M6.331 8H17.67a2 2 0 0 1 1.977 2.304l-1.255 8.152A3 3 0 0 1 15.426 21H8.574a3 3 0 0 1-2.965-2.544l-1.255-8.152A2 2 0 0 1 6.331 8"></path>
-                                            <path d="M9 11V6a3 3 0 0 1 6 0v5"></path>
-                                        </g>
-                                    </svg>
+                                    <IconShoppingBag stroke={1.25} size={28} />
                                     <div className="d-none d-md-block">${formatPrice(order.total)} </div>
                                 </button>
                             </div>
                         </Link>
                     </div>
 
-
-
                     <div className="col-auto d-lg-none">
                         <button className="navbar-toggler btn btn-icon btn-transparent px-0" type="button"
                                 data-bs-toggle="offcanvas" data-bs-target="#navbarNav" aria-controls="navbarNav"
                                 aria-expanded="false" aria-label="Toggle navigation">
-                            <svg viewBox="0 0 24 24" className="icon icon-md" aria-hidden="true">
-                                <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                                      strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                            </svg>
+                            <IconMenu2 stroke={1.25} size={28} />
                         </button>
                     </div>
                 </div>

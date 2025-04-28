@@ -3,6 +3,7 @@ import { OrderItem } from '../../types/Order';
 import { formatPrice } from '../../utils/price';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { IconX } from '@tabler/icons-react';
 
 interface ProductRowProps {
   orderItem: OrderItem;
@@ -60,22 +61,7 @@ const ProductRow: React.FC<ProductRowProps> = ({
           type="button"
           onClick={() => onRemove(orderItem.id)}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="icon icon-tabler"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M18 6l-12 12"></path>
-            <path d="M6 6l12 12"></path>
-          </svg>
+          <IconX stroke={2} />
         </button>
       </td>
       <td>

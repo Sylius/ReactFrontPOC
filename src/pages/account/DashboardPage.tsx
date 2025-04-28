@@ -2,6 +2,7 @@ import React from "react";
 import Default from "../../layouts/Default";
 import AccountLayout from "../../layouts/Account";
 import {useCustomer} from "../../context/CustomerContext";
+import { IconPencil, IconLock, IconCheck } from '@tabler/icons-react';
 
 const DashboardPage: React.FC = () => {
 
@@ -37,25 +38,13 @@ const DashboardPage: React.FC = () => {
                             <div className="d-flex flex-column align-items-center flex-sm-row gap-2">
                                 <a href="#"
                                    className="btn btn-sm btn-icon btn-outline-gray">
-                                    <svg viewBox="0 0 24 24" className="icon icon-xs" aria-hidden="true">
-                                        <path fill="none" stroke="currentColor" strokeLinecap="round"
-                                              strokeLinejoin="round" strokeWidth="2"
-                                              d="M4 20h4L18.5 9.5a2.828 2.828 0 1 0-4-4L4 16zm9.5-13.5l4 4"></path>
-                                    </svg>
+                                    <IconPencil stroke={2} size={16} />
                                     Edit
                                 </a>
 
                                 <a href="#"
                                    className="btn btn-sm btn-icon btn-outline-gray">
-                                    <svg viewBox="0 0 24 24" className="icon icon-xs" aria-hidden="true">
-                                        <g fill="none" stroke="currentColor" strokeLinecap="round"
-                                           strokeLinejoin="round" strokeWidth="2">
-                                            <path
-                                                d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"></path>
-                                            <path
-                                                d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3-5V7a4 4 0 1 1 8 0v4"></path>
-                                        </g>
-                                    </svg>
+                                    <IconLock stroke={2} size={16} />
                                     Change password
                                 </a>
 
@@ -63,11 +52,7 @@ const DashboardPage: React.FC = () => {
                                     <form action="/en_US/verify" method="post">
                                         <button className="btn btn-sm btn-icon btn-outline-gray text-primary"
                                                 type="submit">
-                                            <svg viewBox="0 0 24 24" className="icon icon-xs" aria-hidden="true">
-                                                <path fill="none" stroke="currentColor" strokeLinecap="round"
-                                                      strokeLinejoin="round" strokeWidth="2"
-                                                      d="m5 12l5 5L20 7"></path>
-                                            </svg>
+                                            <IconCheck stroke={2} size={16} />
                                             Verify
                                         </button>
                                     </form>

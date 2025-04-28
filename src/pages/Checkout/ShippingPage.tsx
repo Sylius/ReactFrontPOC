@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { formatPrice } from '../../utils/price';
 import { useNavigate } from 'react-router-dom';
 import Steps from '../../components/checkout/Steps';
+import {IconChevronLeft, IconChevronRight} from "@tabler/icons-react";
 
 const ShippingPage: React.FC = () => {
   const { order } = useOrder();
@@ -137,20 +138,7 @@ const ShippingPage: React.FC = () => {
 
               <div className="d-flex justify-content-between flex-column flex-sm-row gap-2">
                 <Link className="btn btn-light btn-icon" to="/checkout/address">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="icon icon-sm flex-shrink-0"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m15 6l-6 6l6 6"
-                    ></path>
-                  </svg>
+                  <IconChevronLeft stroke={2} />
                   Change address
                 </Link>
 
@@ -159,21 +147,8 @@ const ShippingPage: React.FC = () => {
                   disabled={isSubmitting}
                   className="btn btn-primary btn-icon"
                 >
-                  Next{' '}
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="icon icon-sm"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m9 6l6 6l-6 6"
-                    ></path>
-                  </svg>
+                  Next
+                  <IconChevronRight stroke={2} />
                 </button>
               </div>
             </form>
