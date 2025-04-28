@@ -1,7 +1,8 @@
 import React from 'react';
+import {IconBrandFacebook, IconBrandInstagram, IconBrandX} from "@tabler/icons-react";
 
 
-const Footer =  () => {
+const Footer: React.FC =  () => {
 return (
     <div className="mt-auto border-top mt-5 py-5">
         <footer className="container">
@@ -62,29 +63,14 @@ return (
                         className="d-flex justify-content-center justify-content-md-start justify-content-lg-center gap-3 mb-5">
                         <a className="link-reset" href="https://www.instagram.com/sylius.team/" target="_blank"
                            aria-label="instagram logo">
-                            <svg viewBox="0 0 24 24" className="icon icon-md" aria-hidden="true">
-                                <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                                   strokeWidth="2">
-                                    <path
-                                        d="M4 8a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"></path>
-                                    <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0-6 0m7.5-4.5v.01"></path>
-                                </g>
-                            </svg>
+                            <IconBrandInstagram stroke={2} />
                         </a>
                         <a className="link-reset" href="https://www.facebook.com/SyliusEcommerce/" target="_blank"
                            aria-label="facebook logo">
-                            <svg viewBox="0 0 24 24" className="icon icon-md" aria-hidden="true">
-                                <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                                      strokeWidth="2"
-                                      d="M7 10v4h3v7h4v-7h3l1-4h-4V8a1 1 0 0 1 1-1h3V3h-3a5 5 0 0 0-5 5v2z"></path>
-                            </svg>
+                            <IconBrandFacebook stroke={2} />
                         </a>
                         <a className="link-reset" href="https://x.com/Sylius" target="_blank" aria-label="x logo">
-                            <svg viewBox="0 0 24 24" className="icon icon-md" aria-hidden="true">
-                                <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                                      strokeWidth="2"
-                                      d="m4 4l11.733 16H20L8.267 4zm0 16l6.768-6.768m2.46-2.46L20 4"></path>
-                            </svg>
+                            <IconBrandX stroke={2} />
                         </a>
                     </div>
                 </div>
