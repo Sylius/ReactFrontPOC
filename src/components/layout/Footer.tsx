@@ -161,7 +161,7 @@ const Footer: FC = () => {
             </a>
 
             <div className='mb-3'>
-              © Your Store, Powered by
+              © Your Store, Powered by{' '}
               <a href='https://sylius.com' target='blank'>
                 Sylius
               </a>
