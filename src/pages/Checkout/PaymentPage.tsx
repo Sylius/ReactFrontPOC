@@ -1,19 +1,23 @@
 import { type FC, useState } from 'react';
-import GooglePay from '@/components/checkout/payments/GooglePay';
-import Steps from '@/components/checkout/Steps';
-import { useOrder } from '@/context/OrderContext';
+
 import CheckoutLayout from '@/layouts/Checkout';
+import { Link } from 'react-router';
+import { useOrder } from '@/context/OrderContext';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, Link } from 'react-router-dom';
-import { apiFetch } from '@/utils/apiFetch';
+import { useNavigate } from 'react-router-dom';
+import Steps from '@/components/checkout/Steps';
+import GooglePay from '@/components/checkout/payments/GooglePay';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 const PaymentPage: FC = () => {
   const { order, fetchOrder } = useOrder();
   const navigate = useNavigate();
 
   const fetchPaymentMethodsFromAPI = async (): Promise<any> => {
-    const response = await apiFetch(
-      `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/payments/${order?.payments[0].id}/methods`,
+    const response = await fetch(
+      `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/payments/${
+        order?.payments[0].id
+      }/methods`,
     );
     if (!response.ok) {
       throw new Error('Problem fetching payment methods');
@@ -39,8 +43,10 @@ const PaymentPage: FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await apiFetch(
-        `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/payments/${order.payments[0].id}`,
+      const response = await fetch(
+        `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/payments/${
+          order.payments[0].id
+        }`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/merge-patch+json' },
@@ -75,7 +81,7 @@ const PaymentPage: FC = () => {
             data-live-name-value='sylius_shop:checkout:payment:form'
             data-live-url-value='/en_US/_components/sylius_shop:checkout:payment:form'
             id='live-1350467424-0'
-            data-live-props-value='{&quot;formName&quot;:&quot;sylius_shop_checkout_select_payment&quot;,&quot;sylius_shop_checkout_select_payment&quot;:{&quot;payments&quot;:[{&quot;method&quot;:&quot;PAYPAL&quot;}],&quot;_token&quot;:&quot;94004cb8ac3ba863cf595d182c94.2y-5_TCUgzXIHaEJekeoHH5ZBmWaFi5Sfn-_74xBpTI.vhz8tVam53uDV-RkSQr_akg4QDy3T0UXIRPT3eYMkXiuf5SIVMvHfLx61g&quot;},&quot;isValidated&quot;:false,&quot;validatedFields&quot;:[],&quot;template&quot;:&quot;@SyliusShop\/checkout\/select_payment\/content\/form.html.twig&quot;,&quot;resource&quot;:67322,&quot;hookableMetadata&quot;:{&quot;renderedBy&quot;:&quot;sylius_shop.checkout.select_payment.content&quot;,&quot;configuration&quot;:&quot;[]&quot;,&quot;prefixes&quot;:[&quot;sylius_shop.checkout.select_payment.content&quot;,&quot;sylius_shop.base.select_payment.content&quot;]},&quot;@attributes&quot;:{&quot;id&quot;:&quot;live-1350467424-0&quot;},&quot;@checksum&quot;:&quot;1Ah5w+xgxumTPXJpFwWJcFXGiO2a32FU0lqM2qF8zo4=&quot;}'
+            data-live-props-value='{"formName":"sylius_shop_checkout_select_payment","sylius_shop_checkout_select_payment":{"payments":[{"method":"PAYPAL"}],"_token":"94004cb8ac3ba863cf595d182c94.2y-5_TCUgzXIHaEJekeoHH5ZBmWaFi5Sfn-_74xBpTI.vhz8tVam53uDV-RkSQr_akg4QDy3T0UXIRPT3eYMkXiuf5SIVMvHfLx61g"},"isValidated":false,"validatedFields":[],"template":"@SyliusShop\/checkout\/select_payment\/content\/form.html.twig","resource":67322,"hookableMetadata":{"renderedBy":"sylius_shop.checkout.select_payment.content","configuration":"[]","prefixes":["sylius_shop.checkout.select_payment.content","sylius_shop.base.select_payment.content"]},"@attributes":{"id":"live-1350467424-0"},"@checksum":"1Ah5w+xgxumTPXJpFwWJcFXGiO2a32FU0lqM2qF8zo4="}'
           >
             <form
               name='sylius_shop_checkout_select_payment'
@@ -127,35 +133,13 @@ const PaymentPage: FC = () => {
 
               <div className='d-flex justify-content-between flex-column flex-sm-row gap-2'>
                 <Link className='btn btn-light btn-icon' to='/checkout/select-shipping'>
-                  <svg
-                    viewBox='0 0 24 24'
-                    className='icon icon-sm flex-shrink-0'
-                    aria-hidden='true'
-                  >
-                    <path
-                      fill='none'
-                      stroke='currentColor'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='m15 6l-6 6l6 6'
-                    />
-                  </svg>
+                  <IconChevronLeft stroke={2} />
                   Change shipping method
                 </Link>
 
                 <button type='submit' className='btn btn-primary btn-icon' disabled={isSubmitting}>
-                  Next{' '}
-                  <svg viewBox='0 0 24 24' className='icon icon-sm' aria-hidden='true'>
-                    <path
-                      fill='none'
-                      stroke='currentColor'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='m9 6l6 6l-6 6'
-                    />
-                  </svg>
+                  Next
+                  <IconChevronRight stroke={2} />
                 </button>
               </div>
             </form>

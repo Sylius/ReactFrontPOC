@@ -2,7 +2,7 @@ import { type FC, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Taxon, TaxonChild } from '@/types/Taxon';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { apiFetch } from '@/utils/apiFetch';
+import { IconChevronDown } from '@tabler/icons-react';
 
 const Navbar: FC = () => {
   const [taxons, setTaxons] = useState<Taxon[]>([]);
@@ -11,7 +11,7 @@ const Navbar: FC = () => {
   useEffect(() => {
     const fetchTaxons = async () => {
       try {
-        const res = await apiFetch('/api/v2/shop/taxons');
+        const res = await fetch('/api/v2/shop/taxons');
         const json = await res.json();
         const data: Taxon[] = json['hydra:member'] || [];
 
@@ -21,7 +21,7 @@ const Navbar: FC = () => {
           data.map(async (taxon) => {
             const childObjects: TaxonChild[] = await Promise.all(
               taxon.children.map(async (childUrl) => {
-                const res = await apiFetch(childUrl);
+                const res = await fetch(`${childUrl}`);
                 return await res.json();
               }),
             );
@@ -36,7 +36,7 @@ const Navbar: FC = () => {
 
         setChildrenMap(map);
       } catch (err) {
-        console.error('Błąd ładowania kategorii:', err);
+        console.error('Error loading categories:', err);
       }
     };
 
@@ -64,24 +64,16 @@ const Navbar: FC = () => {
 
               return hasChildren ? (
                 <div key={taxon.id} className='nav-item dropdown position-relative'>
-                  <button
-                    type='button'
+                  <a
+                    href='#'
                     className='nav-link d-flex align-items-center gap-1'
+                    type='button'
                     data-bs-toggle='dropdown'
                     aria-expanded='false'
                   >
                     {taxon.name}
-                    <svg viewBox='0 0 24 24' className='icon icon-sm' aria-hidden='true'>
-                      <path
-                        fill='none'
-                        stroke='currentColor'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        d='m6 9l6 6l6-6'
-                      />
-                    </svg>
-                  </button>
+                    <IconChevronDown stroke={2} size={20} />
+                  </a>
 
                   <div className='dropdown-menu position-absolute border dropdown-custom '>
                     {childrenMap[taxon.id].map((child) => (
@@ -96,11 +88,7 @@ const Navbar: FC = () => {
                   </div>
                 </div>
               ) : (
-                <Link
-                  key={taxon.id}
-                  className='nav-link d-flex align-items-center'
-                  to={`/${taxon.slug}`}
-                >
+                <Link key={taxon.id} className='nav-link' to={`/${taxon.slug}`}>
                   {taxon.name}
                 </Link>
               );

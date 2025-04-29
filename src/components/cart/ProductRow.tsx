@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import type { OrderItem } from '@/types/Order';
 import { formatPrice } from '@/utils/price';
 import { apiFetch } from '@/utils/apiFetch';
+import { IconX } from '@tabler/icons-react';
 
 interface ProductRowProps {
   orderItem: OrderItem;
@@ -69,6 +70,7 @@ const ProductRow: FC<ProductRowProps> = ({ orderItem, onRemove, onUpdate }) => {
             <path d='M18 6l-12 12' />
             <path d='M6 6l12 12' />
           </svg>
+          <IconX stroke={2} />
         </button>
       </td>
       <td>

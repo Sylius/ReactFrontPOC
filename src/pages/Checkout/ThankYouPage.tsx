@@ -1,7 +1,14 @@
-import type { FC } from 'react';
+import { type FC, useEffect } from 'react';
 import Layout from '@/layouts/Default';
+import { useOrder } from '@/context/OrderContext.tsx';
 
-const ThankYouPage: FC = () => {
+const ThankYouPage: React.FC = () => {
+  const { fetchOrder } = useOrder();
+
+  useEffect(() => {
+    fetchOrder();
+  }, []);
+
   return (
     <Layout>
       <div className='container text-center my-auto'>
@@ -9,11 +16,11 @@ const ThankYouPage: FC = () => {
           <h1 className='h2'>Thank you!</h1>
           You have successfully placed an order.
           <div className='d-flex flex-column flex-lg-row justify-content-center gap-2 mt-4'>
-            <a className='btn btn-primary' id='payment-method-page' href='/change-payment-method'>
+            <a className='btn btn-primary' id='payment-method-page' href='#'>
               Change payment method
             </a>
 
-            <a className='btn btn-secondary' id='create-an-account' href='/create-account'>
+            <a className='btn btn-secondary' id='create-an-account' href='#'>
               Create an account
             </a>
           </div>

@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { useCustomer } from '@/context/CustomerContext';
 import { Link } from 'react-router';
+import { IconUser } from '@tabler/icons-react';
 
 const UserNavigation: FC = () => {
   const { customer, clearCustomer } = useCustomer();
@@ -15,26 +16,17 @@ const UserNavigation: FC = () => {
         <div className='col-auto'>
           <div className='d-lg-none'>
             <button
+              type='button'
               className='btn btn-icon btn-transparent px-0'
               data-bs-toggle='dropdown'
               aria-expanded='false'
-              type='button'
             >
-              <svg viewBox='0 0 24 24' className='icon' aria-hidden='true'>
-                <path
-                  fill='none'
-                  stroke='currentColor'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2'
-                />
-              </svg>
+              <IconUser stroke={1.25} size={28} />
             </button>
             <ul className='dropdown-menu dropdown-menu-end'>
               <li>
                 <a
-                  href='/account/dashboard'
+                  href='/en_US/account/dashboard'
                   className='link-reset dropdown-item'
                   id='mobile-my-account-button'
                 >
@@ -42,7 +34,11 @@ const UserNavigation: FC = () => {
                 </a>
               </li>
               <li>
-                <a href='/logout' className='link-reset dropdown-item' id='mobile-logout-button'>
+                <a
+                  href='/en_US/logout'
+                  className='link-reset dropdown-item'
+                  id='mobile-logout-button'
+                >
                   Logout
                 </a>
               </li>
@@ -50,16 +46,7 @@ const UserNavigation: FC = () => {
           </div>
 
           <div className='d-none d-lg-flex gap-2 align-items-center ps-2'>
-            <svg viewBox='0 0 24 24' className='icon' aria-hidden='true'>
-              <path
-                fill='none'
-                stroke='currentColor'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2'
-              />
-            </svg>
+            <IconUser stroke={1.25} size={28} />
             <span>Hello {customer.firstName}!</span>
 
             <small className='text-black-50 px-1'>|</small>
@@ -87,38 +74,19 @@ const UserNavigation: FC = () => {
                 className='btn btn-icon btn-transparent px-0'
                 aria-label='account button'
               >
-                <svg viewBox='0 0 24 24' className='icon' aria-hidden='true'>
-                  <path
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2'
-                  />
-                </svg>
-                <title>Sylius</title>
+                <IconUser stroke={1.25} size={28} />
               </a>
             </div>
 
             <div className='d-none d-lg-flex align-items-center gap-2 ps-2'>
-              <svg viewBox='0 0 24 24' className='icon' aria-hidden='true'>
-                <path
-                  fill='none'
-                  stroke='currentColor'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2'
-                />
-              </svg>
+              <IconUser stroke={1.25} size={28} />
 
               <Link to='/login' className='link-reset' id='login-page-button'>
                 Login
               </Link>
 
               <small className='text-black-50 px-1'>|</small>
-              <a href='/register' className='link-reset' id='register-page-button'>
+              <a href='/en_US/register' className='link-reset' id='register-page-button'>
                 Register
               </a>
             </div>

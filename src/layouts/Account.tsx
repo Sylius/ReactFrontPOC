@@ -1,9 +1,11 @@
 import type { FC } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { Link } from 'react-router';
+import { IconBook, IconHome, IconLock, IconShoppingCart, IconUser } from '@tabler/icons-react';
 
 interface AccountLayoutProps {
   children: any;
+  breadcrumbs?: object;
 }
 
 const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
@@ -27,91 +29,39 @@ const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
                 className='d-flex align-items-center gap-2 py-1 link-reset'
                 to='/account/dashboard'
               >
-                <svg viewBox='0 0 24 24' className='icon mr-2' aria-hidden='true'>
-                  <g
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                  >
-                    <path d='M5 12H3l9-9l9 9h-2M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7' />
-                    <path d='M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6' />
-                  </g>
-                </svg>
+                <IconHome stroke={1.25} size={28} />
                 Dashboard
               </Link>
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/account/profile/edit'
+                href='/en_US/account/profile/edit'
               >
-                <svg viewBox='0 0 24 24' className='icon mr-2' aria-hidden='true'>
-                  <path
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2'
-                  />
-                </svg>
+                <IconUser stroke={1.25} size={28} />
                 Personal information
               </a>
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/account/change-password'
+                href='/en_US/account/change-password'
               >
-                <svg viewBox='0 0 24 24' className='icon mr-2' aria-hidden='true'>
-                  <g
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                  >
-                    <path d='M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z' />
-                    <path d='M11 16a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3-5V7a4 4 0 1 1 8 0v4' />
-                  </g>
-                </svg>
+                <IconLock stroke={1.25} size={28} />
                 Change password
               </a>
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/account/address-book/'
+                href='/en_US/account/address-book/'
               >
-                <svg viewBox='0 0 24 24' className='icon mr-2' aria-hidden='true'>
-                  <path
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6v13m9-13v13m9-13v13'
-                  />
-                </svg>
+                <IconBook stroke={1.25} size={28} />
                 Address book
               </a>
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/account/orders/'
+                href='/en_US/account/orders/'
               >
-                <svg viewBox='0 0 24 24' className='icon mr-2' aria-hidden='true'>
-                  <g
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                  >
-                    <path d='M4 19a2 2 0 1 0 4 0a2 2 0 1 0-4 0m11 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0' />
-                    <path d='M17 17H6V3H4' />
-                    <path d='m6 5l14 1l-1 7H6' />
-                  </g>
-                </svg>
+                <IconShoppingCart stroke={1.25} size={28} />
                 Order history
               </a>
             </div>

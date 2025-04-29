@@ -1,9 +1,11 @@
 import { type FC, useState } from 'react';
-import Steps from '@/components/checkout/Steps';
+
 import CheckoutLayout from '@/layouts/Checkout';
 import type { AddressInterface } from '@/types/Order';
-import { useNavigate, Link } from 'react-router-dom';
-import { apiFetch } from '@/utils/apiFetch';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router';
+import Steps from '@/components/checkout/Steps';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 const AddressPage: FC = () => {
   const [billingAddress, setBillingAddress] = useState<AddressInterface>({
@@ -37,7 +39,7 @@ const AddressPage: FC = () => {
     setErrors({});
 
     try {
-      const response = await apiFetch(`/api/v2/shop/orders/${localStorage.getItem('orderToken')}`, {
+      const response = await fetch(`/api/v2/shop/orders/${localStorage.getItem('orderToken')}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -80,9 +82,9 @@ const AddressPage: FC = () => {
             data-controller='live'
             data-live-name-value='sylius_shop:checkout:address:form'
             data-live-url-value='/en_US/_components/sylius_shop:checkout:address:form'
-            data-live-listeners-value='[{&quot;action&quot;:&quot;addressFieldUpdated&quot;,&quot;event&quot;:&quot;sylius:shop:address-updated&quot;}]'
+            data-live-listeners-value='[{"action":"addressFieldUpdated","event":"sylius:shop:address-updated"}]'
             id='live-1350467424-0'
-            data-live-props-value='{&quot;emailExists&quot;:false,&quot;resource&quot;:66780,&quot;formName&quot;:&quot;sylius_shop_checkout_address&quot;,&quot;sylius_shop_checkout_address&quot;:{&quot;differentBillingAddress&quot;:null,&quot;differentShippingAddress&quot;:null,&quot;shippingAddress&quot;:{&quot;firstName&quot;:&quot;&quot;,&quot;lastName&quot;:&quot;&quot;,&quot;phoneNumber&quot;:&quot;&quot;,&quot;company&quot;:&quot;&quot;,&quot;countryCode&quot;:&quot;&quot;,&quot;street&quot;:&quot;&quot;,&quot;city&quot;:&quot;&quot;,&quot;postcode&quot;:&quot;&quot;,&quot;__dynamic_error&quot;:&quot;&quot;},&quot;billingAddress&quot;:{&quot;firstName&quot;:&quot;&quot;,&quot;lastName&quot;:&quot;&quot;,&quot;phoneNumber&quot;:&quot;&quot;,&quot;company&quot;:&quot;&quot;,&quot;countryCode&quot;:&quot;&quot;,&quot;street&quot;:&quot;&quot;,&quot;city&quot;:&quot;&quot;,&quot;postcode&quot;:&quot;&quot;,&quot;__dynamic_error&quot;:&quot;&quot;},&quot;customer&quot;:{&quot;email&quot;:&quot;&quot;},&quot;_token&quot;:&quot;5ffeca70aac9afcc7d21015eee1745df.P3reSeEhUg9ZiVTTtZFYYG2Cnsy0MFezzFYeXKGkve8.Si-cH5VJGW0I2ji63cACGiPOzr39Am-DvDVBb-yJ7KB1F5h5jUo_djbROw&quot;},&quot;isValidated&quot;:false,&quot;validatedFields&quot;:[],&quot;hookableMetadata&quot;:{&quot;renderedBy&quot;:&quot;sylius_shop.checkout.address.content&quot;,&quot;configuration&quot;:&quot;[]&quot;,&quot;prefixes&quot;:[&quot;sylius_shop.checkout.address.content&quot;,&quot;sylius_shop.base.address.content&quot;]},&quot;template&quot;:&quot;@SyliusShop\/checkout\/address\/content\/form.html.twig&quot;,&quot;@attributes&quot;:{&quot;id&quot;:&quot;live-1350467424-0&quot;},&quot;@checksum&quot;:&quot;sIieEmhrJal3lA+4nE2dLurJliM0dzr2S0KLNCKsmrg=&quot;}'
+            data-live-props-value='{"emailExists":false,"resource":66780,"formName":"sylius_shop_checkout_address","sylius_shop_checkout_address":{"differentBillingAddress":null,"differentShippingAddress":null,"shippingAddress":{"firstName":"","lastName":"","phoneNumber":"","company":"","countryCode":"","street":"","city":"","postcode":"","__dynamic_error":""},"billingAddress":{"firstName":"","lastName":"","phoneNumber":"","company":"","countryCode":"","street":"","city":"","postcode":"","__dynamic_error":""},"customer":{"email":""},"_token":"5ffeca70aac9afcc7d21015eee1745df.P3reSeEhUg9ZiVTTtZFYYG2Cnsy0MFezzFYeXKGkve8.Si-cH5VJGW0I2ji63cACGiPOzr39Am-DvDVBb-yJ7KB1F5h5jUo_djbROw"},"isValidated":false,"validatedFields":[],"hookableMetadata":{"renderedBy":"sylius_shop.checkout.address.content","configuration":"[]","prefixes":["sylius_shop.checkout.address.content","sylius_shop.base.address.content"]},"template":"@SyliusShop\/checkout\/address\/content\/form.html.twig","@attributes":{"id":"live-1350467424-0"},"@checksum":"sIieEmhrJal3lA+4nE2dLurJliM0dzr2S0KLNCKsmrg="}'
           >
             <form
               name='sylius_shop_checkout_address'
@@ -313,35 +315,13 @@ const AddressPage: FC = () => {
 
               <div className='d-flex justify-content-between flex-column flex-sm-row gap-2'>
                 <Link className='btn btn-light btn-icon' to='/'>
-                  <svg
-                    viewBox='0 0 24 24'
-                    className='icon icon-sm flex-shrink-0'
-                    aria-hidden='true'
-                  >
-                    <path
-                      fill='none'
-                      stroke='currentColor'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='m15 6l-6 6l6 6'
-                    />
-                  </svg>
+                  <IconChevronLeft stroke={2} />
                   Back to store
                 </Link>
 
                 <button type='submit' className='btn btn-primary btn-icon' disabled={isSubmitting}>
-                  Next{' '}
-                  <svg viewBox='0 0 24 24' className='icon icon-sm' aria-hidden='true'>
-                    <path
-                      fill='none'
-                      stroke='currentColor'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='m9 6l6 6l-6 6'
-                    />
-                  </svg>
+                  Next
+                  <IconChevronRight stroke={2} />
                 </button>
               </div>
 

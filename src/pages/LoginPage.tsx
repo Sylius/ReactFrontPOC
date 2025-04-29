@@ -1,8 +1,8 @@
 import { type FC, useState } from 'react';
 import Default from '@/layouts/Default';
-import { useCustomer } from '@/context/CustomerContext';
 import { useNavigate } from 'react-router-dom';
-import { apiFetch } from '@/utils/apiFetch';
+import { useCustomer } from '@/context/CustomerContext';
+import { IconLockOpen } from '@tabler/icons-react';
 
 const LoginPage: FC = () => {
   const [email, setEmail] = useState('');
@@ -18,7 +18,7 @@ const LoginPage: FC = () => {
     setError(null);
 
     try {
-      const response = await apiFetch('/api/v2/shop/customers/token', {
+      const response = await fetch('/api/v2/shop/customers/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ const LoginPage: FC = () => {
                 </form>
 
                 <div className='d-grid'>
-                  <a className='btn btn-link' href='/forgotten-password'>
+                  <a className='btn btn-link' href='/en_US/forgotten-password'>
                     Forgot password?
                   </a>
                 </div>
@@ -137,19 +137,10 @@ const LoginPage: FC = () => {
             <div className='d-flex flex-column justify-content-center align-items-center bg-light rounded-4 h-100 p-3'>
               <div className='text-center'>
                 <div className='mb-3'>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    height='144px'
-                    viewBox='0 -960 960 960'
-                    width='144px'
-                    fill='#e8eaed'
-                  >
-                    <title>Sylius</title>
-                    <path d='M266-586h337v-85q0-51.25-35.82-87.13-35.83-35.87-87-35.87Q429-794 393-758.13q-36 35.88-36 87.13h-22q0-61 42.17-103 42.18-42 103-42Q541-816 583-773.88T625-671v85h69q21.75 0 37.88 15.74Q748-554.53 748-532v346q0 21.75-16.12 37.87Q715.75-132 694-132H266q-21.75 0-37.87-16.13Q212-164.25 212-186v-346q0-22.53 16.13-38.26Q244.25-586 266-586Zm0 432h428q14 0 23-9t9-23v-346q0-14-9-23t-23-9H266q-14 0-23 9t-9 23v346q0 14 9 23t23 9Zm214.17-152q21.83 0 37.33-15.53T533-359q0-21-15.67-37t-37.5-16q-21.83 0-37.33 16T427-358.5q0 21.5 15.67 37t37.5 15.5ZM234-154v-410 410Z' />
-                  </svg>
+                  <IconLockOpen stroke={2} size={144} color={'#e8eaed'} />
                 </div>
                 <h2>Don't have an account?</h2>
-                <a className='btn btn-link' id='register-here-button' href='/register'>
+                <a className='btn btn-link' id='register-here-button' href='/en_US/register'>
                   Register here
                 </a>
               </div>

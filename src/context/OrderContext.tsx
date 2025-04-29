@@ -1,7 +1,5 @@
-import { createContext, type FC, useContext, useEffect, useState } from 'react';
+import { type FC, createContext, useContext, useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useLocation } from 'react-router-dom';
-import { apiFetch } from '@/utils/apiFetch';
 
 interface OrderContextType {
   order: any;
@@ -10,14 +8,14 @@ interface OrderContextType {
   removeOrderItem: (id: number) => void;
   isFetching: boolean;
   orderToken: string | null;
-  setOrderToken: (token: string) => void;
+  setOrderToken: (token: string | null) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 const pickupCart = async () => {
   try {
-    const response = await apiFetch('/api/v2/shop/orders', {
+    const response = await fetch('/api/v2/shop/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -36,14 +34,8 @@ const pickupCart = async () => {
   }
 };
 
-export const fetchOrderFromAPI = async (): Promise<any> => {
-  const response = await apiFetch(`/api/v2/shop/orders/${localStorage.getItem('orderToken')}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
+const fetchOrderFromAPI = async (): Promise<any> => {
+  const response = await fetch(`/api/v2/shop/orders/${localStorage.getItem('orderToken')}`);
   if (!response.ok) {
     throw new Error('Problem fetching products');
   }
@@ -53,44 +45,66 @@ export const fetchOrderFromAPI = async (): Promise<any> => {
   return data['hydra:member'] || data;
 };
 
-export const updateOrderItemAPI = async ({
+const updateOrderItemAPI = async ({
   id,
   quantity,
 }: {
   id: number;
   quantity: number;
 }) => {
-  const response = await apiFetch(
-    `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
+  const response = await fetch(
+    `api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}}`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/merge-patch+json' },
       body: JSON.stringify({ quantity: quantity }),
     },
   );
-
-  if (!response.ok) {
-    throw new Error('Failed to update the quantity of the product');
-  }
+  if (!response.ok) throw new Error('Failed to update the quantity of the product');
 };
 
-export const removeOrderItemAPI = async (id: number) => {
-  const response = await apiFetch(
+const removeOrderItemAPI = async (id: number) => {
+  const response = await fetch(
     `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
     { method: 'DELETE' },
   );
-
-  if (!response.ok) {
-    throw new Error('Failed to remove item from the cart');
-  }
+  if (!response.ok) throw new Error('Failed to remove the product from the cart');
 };
 
 export const OrderProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [orderToken, setOrderToken] = useState<string | null>(
+    localStorage.getItem('orderToken') ?? null,
+  );
+
   const {
     data: order,
     refetch,
     isFetching,
-  } = useQuery({ queryKey: ['order'], queryFn: fetchOrderFromAPI });
+  } = useQuery({
+    queryKey: ['order'],
+    queryFn: async () => {
+      if (!orderToken) {
+        const newToken = await pickupCart();
+
+        setOrderToken(newToken);
+        localStorage.setItem('orderToken', newToken);
+
+        return fetchOrderFromAPI();
+      }
+
+      try {
+        return await fetchOrderFromAPI();
+      } catch {
+        console.warn('Invalid token, generating a new order...');
+        const newToken = await pickupCart();
+
+        setOrderToken(newToken);
+        localStorage.setItem('orderToken', newToken);
+
+        return fetchOrderFromAPI();
+      }
+    },
+  });
   const updateMutation = useMutation({
     mutationFn: updateOrderItemAPI,
     onSuccess: () => refetch(),
@@ -100,28 +114,11 @@ export const OrderProvider: FC<{ children: React.ReactNode }> = ({ children }) =
     onSuccess: () => refetch(),
   });
 
-  const [orderToken, setOrderToken] = useState<string | null>(null);
-  const location = useLocation();
-
-  const checkAndGenerateOrderToken = async () => {
-    const existingToken = localStorage.getItem('orderToken');
-    if (!existingToken || existingToken === 'undefined') {
-      try {
-        const newToken = await pickupCart();
-        localStorage.setItem('orderToken', newToken);
-        setOrderToken(newToken);
-        await refetch();
-      } catch (error) {
-        console.error('Error generating order token:', error);
-      }
-    } else {
-      setOrderToken(existingToken);
-    }
-  };
-
   useEffect(() => {
-    checkAndGenerateOrderToken();
-  }, [location.pathname]);
+    if (orderToken) {
+      localStorage.setItem('orderToken', orderToken);
+    }
+  }, [orderToken]);
 
   const updateOrderItem = (id: number, quantity: number) => {
     updateMutation.mutate({ id, quantity });
