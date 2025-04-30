@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Customer } from '../types/Customer';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { Customer } from "../types/Customer";
 
 interface CustomerContextType {
   customer: Customer | null;
@@ -10,7 +10,7 @@ interface CustomerContextType {
 }
 
 const CustomerContext = createContext<CustomerContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -21,8 +21,8 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<string | null>(null);
 
   const fetchCustomer = async () => {
-    const token = localStorage.getItem('jwtToken');
-    const userUrl = localStorage.getItem('userUrl');
+    const token = localStorage.getItem("jwtToken");
+    const userUrl = localStorage.getItem("userUrl");
     if (!token || !userUrl) {
       setCustomer(null);
       setLoading(false);
@@ -35,11 +35,11 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
         `${import.meta.env.VITE_REACT_APP_API_URL}${userUrl}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error('Unauthorized');
+        throw new Error("Unauthorized");
       }
 
       const data = await response.json();
@@ -47,7 +47,7 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
       setCustomer(data);
     } catch (err: any) {
       setCustomer(null);
-      setError(err.message || 'Failed to load user');
+      setError(err.message || "Failed to load user");
     } finally {
       setLoading(false);
     }
@@ -59,8 +59,8 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const clearCustomer = () => {
     setCustomer(null);
-    localStorage.removeItem('jwtToken');
-    localStorage.removeItem('userUrl');
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("userUrl");
   };
 
   return (
@@ -81,7 +81,7 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useCustomer = () => {
   const context = useContext(CustomerContext);
   if (!context) {
-    throw new Error('useUser must be used within a CustomerProvider');
+    throw new Error("useUser must be used within a CustomerProvider");
   }
   return context;
 };
