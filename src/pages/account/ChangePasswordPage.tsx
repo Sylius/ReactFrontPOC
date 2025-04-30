@@ -4,10 +4,12 @@ import AccountLayout from "../../layouts/Account.tsx";
 import { useCustomer } from "../../context/CustomerContext.tsx";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../components/layout/Loader.tsx";
+import { useFlashMessages } from "../../context/FlashMessagesContext.tsx";
 
 const ChangePasswordPage: React.FC = () => {
   const { customer } = useCustomer();
   const navigate = useNavigate();
+  const { addMessage } = useFlashMessages();
 
   const [currentPassword, setCurrentPassword] = useState<string>();
   const [newPassword, setNewPassword] = useState<string>();
@@ -54,8 +56,9 @@ const ChangePasswordPage: React.FC = () => {
       }
 
       navigate("/account/dashboard");
+      addMessage("success", "Password changed successfully");
     } catch (err) {
-      console.error(err);
+      console.log(err);
     } finally {
       setLoading(false);
     }
