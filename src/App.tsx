@@ -16,6 +16,7 @@ import DashboardPage from "./pages/account/DashboardPage";
 import './assets/scss/main.scss';
 import {OrderProvider} from "./context/OrderContext";
 import {CustomerProvider} from "./context/CustomerContext";
+import ChangePasswordPage from "./pages/account/ChangePasswordPage.tsx";
 
 const App: React.FC = () => {
     return (
@@ -34,6 +35,7 @@ const App: React.FC = () => {
                     <Route path="/product/:code" element={<ProductPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/account/dashboard" element={<DashboardPage />} />
+                    <Route path="/account/change-password" element={<ChangePasswordPage />} />
                 </Routes>
             </OrderProvider>
         </CustomerProvider>
