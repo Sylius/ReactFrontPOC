@@ -42,3 +42,20 @@ export interface Shipment {
     "@type"?: string;
     method?: string;
 }
+
+export interface ShippingAddress {
+    firstName?: string;
+    lastName?: string;
+}
+
+export interface Order {
+    id?: number;
+    number: string;
+    tokenValue: string;
+    state: string;
+    itemsSubtotal: number;
+    currencyCode: string;
+    shippingAddress?: ShippingAddress;
+    payments?: Payment[];
+    createdAt?: string;
+}
