@@ -1,6 +1,8 @@
 import { OrderItem } from '../../types/Order';
 import { formatPrice } from '../../utils/price';
 import { useQuery } from '@tanstack/react-query';
+import {Link} from "react-router-dom";
+import React from "react";
 
 interface ProductRowProps {
   orderItem: OrderItem;
@@ -63,12 +65,16 @@ const ProductRow: React.FC<ProductRowProps> = ({ orderItem }) => {
           </div>
           <div>
             <div className="h6">
-              <a
-                className="link-reset text-break"
-                href="/en_US/products/celestial-harmony-t-shirt"
-              >
-                {orderItem?.productName}
-              </a>
+              {product?.code ? (
+                  <Link
+                      className="link-reset text-break"
+                      to={`/product/${product.code}`}
+                  >
+                    {orderItem?.productName}
+                  </Link>
+              ) : (
+                  orderItem?.productName
+              )}
             </div>
 
             <small className="text-body-tertiary">{variant?.code}</small>

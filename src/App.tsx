@@ -13,6 +13,7 @@ import ThankYouPage from "./pages/Checkout/ThankYouPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/account/DashboardPage";
 import OrderHistoryPage from "./pages/account/OrderHistoryPage";
+import OrderDetailsPage from "./pages/account/OrderDetailsPage";
 
 import "./assets/scss/main.scss";
 import { OrderProvider } from "./context/OrderContext";
@@ -49,6 +50,8 @@ const App: React.FC = () => {
                 path="/account/change-password"
                 element={<ChangePasswordPage />}
               />
+              <Route path="/account/order-history" element={<OrderHistoryPage />} />
+              <Route path="/account/orders/:token" element={<OrderDetailsPage />} />
             </Routes>
           </FlashMessagesProvider>
         </OrderProvider>

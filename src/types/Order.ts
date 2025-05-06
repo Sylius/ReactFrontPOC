@@ -34,7 +34,10 @@ export interface Payment {
     "@id"?: string;
     "@type"?: string;
     id?: number;
-    method?: string | null;
+    method?: {
+        name?: string;
+    } | null;
+    state?: string;
 }
 
 export interface Shipment {
@@ -55,7 +58,16 @@ export interface Order {
     state: string;
     itemsSubtotal: number;
     currencyCode: string;
-    shippingAddress?: ShippingAddress;
+    shippingAddress?: AddressInterface;
+    billingAddress?: AddressInterface;
     payments?: Payment[];
+    shipments?: Shipment[];
     createdAt?: string;
+    total?: number;
+    taxTotal?: number;
+    orderPromotionTotal?: number;
+    shippingTotal?: number;
+    items?: OrderItem[];
+    localeCode?: string;
+    paymentState?: string;
 }

@@ -74,7 +74,12 @@ const OrderHistoryPage: React.FC = () => {
 
     return (
         <Default>
-            <AccountLayout>
+            <AccountLayout
+                breadcrumbs={[
+                    { label: "Home", url: "/" },
+                    { label: "My account", url: "/account/dashboard" },
+                    { label: "Order History", url: "/account/order-history" }
+                ]}>
                 <div className="col-12 col-md-9">
                     <div className="mb-4">
                         <h1>Order history</h1>
@@ -121,7 +126,8 @@ const OrderHistoryPage: React.FC = () => {
                                                     <td>${(order.itemsSubtotal / 100).toFixed(2)}</td>
                                                     <td>{order.state}</td>
                                                     <td>
-                                                        <a href="#" className="btn btn-sm btn-outline-gray">
+                                                        <a href={`/account/orders/${order.tokenValue}`}
+                                                           className="btn btn-sm btn-outline-gray">
                                                             Show
                                                         </a>
                                                     </td>
