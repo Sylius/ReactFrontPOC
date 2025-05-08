@@ -1,34 +1,34 @@
 export interface Product {
-    id: number;
-    slug: string;
-    name: string;
-    code: string;
-    description: string;
-    shortDescription: string;
-    variants: string[];
-    images: Image[];
-    options?: string[];
+  id: number;
+  slug: string;
+  name: string;
+  code: string;
+  description: string;
+  shortDescription: string;
+  variants: string[];
+  images: Image[];
+  options?: string[];
 }
 
 export interface ProductOption {
-    code: string;
-    name: string;
-    values: ProductOptionValue[];
+  code: string;
+  name: string;
+  values: ProductOptionValue[];
 }
 
 export interface ProductOptionValue {
-    code: string;
-    value: string;
+  code: string;
+  value: string;
 }
 
 export interface ProductVariantDetails {
-    id: number;
-    price: number;
-    code: string;
-    name?: string;
+  id: number;
+  price: number;
+  code: string;
+  name?: string;
 }
 
 export interface Image {
-    id: number;
-    path: string;
+  id: number;
+  path: string;
 }

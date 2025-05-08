@@ -1,25 +1,24 @@
-import React from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { Link } from 'react-router-dom';
-import { Product } from '../types/Product';
-import { formatPrice } from '../utils/price';
+import type { Product } from '@/types/Product';
+import { formatPrice } from '@/utils/price';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { apiFetch } from '@/utils/apiFetch';
 
 interface ProductCardProps {
   product: Product;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const [variant, setVariant] = React.useState<any | null>(null);
-  const [loading, setLoading] = React.useState<boolean>(true);
+const ProductCard: FC<ProductCardProps> = ({ product }) => {
+  const [variant, setVariant] = useState<any | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchVariant = async () => {
       try {
         if (!product.variants.length) return;
-        const response = await fetch(
-          `${import.meta.env.VITE_REACT_APP_API_URL}${product.variants[0]}`
-        );
+        const response = await apiFetch(product.variants[0]);
         const data = await response.json();
         setVariant(data);
       } catch (error) {
@@ -34,28 +33,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <div>
-      <Link to={`/product/${product.code}`} className="link-reset">
-        <div className="mb-4">
-          <div
-            className="bg-light rounded-3"
-            style={{ aspectRatio: '3 / 4', overflow: 'hidden' }}
-          >
+      <Link to={`/product/${product.code}`} className='link-reset'>
+        <div className='mb-4'>
+          <div className='bg-light rounded-3' style={{ aspectRatio: '3 / 4', overflow: 'hidden' }}>
             {loading ? (
-              <Skeleton
-                style={{ width: '100%', height: '100%', display: 'block' }}
-              />
+              <Skeleton style={{ width: '100%', height: '100%', display: 'block' }} />
             ) : (
               <img
                 src={product.images[0]?.path}
                 alt={product.name}
-                className="img-fluid w-100 h-100 object-fit-cover"
+                className='img-fluid w-100 h-100 object-fit-cover'
               />
             )}
           </div>
         </div>
-        <div className="h6 text-break">
-          {loading ? <Skeleton width={120} /> : product.name}
-        </div>
+        <div className='h6 text-break'>{loading ? <Skeleton width={120} /> : product.name}</div>
       </Link>
       <div>
         {loading ? (

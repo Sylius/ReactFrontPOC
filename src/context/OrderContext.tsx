@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { type FC, createContext, useContext, useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 interface OrderContextType {
@@ -15,16 +15,13 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 const pickupCart = async () => {
   try {
-    const response = await fetch(
-      `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({}),
-      }
-    );
+    const response = await fetch('/api/v2/shop/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    });
 
     if (!response.ok) {
       throw new Error('Failed to pickup cart');
@@ -38,13 +35,9 @@ const pickupCart = async () => {
 };
 
 const fetchOrderFromAPI = async (): Promise<any> => {
-  const response = await fetch(
-    `${
-      import.meta.env.VITE_REACT_APP_API_URL
-    }/api/v2/shop/orders/${localStorage.getItem('orderToken')}`
-  );
+  const response = await fetch(`/api/v2/shop/orders/${localStorage.getItem('orderToken')}`);
   if (!response.ok) {
-    throw new Error('Problem z pobieraniem produktów');
+    throw new Error('Problem fetching products');
   }
 
   const data = await response.json();
@@ -60,38 +53,36 @@ const updateOrderItemAPI = async ({
   quantity: number;
 }) => {
   const response = await fetch(
-    `${
-      import.meta.env.VITE_REACT_APP_API_URL
-    }/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}}`,
+    `api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}}`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/merge-patch+json' },
       body: JSON.stringify({ quantity: quantity }),
-    }
+    },
   );
-  if (!response.ok) throw new Error('Nie udało się zmienić ilości produktu');
+  if (!response.ok) throw new Error('Failed to update the quantity of the product');
 };
 
 const removeOrderItemAPI = async (id: number) => {
   const response = await fetch(
-    `${
-      import.meta.env.VITE_REACT_APP_API_URL
-    }/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
-    { method: 'DELETE' }
+    `/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
+    { method: 'DELETE' },
   );
-  if (!response.ok) throw new Error('Nie udało się usunąć produktu z koszyka');
+  if (!response.ok) throw new Error('Failed to remove the product from the cart');
 };
 
-export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [orderToken, setOrderToken] = useState<string | null>(localStorage.getItem('orderToken') ?? null);
+export const OrderProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [orderToken, setOrderToken] = useState<string | null>(
+    localStorage.getItem('orderToken') ?? null,
+  );
 
   const {
     data: order,
     refetch,
     isFetching,
-  } = useQuery({ queryKey: ['order'], queryFn: async () => {
+  } = useQuery({
+    queryKey: ['order'],
+    queryFn: async () => {
       if (!orderToken) {
         const newToken = await pickupCart();
 
@@ -103,7 +94,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({
 
       try {
         return await fetchOrderFromAPI();
-      } catch (error) {
+      } catch {
         console.warn('Invalid token, generating a new order...');
         const newToken = await pickupCart();
 
@@ -112,7 +103,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({
 
         return fetchOrderFromAPI();
       }
-    }
+    },
   });
   const updateMutation = useMutation({
     mutationFn: updateOrderItemAPI,

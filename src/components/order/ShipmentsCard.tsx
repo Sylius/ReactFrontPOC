@@ -1,18 +1,21 @@
-import React from 'react';
-import { Shipment } from '../../types/Order';
+import type { FC } from 'react';
+import type { Shipment } from '@/types/Order';
 import { useQuery } from '@tanstack/react-query';
+import { apiFetch } from '@/utils/apiFetch';
 
 interface ShipmentsCardProps {
   shipment: Shipment;
 }
 
-const ShipmentsCard: React.FC<ShipmentsCardProps> = ({ shipment }) => {
+const ShipmentsCard: FC<ShipmentsCardProps> = ({ shipment }) => {
   const fetchShippingMethodFromAPI = async (): Promise<any> => {
-    const response = await fetch(
-      `${import.meta.env.VITE_REACT_APP_API_URL}${shipment.method}`
-    );
+    if (!shipment.method) {
+      throw new Error('Payment method is missing');
+    }
+
+    const response = await apiFetch(shipment.method);
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem metody płatności');
+      throw new Error('Problem fetching the payment method');
     }
 
     const data = await response.json();
@@ -26,14 +29,14 @@ const ShipmentsCard: React.FC<ShipmentsCardProps> = ({ shipment }) => {
   });
 
   return (
-    <div className="card border-0 bg-body-tertiary mb-3">
-      <div className="card-header d-flex align-items-center">
-        <div className="me-auto">Shipments</div>
+    <div className='card border-0 bg-body-tertiary mb-3'>
+      <div className='card-header d-flex align-items-center'>
+        <div className='me-auto'>Shipments</div>
       </div>
 
-      <div className="card-body d-flex flex-column gap-2">
-        <div className="d-flex gap-4">
-          <div className="me-auto">{shippingMethod?.name}</div>
+      <div className='card-body d-flex flex-column gap-2'>
+        <div className='d-flex gap-4'>
+          <div className='me-auto'>{shippingMethod?.name}</div>
         </div>
       </div>
     </div>

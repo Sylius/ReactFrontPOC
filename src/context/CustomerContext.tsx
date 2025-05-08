@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { Customer } from "../types/Customer";
+import { type FC, type ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import type { Customer } from '@/types/Customer';
+import { apiFetch } from '@/utils/apiFetch';
 
 interface CustomerContextType {
   customer: Customer | null;
@@ -9,20 +10,16 @@ interface CustomerContextType {
   clearCustomer: () => void;
 }
 
-const CustomerContext = createContext<CustomerContextType | undefined>(
-  undefined,
-);
+const CustomerContext = createContext<CustomerContextType | undefined>(undefined);
 
-export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const CustomerProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchCustomer = async () => {
-    const token = localStorage.getItem("jwtToken");
-    const userUrl = localStorage.getItem("userUrl");
+    const token = localStorage.getItem('jwtToken');
+    const userUrl = localStorage.getItem('userUrl');
     if (!token || !userUrl) {
       setCustomer(null);
       setLoading(false);
@@ -31,23 +28,24 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       setLoading(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_REACT_APP_API_URL}${userUrl}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await apiFetch(userUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (!response.ok) {
-        throw new Error("Unauthorized");
+        throw new Error('Unauthorized');
       }
 
       const data = await response.json();
 
       setCustomer(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setCustomer(null);
-      setError(err.message || "Failed to load user");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to load user');
+      }
     } finally {
       setLoading(false);
     }
@@ -59,8 +57,8 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const clearCustomer = () => {
     setCustomer(null);
-    localStorage.removeItem("jwtToken");
-    localStorage.removeItem("userUrl");
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('userUrl');
   };
 
   return (
@@ -81,7 +79,7 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useCustomer = () => {
   const context = useContext(CustomerContext);
   if (!context) {
-    throw new Error("useUser must be used within a CustomerProvider");
+    throw new Error('useUser must be used within a CustomerProvider');
   }
   return context;
 };

@@ -1,20 +1,19 @@
-import { OrderItem } from '../../types/Order';
-import { formatPrice } from '../../utils/price';
+import type { FC } from 'react';
+import type { OrderItem } from '@/types/Order';
+import { formatPrice } from '@/utils/price';
 import { useQuery } from '@tanstack/react-query';
-import {Link} from "react-router-dom";
-import React from "react";
+import { apiFetch } from '@/utils/apiFetch';
+import { Link } from 'react-router-dom';
 
 interface ProductRowProps {
   orderItem: OrderItem;
 }
 
-const ProductRow: React.FC<ProductRowProps> = ({ orderItem }) => {
-  const fetchVariant = async (): Promise<any> => {
-    const response = await fetch(
-      `${import.meta.env.VITE_REACT_APP_API_URL}${orderItem.variant}`
-    );
+const ProductRow: FC<ProductRowProps> = ({ orderItem }) => {
+  const fetchVariant = async (): Promise<{ product: string; code: string }> => {
+    const response = await apiFetch(orderItem.variant);
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem wariantu');
+      throw new Error('Problem fetching the variant');
     }
 
     const data = await response.json();
@@ -22,17 +21,23 @@ const ProductRow: React.FC<ProductRowProps> = ({ orderItem }) => {
     return data['hydra:member'] || data;
   };
 
-  const { data: variant } = useQuery<any, Error>({
+  const { data: variant } = useQuery<{ product: string; code: string }, Error>({
     queryKey: ['variant', orderItem.id],
     queryFn: fetchVariant,
   });
 
-  const fetchProduct = async (): Promise<any> => {
-    const response = await fetch(
-      `${import.meta.env.VITE_REACT_APP_API_URL}${variant.product}`
-    );
+  interface Product {
+    code: string;
+    images: { path: string }[];
+  }
+
+  const fetchProduct = async (): Promise<Product> => {
+    if (!variant) {
+      throw new Error('Variant is undefined');
+    }
+    const response = await apiFetch(variant.product);
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem wariantu');
+      throw new Error('Problem fetching the variant');
     }
 
     const data = await response.json();
@@ -40,7 +45,7 @@ const ProductRow: React.FC<ProductRowProps> = ({ orderItem }) => {
     return data['hydra:member'] || data;
   };
 
-  const { data: product } = useQuery<any, Error>({
+  const { data: product } = useQuery<Product, Error>({
     queryKey: [orderItem.id],
     queryFn: fetchProduct,
   });
@@ -48,40 +53,34 @@ const ProductRow: React.FC<ProductRowProps> = ({ orderItem }) => {
   return (
     <tr>
       <td>
-        <div className="d-flex align-items-center gap-4">
+        <div className='d-flex align-items-center gap-4'>
           <div style={{ width: '6rem' }}>
-            <div
-              className="overflow-auto bg-light rounded-3"
-              style={{ aspectRatio: '3/4' }}
-            >
+            <div className='overflow-auto bg-light rounded-3' style={{ aspectRatio: '3/4' }}>
               {product?.images[0]?.path && (
                 <img
-                  className="img-fluid w-100 h-100 object-fit-cover"
+                  className='img-fluid w-100 h-100 object-fit-cover'
                   src={product?.images[0]?.path}
-                  alt={variant.code}
+                  alt={variant?.code}
                 />
               )}
             </div>
           </div>
           <div>
-            <div className="h6">
+            <div className='h6'>
               {product?.code ? (
-                  <Link
-                      className="link-reset text-break"
-                      to={`/product/${product.code}`}
-                  >
-                    {orderItem?.productName}
-                  </Link>
+                <Link className='link-reset text-break' to={`/product/${product.code}`}>
+                  {orderItem?.productName}
+                </Link>
               ) : (
-                  orderItem?.productName
+                orderItem?.productName
               )}
             </div>
 
-            <small className="text-body-tertiary">{variant?.code}</small>
+            <small className='text-body-tertiary'>{variant?.code}</small>
           </div>
         </div>
       </td>
-      <td className="text-black-50 text-end">
+      <td className='text-black-50 text-end'>
         <span>${formatPrice(orderItem.unitPrice)}</span>
       </td>
 
@@ -89,7 +88,7 @@ const ProductRow: React.FC<ProductRowProps> = ({ orderItem }) => {
         <span>{orderItem.quantity}</span>
       </td>
 
-      <td className="text-end">
+      <td className='text-end'>
         <span>${formatPrice(orderItem.subtotal)}</span>
       </td>
     </tr>
