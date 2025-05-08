@@ -1,4 +1,4 @@
-import { type FC, createContext, useContext, useEffect, useState } from 'react';
+import { type FC, type ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import type { Customer } from '@/types/Customer';
 import { apiFetch } from '@/utils/apiFetch';
 
@@ -12,7 +12,7 @@ interface CustomerContextType {
 
 const CustomerContext = createContext<CustomerContextType | undefined>(undefined);
 
-export const CustomerProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CustomerProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,9 +39,13 @@ export const CustomerProvider: FC<{ children: React.ReactNode }> = ({ children }
       const data = await response.json();
 
       setCustomer(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setCustomer(null);
-      setError(err.message || 'Failed to load user');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to load user');
+      }
     } finally {
       setLoading(false);
     }

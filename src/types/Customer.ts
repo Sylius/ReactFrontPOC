@@ -1,4 +1,5 @@
 export interface Customer {
+  '@id'?: number | null;
   defaultAddress?: string | null;
   user?: { verified?: boolean } | null;
   email?: string;

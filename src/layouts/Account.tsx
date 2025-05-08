@@ -1,24 +1,24 @@
-import type { FC } from 'react';
-import Breadcrumbs from '@/components/Breadcrumbs';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { Link } from 'react-router';
 import { IconBook, IconHome, IconLock, IconShoppingCart, IconUser } from '@tabler/icons-react';
+import type { FC, ReactNode } from 'react';
 
 interface AccountLayoutProps {
-  children: any;
-  breadcrumbs?: object;
+  children: ReactNode;
+  breadcrumbs?: { label: string; url: string }[];
 }
 
-const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
+const AccountLayout: FC<AccountLayoutProps> = ({ children, breadcrumbs }) => {
+  const defaultBreadcrumbs = [
+    { label: 'Home', url: '/' },
+    { label: 'My account', url: '/account/dashboard' },
+  ];
+
   return (
     <div className='container mb-auto'>
       <div className='row my-4'>
         <div className='col-12'>
-          <Breadcrumbs
-            paths={[
-              { label: 'Home', url: '/account/dashboard' },
-              { label: 'Dashboard', url: '/account/dashboard' },
-            ]}
-          />
+          <Breadcrumbs paths={breadcrumbs ?? defaultBreadcrumbs} />
         </div>
 
         <div className='col-12 col-md-3 mb-4 mb-md-0'>
@@ -35,7 +35,7 @@ const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/en_US/account/profile/edit'
+                href='/account/profile/edit'
               >
                 <IconUser stroke={1.25} size={28} />
                 Personal information
@@ -43,7 +43,7 @@ const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/en_US/account/change-password'
+                href='/account/change-password'
               >
                 <IconLock stroke={1.25} size={28} />
                 Change password
@@ -51,7 +51,7 @@ const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/en_US/account/address-book/'
+                href='/account/address-book/'
               >
                 <IconBook stroke={1.25} size={28} />
                 Address book
@@ -59,7 +59,7 @@ const AccountLayout: FC<AccountLayoutProps> = ({ children }) => {
 
               <a
                 className='d-flex align-items-center gap-2 py-1 link-reset'
-                href='/en_US/account/orders/'
+                href='/account/order-history'
               >
                 <IconShoppingCart stroke={1.25} size={28} />
                 Order history

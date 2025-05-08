@@ -12,27 +12,38 @@ import SummaryPage from './pages/Checkout/SummaryPage';
 import ThankYouPage from './pages/Checkout/ThankYouPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/account/DashboardPage';
+import OrderHistoryPage from './pages/account/OrderHistoryPage';
+import OrderDetailsPage from './pages/account/OrderDetailsPage';
+import ChangePasswordPage from './pages/account/ChangePasswordPage.tsx';
+
 import { OrderProvider } from './context/OrderContext';
 import { CustomerProvider } from './context/CustomerContext';
+import { FlashMessagesProvider } from './context/FlashMessagesContext.tsx';
 
 const App: FC = () => {
   return (
     <Router>
       <CustomerProvider>
         <OrderProvider>
-          <Routes>
-            <Route path='/' element={<Homepage />} />
-            <Route path='/:parentCode/:childCode' element={<ProductList />} />
-            <Route path='/cart' element={<CartPage />} />
-            <Route path='/checkout/address' element={<AddressPage />} />
-            <Route path='/checkout/select-shipping' element={<ShippingPage />} />
-            <Route path='/checkout/select-payment' element={<PaymentPage />} />
-            <Route path='/checkout/complete' element={<SummaryPage />} />
-            <Route path='/order/thank-you' element={<ThankYouPage />} />
-            <Route path='/product/:code' element={<ProductPage />} />
-            <Route path='/login' element={<LoginPage />} />
-            <Route path='/account/dashboard' element={<DashboardPage />} />
-          </Routes>
+          <FlashMessagesProvider>
+            <Routes>
+              <Route path='/' element={<Homepage />} />
+              <Route path='/:parentCode/:childCode' element={<ProductList />} />
+              <Route path='/cart' element={<CartPage />} />
+              <Route path='/checkout/address' element={<AddressPage />} />
+              <Route path='/checkout/select-shipping' element={<ShippingPage />} />
+              <Route path='/checkout/select-payment' element={<PaymentPage />} />
+              <Route path='/checkout/complete' element={<SummaryPage />} />
+              <Route path='/order/thank-you' element={<ThankYouPage />} />
+              <Route path='/product/:code' element={<ProductPage />} />
+              <Route path='/login' element={<LoginPage />} />
+              <Route path='/account/order-history' element={<OrderHistoryPage />} />
+              <Route path='/account/dashboard' element={<DashboardPage />} />
+              <Route path='/account/change-password' element={<ChangePasswordPage />} />
+              <Route path='/account/order-history' element={<OrderHistoryPage />} />
+              <Route path='/account/orders/:token' element={<OrderDetailsPage />} />
+            </Routes>
+          </FlashMessagesProvider>
         </OrderProvider>
       </CustomerProvider>
     </Router>

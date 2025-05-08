@@ -3,13 +3,14 @@ import type { OrderItem } from '@/types/Order';
 import { formatPrice } from '@/utils/price';
 import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/utils/apiFetch';
+import { Link } from 'react-router-dom';
 
 interface ProductRowProps {
   orderItem: OrderItem;
 }
 
 const ProductRow: FC<ProductRowProps> = ({ orderItem }) => {
-  const fetchVariant = async (): Promise<any> => {
+  const fetchVariant = async (): Promise<{ product: string; code: string }> => {
     const response = await apiFetch(orderItem.variant);
     if (!response.ok) {
       throw new Error('Problem fetching the variant');
@@ -20,12 +21,20 @@ const ProductRow: FC<ProductRowProps> = ({ orderItem }) => {
     return data['hydra:member'] || data;
   };
 
-  const { data: variant } = useQuery<any, Error>({
+  const { data: variant } = useQuery<{ product: string; code: string }, Error>({
     queryKey: ['variant', orderItem.id],
     queryFn: fetchVariant,
   });
 
-  const fetchProduct = async (): Promise<any> => {
+  interface Product {
+    code: string;
+    images: { path: string }[];
+  }
+
+  const fetchProduct = async (): Promise<Product> => {
+    if (!variant) {
+      throw new Error('Variant is undefined');
+    }
     const response = await apiFetch(variant.product);
     if (!response.ok) {
       throw new Error('Problem fetching the variant');
@@ -36,7 +45,7 @@ const ProductRow: FC<ProductRowProps> = ({ orderItem }) => {
     return data['hydra:member'] || data;
   };
 
-  const { data: product } = useQuery<any, Error>({
+  const { data: product } = useQuery<Product, Error>({
     queryKey: [orderItem.id],
     queryFn: fetchProduct,
   });
@@ -51,16 +60,20 @@ const ProductRow: FC<ProductRowProps> = ({ orderItem }) => {
                 <img
                   className='img-fluid w-100 h-100 object-fit-cover'
                   src={product?.images[0]?.path}
-                  alt={variant.code}
+                  alt={variant?.code}
                 />
               )}
             </div>
           </div>
           <div>
             <div className='h6'>
-              <a className='link-reset text-break' href='/en_US/products/celestial-harmony-t-shirt'>
-                {orderItem?.productName}
-              </a>
+              {product?.code ? (
+                <Link className='link-reset text-break' to={`/product/${product.code}`}>
+                  {orderItem?.productName}
+                </Link>
+              ) : (
+                orderItem?.productName
+              )}
             </div>
 
             <small className='text-body-tertiary'>{variant?.code}</small>

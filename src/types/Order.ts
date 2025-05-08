@@ -32,11 +32,40 @@ export interface Payment {
   '@id'?: string;
   '@type'?: string;
   id?: number;
-  method?: string | null;
+  method?: {
+    name?: string;
+  } | null;
+  state?: string;
 }
 
 export interface Shipment {
   '@id'?: string;
   '@type'?: string;
   method?: string;
+}
+
+export interface ShippingAddress {
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface Order {
+  id?: number;
+  number: string;
+  tokenValue: string;
+  state: string;
+  itemsSubtotal: number;
+  currencyCode: string;
+  shippingAddress?: AddressInterface;
+  billingAddress?: AddressInterface;
+  payments?: Payment[];
+  shipments?: Shipment[];
+  createdAt?: string;
+  total?: number;
+  taxTotal?: number;
+  orderPromotionTotal?: number;
+  shippingTotal?: number;
+  items?: OrderItem[];
+  localeCode?: string;
+  paymentState?: string;
 }

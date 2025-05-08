@@ -340,3 +340,14 @@ input.form-check-input:checked {
 		overflow: auto !important;
 	}
 }
+
+.btn.btn-outline-gray {
+	&:hover {
+		color: #fff;
+		background-color: #212529;
+	}
+}
+
+.flash-message-close:hover {
+	cursor: pointer;
+}
