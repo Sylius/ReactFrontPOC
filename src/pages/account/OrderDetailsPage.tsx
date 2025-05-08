@@ -8,6 +8,8 @@ import ShipmentsCard from "../../components/order/ShipmentsCard";
 import ProductRow from "../../components/order/ProductRow";
 import { OrderItem, Order } from "../../types/Order";
 import { formatPrice } from "../../utils/price";
+import Skeleton from "react-loading-skeleton";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const OrderDetailsPage: React.FC = () => {
     const { token } = useParams<{ token: string }>();
@@ -51,7 +53,20 @@ const OrderDetailsPage: React.FC = () => {
         fetchOrder();
     }, [token]);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) {
+        return (
+            <Default>
+                <AccountLayout>
+                    <div className="col-12 col-md-9 pt-4">
+                        <Skeleton height={30} width={200} className="mb-4" />
+                        <Skeleton height={100} className="mb-3" count={2} />
+                        <Skeleton height={200} className="mb-4" />
+                    </div>
+                </AccountLayout>
+            </Default>
+        );
+    }
+
     if (!order) return <p>Order not found.</p>;
 
     return (
@@ -65,6 +80,7 @@ const OrderDetailsPage: React.FC = () => {
                 ]}>
                 <div className="col-12 col-md-9 pt-4">
                     <h1 className="h5 mb-4">Order #{order.number}</h1>
+
                     <div className="card border-0 bg-body-tertiary mb-3">
                         <div className="card-body d-flex flex-column gap-1">
                             <div className="row">
@@ -91,16 +107,17 @@ const OrderDetailsPage: React.FC = () => {
                             </div>
                         </div>
                     </div>
+
                     <div className="mb-4">
                         <div className="row">
                             <div className="col-md-6 mb-3">
                                 {order.billingAddress && (
-                                    <Address sectionName="Billing address" address={order.billingAddress}/>
+                                    <Address sectionName="Billing address" address={order.billingAddress} />
                                 )}
                             </div>
                             <div className="col-md-6 mb-3">
                                 {order.shippingAddress && (
-                                    <Address sectionName="Shipping address" address={order.shippingAddress}/>
+                                    <Address sectionName="Shipping address" address={order.shippingAddress} />
                                 )}
                             </div>
                         </div>
@@ -121,7 +138,7 @@ const OrderDetailsPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {order.shipments?.[0] && <ShipmentsCard shipment={order.shipments[0]}/>}
+                    {order.shipments?.[0] && <ShipmentsCard shipment={order.shipments[0]} />}
 
                     <div className="table-responsive mt-4">
                         <table className="table table-borderless align-middle">
@@ -135,7 +152,7 @@ const OrderDetailsPage: React.FC = () => {
                             </thead>
                             <tbody>
                             {order.items?.map((item: OrderItem) => (
-                                <ProductRow key={item.id} orderItem={item}/>
+                                <ProductRow key={item.id} orderItem={item} />
                             ))}
                             </tbody>
                         </table>

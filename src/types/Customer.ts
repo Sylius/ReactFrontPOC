@@ -1,7 +1,15 @@
+export interface ShopUser {
+  "@id": string;
+  "@type": string;
+  verified: boolean;
+}
+
 export interface Customer {
-  "@id"?: number | null;
+  "@context"?: string;
+  "@id"?: string;
+  "@type"?: string;
   defaultAddress?: string | null;
-  user?: { verified?: boolean } | null;
+  user?: ShopUser | null;
   email?: string;
   firstName?: string | null;
   lastName?: string | null;

@@ -14,6 +14,7 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/account/DashboardPage";
 import OrderHistoryPage from "./pages/account/OrderHistoryPage";
 import OrderDetailsPage from "./pages/account/OrderDetailsPage";
+import ProfilePage from "./pages/account/ProfilePage.tsx";
 
 import "./assets/scss/main.scss";
 import { OrderProvider } from "./context/OrderContext";
@@ -46,6 +47,7 @@ const App: React.FC = () => {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/account/order-history" element={<OrderHistoryPage />} />
               <Route path="/account/dashboard" element={<DashboardPage />} />
+              <Route path="/account/profile/edit" element={<ProfilePage />} />
               <Route
                 path="/account/change-password"
                 element={<ChangePasswordPage />}

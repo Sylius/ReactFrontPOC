@@ -4,10 +4,12 @@ import AccountLayout from "../../layouts/Account";
 import { useCustomer } from "../../context/CustomerContext";
 import { useQuery } from "@tanstack/react-query";
 import { Order } from "../../types/Order";
+import Skeleton from "react-loading-skeleton";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const fetchCustomerOrders = async (): Promise<Order[]> => {
-    const token = localStorage.getItem('jwtToken');
-    if (!token) throw new Error('Brak tokenu');
+    const token = localStorage.getItem("jwtToken");
+    if (!token) throw new Error("Brak tokenu");
 
     const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -16,11 +18,11 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
     });
 
     if (!response.ok) {
-        throw new Error('Błąd pobierania zamówień');
+        throw new Error("Błąd pobierania zamówień");
     }
 
     const data = await response.json();
-    const basicOrders = data['hydra:member'] || [];
+    const basicOrders = data["hydra:member"] || [];
 
     const fullOrders = await Promise.all(
         basicOrders.map(async (order: any) => {
@@ -30,7 +32,7 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
                 });
 
                 if (!orderResponse.ok) {
-                    throw new Error('Błąd pobierania pełnego zamówienia');
+                    throw new Error("Błąd pobierania pełnego zamówienia");
                 }
 
                 const fullOrderData = await orderResponse.json();
@@ -38,7 +40,7 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
                 let createdAt: string | undefined = undefined;
 
                 if (fullOrderData.payments && fullOrderData.payments.length > 0) {
-                    const paymentUrl = fullOrderData.payments[0]['@id'];
+                    const paymentUrl = fullOrderData.payments[0]["@id"];
                     const paymentResponse = await fetch(`${baseUrl}${paymentUrl}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
@@ -67,7 +69,7 @@ const OrderHistoryPage: React.FC = () => {
     const { customer } = useCustomer();
 
     const { data: orders = [], isLoading, isError } = useQuery<Order[]>({
-        queryKey: ['customerOrders', customer?.email],
+        queryKey: ["customerOrders", customer?.email],
         queryFn: fetchCustomerOrders,
         enabled: !!customer,
     });
@@ -78,8 +80,9 @@ const OrderHistoryPage: React.FC = () => {
                 breadcrumbs={[
                     { label: "Home", url: "/" },
                     { label: "My account", url: "/account/dashboard" },
-                    { label: "Order History", url: "/account/order-history" }
-                ]}>
+                    { label: "Order History", url: "/account/order-history" },
+                ]}
+            >
                 <div className="col-12 col-md-9">
                     <div className="mb-4">
                         <h1>Order history</h1>
@@ -90,8 +93,23 @@ const OrderHistoryPage: React.FC = () => {
                         <div className="card-body border-bottom py-3">
                             <div className="d-flex border-bottom pb-3"></div>
                             <div className="table-responsive">
-                                {isLoading && <p>Loading orders...</p>}
+                                {isLoading && (
+                                    <table className="table card-table">
+                                        <tbody>
+                                        <tr>
+                                            <td><Skeleton width={80} /></td>
+                                            <td><Skeleton width={100} /></td>
+                                            <td><Skeleton width={100} /></td>
+                                            <td><Skeleton width={80} /></td>
+                                            <td><Skeleton width={80} /></td>
+                                            <td><Skeleton width={60} height={30} /></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                )}
+
                                 {isError && <p>Failed to load orders. Please try again later.</p>}
+
                                 {!isLoading && !isError && (
                                     <table className="table card-table table-vcenter text-nowrap datatable">
                                         <thead>
@@ -105,38 +123,32 @@ const OrderHistoryPage: React.FC = () => {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {(orders.length > 0 ? orders : [{ id: 'empty' }]).map((order: any) => (
-                                            order.id !== 'empty' ? (
-                                                <tr key={order.id || order.tokenValue} className="item">
-                                                    <td>#{order.number}</td>
-                                                    <td>
-                                                        {order.createdAt
-                                                            ? new Date(order.createdAt).toLocaleDateString('en-GB', {
-                                                                year: 'numeric',
-                                                                month: '2-digit',
-                                                                day: '2-digit',
-                                                            })
-                                                            : '-'}
-                                                    </td>
-                                                    <td>
-                                                        {order.shippingAddress
-                                                            ? `${order.shippingAddress.firstName ?? ''} ${order.shippingAddress.lastName ?? ''}`.trim()
-                                                            : '-'}
-                                                    </td>
-                                                    <td>${(order.itemsSubtotal / 100).toFixed(2)}</td>
-                                                    <td>{order.state}</td>
-                                                    <td>
-                                                        <a href={`/account/orders/${order.tokenValue}`}
-                                                           className="btn btn-sm btn-outline-gray">
-                                                            Show
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                <tr key="empty">
-                                                    <td colSpan={6} className="text-center">No orders found.</td>
-                                                </tr>
-                                            )
+                                        {orders.map((order: any) => (
+                                            <tr key={order.id || order.tokenValue} className="item">
+                                                <td>#{order.number}</td>
+                                                <td>
+                                                    {order.createdAt
+                                                        ? new Date(order.createdAt).toLocaleDateString('en-GB', {
+                                                            year: 'numeric',
+                                                            month: '2-digit',
+                                                            day: '2-digit',
+                                                        })
+                                                        : '-'}
+                                                </td>
+                                                <td>
+                                                    {order.shippingAddress
+                                                        ? `${order.shippingAddress.firstName ?? ''} ${order.shippingAddress.lastName ?? ''}`.trim()
+                                                        : '-'}
+                                                </td>
+                                                <td>${(order.itemsSubtotal / 100).toFixed(2)}</td>
+                                                <td>{order.state}</td>
+                                                <td>
+                                                    <a href={`/account/orders/${order.tokenValue}`}
+                                                       className="btn btn-sm btn-outline-gray">
+                                                        Show
+                                                    </a>
+                                                </td>
+                                            </tr>
                                         ))}
                                         </tbody>
                                     </table>
