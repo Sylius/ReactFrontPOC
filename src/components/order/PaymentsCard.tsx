@@ -5,7 +5,7 @@ import { formatPrice } from '../../utils/price';
 interface PaymentsCardProps {
     payment: Payment;
     total: number;
-    paymentState?: string; // ← DODANE!
+    paymentState?: string;
 }
 
 const PaymentsCard: React.FC<PaymentsCardProps> = ({ payment, total, paymentState }) => {

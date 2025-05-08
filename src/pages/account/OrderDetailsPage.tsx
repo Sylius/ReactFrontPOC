@@ -28,7 +28,6 @@ const OrderDetailsPage: React.FC = () => {
                 if (!orderRes.ok) throw new Error("Błąd pobierania zamówienia");
                 const data = await orderRes.json();
 
-                // ⬇️ Pobierz pełne dane płatności, żeby mieć createdAt
                 if (data.payments?.[0]?.['@id']) {
                     const paymentRes = await fetch(`${baseUrl}${data.payments[0]['@id']}`, {
                         headers: { Authorization: `Bearer ${tokenJwt}` },
@@ -37,7 +36,7 @@ const OrderDetailsPage: React.FC = () => {
                     if (paymentRes.ok) {
                         const fullPayment = await paymentRes.json();
                         data.payments[0] = fullPayment;
-                        data.createdAt = fullPayment.createdAt; // ⬅️ dodaj pole
+                        data.createdAt = fullPayment.createdAt;
                     }
                 }
 
