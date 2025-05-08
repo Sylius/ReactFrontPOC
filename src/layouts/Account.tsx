@@ -10,22 +10,22 @@ import {
 } from "@tabler/icons-react";
 
 interface AccountLayoutProps {
-  children: any;
-  breadcrumbs?: object;
+    children: React.ReactNode;
+    breadcrumbs?: { label: string; url: string }[];
 }
 
-const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
-  return (
-    <div className="container mb-auto">
-      <div className="row my-4">
-        <div className="col-12">
-          <Breadcrumbs
-            paths={[
-              { label: "Home", url: "/account/dashboard" },
-              { label: "Dashboard", url: "/account/dashboard" },
-            ]}
-          />
-        </div>
+const AccountLayout: React.FC<AccountLayoutProps> = ({ children, breadcrumbs }) => {
+    const defaultBreadcrumbs = [
+        { label: "Home", url: "/" },
+        { label: "My account", url: "/account/dashboard" },
+    ];
+
+    return (
+        <div className="container mb-auto">
+            <div className="row my-4">
+                <div className="col-12">
+                    <Breadcrumbs paths={breadcrumbs ?? defaultBreadcrumbs} />
+                </div>
 
         <div className="col-12 col-md-3 mb-4 mb-md-0">
           <div className="mb-3">
@@ -65,7 +65,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
 
               <a
                 className="d-flex align-items-center gap-2 py-1 link-reset"
-                href="/account/orders/"
+                href="/account/order-history"
               >
                 <IconShoppingCart stroke={1.25} size={28} />
                 Order history

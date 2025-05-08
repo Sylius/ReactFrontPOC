@@ -326,6 +326,13 @@ input.form-check-input:checked {
   }
 }
 
+.btn.btn-outline-gray{
+  &:hover{
+    color: #fff;
+    background-color: #212529;
+  }
+}
+
 .flash-message-close:hover {
   cursor: pointer;
 }
