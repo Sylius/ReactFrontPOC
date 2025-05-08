@@ -3,6 +3,8 @@ import Default from "../../layouts/Default";
 import AccountLayout from "../../layouts/Account";
 import { useCustomer } from "../../context/CustomerContext";
 import { useFlashMessages } from "../../context/FlashMessagesContext";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const ProfilePage: React.FC = () => {
     const { customer, refetchCustomer } = useCustomer();
@@ -86,7 +88,7 @@ const ProfilePage: React.FC = () => {
                     </div>
 
                     {loading ? (
-                        <p>Loading...</p>
+                        <Skeleton count={12} height={36} className="mb-2" />
                     ) : (
                         <form onSubmit={handleSubmit}>
                             <div className="row">
