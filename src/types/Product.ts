@@ -32,3 +32,9 @@ export interface Image {
     id: number;
     path: string;
 }
+
+export interface ProductAttribute {
+    id: number;
+    name: string;
+    value: string;
+}

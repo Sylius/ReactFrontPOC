@@ -336,3 +336,10 @@ input.form-check-input:checked {
 .flash-message-close:hover {
   cursor: pointer;
 }
+.accordion-body{
+  tr:last-of-type{
+    th{
+      border: none;
+    }
+  }
+}
