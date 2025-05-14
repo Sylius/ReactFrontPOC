@@ -12,7 +12,14 @@ import 'yet-another-react-lightbox/styles.css';
 import { useFlashMessages } from '../context/FlashMessagesContext';
 import ReviewSummary from '../components/product/ReviewSummary';
 import ReviewSummarySkeleton from '../components/product/ReviewSummarySkeleton';
-import { Product, ProductVariantDetails, ProductOption, ProductOptionValue, ProductAttribute, ProductReview } from '../types/Product';
+import {
+    Product,
+    ProductVariantDetails,
+    ProductOption,
+    ProductOptionValue,
+    ProductAttribute,
+    ProductReview,
+} from '../types/Product';
 
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -26,6 +33,7 @@ const ProductPage: React.FC = () => {
     const [options, setOptions] = useState<ProductOption[]>([]);
     const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
     const [reviews, setReviews] = useState<ProductReview[]>([]);
+    const [allReviewCount, setAllReviewCount] = useState(0);
     const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
     const [activeImage, setActiveImage] = useState<string | null>(null);
     const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -62,16 +70,16 @@ const ProductPage: React.FC = () => {
     const fetchProductAttributes = async (productCode: string) => {
         try {
             const res = await fetch(`${API_URL}/api/v2/shop/products/${productCode}/attributes`);
-            if (!res.ok) throw new Error('Failed to fetch product attributes');
             const data = await res.json();
             setAttributes(data['hydra:member'] || []);
         } catch (err) {
-            console.error('Error while loading product attributes:', err);
+            console.error('Error loading attributes:', err);
         }
     };
 
     const fetchProductReviews = async (reviewRefs: { '@id': string }[]) => {
         try {
+            setAllReviewCount(reviewRefs.length);
             const data: ProductReview[] = await Promise.all(
                 reviewRefs.map(async (ref) => {
                     const res = await fetch(`${API_URL}${ref['@id']}`);
@@ -110,11 +118,11 @@ const ProductPage: React.FC = () => {
                 setVariant(variantData);
             }
             if (data.code) await fetchProductAttributes(data.code);
-            if (Array.isArray(data.reviews) && data.reviews.length > 0) {
+            if (Array.isArray(data.reviews)) {
                 await fetchProductReviews(data.reviews);
             }
         } catch (err) {
-            console.error('Error while loading product data:', err);
+            console.error('Error loading product:', err);
             setError('Error while loading product data');
         } finally {
             setLoading(false);
@@ -155,13 +163,11 @@ const ProductPage: React.FC = () => {
     }, [code]);
 
     const renderReviews = () => {
-        if (!reviews.length) {
+        if (!allReviewCount) {
             return (
                 <>
                     <div className="alert alert-info">
-                        <div className="fw-bold">
-                            Info
-                        </div>
+                        <div className="fw-bold">Info</div>
                         There are no reviews
                     </div>
                     <a href={`/product/${code}/review/new`} className="btn btn-primary">
@@ -195,7 +201,7 @@ const ProductPage: React.FC = () => {
             },
             {
                 title: 'Attributes',
-                content: attributes.length > 0 ? (
+                content: attributes.length ? (
                     <table className="table table-lg table-list">
                         <tbody>
                         {attributes.map((attr) => (
@@ -211,20 +217,16 @@ const ProductPage: React.FC = () => {
                 ),
             },
             {
-                title: `Reviews (${reviews.length})`,
+                title: `Reviews (${allReviewCount})`,
                 content: renderReviews(),
             },
         ];
-    }, [product, attributes, reviews]);
+    }, [product, attributes, reviews, allReviewCount]);
 
-    const lightboxSlides = product?.images.map((img) => ({ src: img.path })) || [];
-    const lightboxIndex = Math.max(
-        0,
-        product?.images.findIndex((img) => img.path === activeImage) ?? 0
-    );
+    const lightboxSlides = product?.images?.map((img) => ({ src: img.path })) || [];
+    const lightboxIndex = Math.max(0, product?.images?.findIndex((img) => img.path === activeImage) ?? 0);
 
     if (error) return <div className="text-danger text-center">{error}</div>;
-
 
     return (
         <Layout>
@@ -271,7 +273,7 @@ const ProductPage: React.FC = () => {
                                         <Skeleton style={{ width: '100%', height: '100%' }} />
                                     ) : (
                                         <img
-                                            src={activeImage || product?.images[0]?.path}
+                                            src={activeImage || product?.images?.[0]?.path}
                                             alt={product?.name}
                                             className="img-fluid w-100 h-100 object-fit-cover"
                                         />
@@ -291,7 +293,9 @@ const ProductPage: React.FC = () => {
                             {loading ? (
                                 <ReviewSummarySkeleton />
                             ) : (
-                                product && <ReviewSummary reviews={reviews} productCode={product.code} />
+                                product && (
+                                    <ReviewSummary reviews={reviews} productCode={product.code} allReviewCount={allReviewCount} />
+                                )
                             )}
                             <div className="fs-3 mb-3">
                                 {loading ? (
@@ -343,9 +347,7 @@ const ProductPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="mb-3">
-                                {product?.shortDescription || 'No short description'}
-                            </div>
+                            <div className="mb-3">{product?.shortDescription || 'No short description'}</div>
 
                             <small className="text-body-tertiary">
                                 {product?.name.replace(/\s+/g, '_')}
