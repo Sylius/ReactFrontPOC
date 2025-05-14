@@ -295,6 +295,30 @@ input.form-check-input:checked {
   }
 }
 
+.product-thumbnails {
+  max-height: 720px;
+  gap: 0.75rem;
+  padding-right: 4px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+
+  button {
+    aspect-ratio: 3 / 4;
+    width: 100px;
+    max-width: 100%;
+
+    img {
+      display: block;
+    }
+  }
+}
+
+.product-main-image-wrapper {
+  aspect-ratio: 3 / 4;
+  height: auto;
+  cursor: zoom-in;
+}
+
 .cursor-pointer:hover {
   cursor: pointer;
 }
@@ -335,4 +359,11 @@ input.form-check-input:checked {
 
 .flash-message-close:hover {
   cursor: pointer;
+}
+.accordion-body{
+  tr:last-of-type{
+    th{
+      border: none;
+    }
+  }
 }
