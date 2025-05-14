@@ -10,6 +10,7 @@ import Skeleton from 'react-loading-skeleton';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { useFlashMessages } from '../context/FlashMessagesContext';
+import ReviewSummary from '../components/product/ReviewSummary';
 import { Product, ProductVariantDetails, ProductOption, ProductOptionValue, ProductAttribute, ProductReview } from '../types/Product';
 
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -76,7 +77,12 @@ const ProductPage: React.FC = () => {
                     return await res.json();
                 })
             );
-            setReviews(data);
+
+            const sorted = data
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                .slice(0, 5);
+
+            setReviews(sorted);
         } catch (err) {
             console.error('Error fetching reviews:', err);
         }
@@ -151,7 +157,12 @@ const ProductPage: React.FC = () => {
         if (!reviews.length) {
             return (
                 <>
-                    <div className="alert alert-info">There are no reviews</div>
+                    <div className="alert alert-info">
+                        <div className="fw-bold">
+                            Info
+                        </div>
+                        There are no reviews
+                    </div>
                     <a href={`/product/${code}/review/new`} className="btn btn-primary">
                         Add your review
                     </a>
@@ -276,7 +287,13 @@ const ProductPage: React.FC = () => {
                             <div className="mb-4">
                                 <h1 className="h2 text-wrap">{product?.name}</h1>
                             </div>
-
+                            {loading ? (
+                                <div className="mb-3">
+                                    <Skeleton width={250} height={24} />
+                                </div>
+                            ) : (
+                                product && <ReviewSummary reviews={reviews} productCode={product.code} />
+                            )}
                             <div className="fs-3 mb-3">
                                 {loading ? (
                                     <Skeleton width={100} />
