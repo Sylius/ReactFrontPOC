@@ -109,7 +109,7 @@ const ProductPage: React.FC = () => {
             }
         } catch (err: unknown) {
             console.error('Error while loading product data:', err);
-            setError('Błąd podczas ładowania danych produktu');
+            setError('Error while loading product data');
         } finally {
             setLoading(false);
         }
@@ -138,7 +138,7 @@ const ProductPage: React.FC = () => {
                     }),
                 }
             );
-            if (!response.ok) throw new Error('Nie udało się dodać do koszyka');
+            if (!response.ok) throw new Error('Failed to add to cart');
             fetchOrder();
             setShowConfirmation(true);
         } catch (err: unknown) {
@@ -260,7 +260,7 @@ const ProductPage: React.FC = () => {
                                 ) : variant?.price ? (
                                     `$${formatPrice(variant.price)}`
                                 ) : (
-                                    'Brak ceny'
+                                    'No price available'
                                 )}
                             </div>
 
@@ -302,14 +302,14 @@ const ProductPage: React.FC = () => {
                                             onClick={handleAddToCart}
                                             disabled={isAddToCartLoading || loading}
                                         >
-                                            {isAddToCartLoading ? 'Dodawanie...' : 'Add to cart'}
+                                            {isAddToCartLoading ? 'Adding...' : 'Add to cart'}
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="mb-3">
-                                {product?.shortDescription || 'Brak krótkiego opisu'}
+                                {product?.shortDescription || 'No short description'}
                             </div>
 
                             <small className="text-body-tertiary">
