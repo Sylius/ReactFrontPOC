@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Layout from '../layouts/Default';
 import { useParams } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
 import BootstrapAccordion from '../components/Accordion';
 import { formatPrice } from '../utils/price';
 import { useOrder } from '../context/OrderContext';
+import AddToCartConfirmation from '../components/product/AddToCartConfirmation';
 import Skeleton from 'react-loading-skeleton';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
@@ -17,6 +18,8 @@ import {
     ProductAttribute,
 } from '../types/Product';
 
+const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
+
 const ProductPage: React.FC = () => {
     const { fetchOrder } = useOrder();
     const { code } = useParams<{ code: string }>();
@@ -28,7 +31,6 @@ const ProductPage: React.FC = () => {
     const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
     const [activeImage, setActiveImage] = useState<string | null>(null);
     const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
-
     const [loading, setLoading] = useState(true);
     const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -36,12 +38,12 @@ const ProductPage: React.FC = () => {
     const [showConfirmation, setShowConfirmation] = useState(false);
 
     const fetchOption = async (url: string): Promise<ProductOption> => {
-        const res = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}${url}`);
+        const res = await fetch(`${API_URL}${url}`);
         const data = await res.json();
 
         const values: ProductOptionValue[] = await Promise.all(
             data.values.map(async (valueUrl: string) => {
-                const res = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}${valueUrl}`);
+                const res = await fetch(`${API_URL}${valueUrl}`);
                 return await res.json();
             })
         );
@@ -53,40 +55,34 @@ const ProductPage: React.FC = () => {
         };
     };
 
-    const fetchVariantByOptions = async (
-        productCode: string,
-        selected: Record<string, string>
-    ) => {
-        const baseUrl = `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/product-variants`;
-        const productParam = `product=/api/v2/shop/products/${productCode}`;
+    const fetchVariantByOptions = async (productCode: string, selected: Record<string, string>) => {
         const optionParams = Object.entries(selected)
             .map(
                 ([optionCode, valueCode]) =>
                     `optionValues[]=/api/v2/shop/product-options/${optionCode}/values/${valueCode}`
             )
             .join('&');
-
-        const fullUrl = `${baseUrl}?${productParam}&${optionParams}`;
+        const fullUrl = `${API_URL}/api/v2/shop/product-variants?product=/api/v2/shop/products/${productCode}&${optionParams}`;
         const res = await fetch(fullUrl);
         const data = await res.json();
         setVariant(data['hydra:member']?.[0] || null);
     };
 
     const fetchProductAttributes = async (productCode: string) => {
-        const res = await fetch(
-            `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/products/${productCode}/attributes`
-        );
-        const data = await res.json();
-        setAttributes(data['hydra:member'] || []);
+        try {
+            const res = await fetch(`${API_URL}/api/v2/shop/products/${productCode}/attributes`);
+            if (!res.ok) throw new Error('Failed to fetch product attributes');
+            const data = await res.json();
+            setAttributes(data['hydra:member'] || []);
+        } catch (err: unknown) {
+            console.error('Error while loading product attributes:', err);
+        }
     };
 
     const fetchProduct = async () => {
         try {
-            const res = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/products/${code}`
-            );
+            const res = await fetch(`${API_URL}/api/v2/shop/products/${code}`);
             const data = await res.json();
-
             setProduct(data);
 
             if (data.images?.length > 0) {
@@ -96,16 +92,14 @@ const ProductPage: React.FC = () => {
             if (data.options?.length) {
                 const fetchedOptions = await Promise.all(data.options.map(fetchOption));
                 setOptions(fetchedOptions);
-
                 const defaultSelections: Record<string, string> = {};
                 fetchedOptions.forEach((option) => {
                     defaultSelections[option.code] = option.values[0]?.code;
                 });
-
                 setSelectedValues(defaultSelections);
                 await fetchVariantByOptions(data.code, defaultSelections);
             } else if (data.defaultVariant) {
-                const res = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}${data.defaultVariant}`);
+                const res = await fetch(`${API_URL}${data.defaultVariant}`);
                 const variantData = await res.json();
                 setVariant(variantData);
             }
@@ -113,7 +107,8 @@ const ProductPage: React.FC = () => {
             if (data.code) {
                 await fetchProductAttributes(data.code);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
+            console.error('Error while loading product data:', err);
             setError('Błąd podczas ładowania danych produktu');
         } finally {
             setLoading(false);
@@ -123,7 +118,6 @@ const ProductPage: React.FC = () => {
     const handleOptionChange = (optionCode: string, valueCode: string) => {
         const updated = { ...selectedValues, [optionCode]: valueCode };
         setSelectedValues(updated);
-
         if (product) {
             fetchVariantByOptions(product.code, updated);
         }
@@ -134,9 +128,7 @@ const ProductPage: React.FC = () => {
         setIsAddToCartLoading(true);
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem(
-                    'orderToken'
-                )}/items`,
+                `${API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -149,7 +141,7 @@ const ProductPage: React.FC = () => {
             if (!response.ok) throw new Error('Nie udało się dodać do koszyka');
             fetchOrder();
             setShowConfirmation(true);
-        } catch (err) {
+        } catch (err: unknown) {
             console.error(err);
         } finally {
             setIsAddToCartLoading(false);
@@ -160,8 +152,9 @@ const ProductPage: React.FC = () => {
         if (code) fetchProduct();
     }, [code]);
 
-    const accordionItems = product
-        ? [
+    const accordionItems = useMemo(() => {
+        if (!product) return [];
+        return [
             {
                 title: 'Details',
                 content: <p>{product.description}</p>,
@@ -187,11 +180,14 @@ const ProductPage: React.FC = () => {
                 title: 'Reviews (0)',
                 content: <p>Reviews will go here...</p>,
             },
-        ]
-        : [];
+        ];
+    }, [product, attributes]);
 
-    const lightboxSlides =
-        product?.images.map((img) => ({ src: img.path })) || [];
+    const lightboxSlides = product?.images.map((img) => ({ src: img.path })) || [];
+    const lightboxIndex = Math.max(
+        0,
+        product?.images.findIndex((img) => img.path === activeImage) ?? 0
+    );
 
     if (error) return <div className="text-danger text-center">{error}</div>;
 
@@ -200,7 +196,7 @@ const ProductPage: React.FC = () => {
             <div className="container mt-4 mb-5">
                 <Breadcrumbs
                     paths={[
-                        { label: 'Strona główna', url: '/' },
+                        { label: 'Home', url: '/' },
                         { label: product?.name || '...', url: `/product/${code}` },
                     ]}
                 />
@@ -208,39 +204,22 @@ const ProductPage: React.FC = () => {
                 <div className="row g-3 g-lg-5 mb-6">
                     <div className="col-12 col-lg-7 col-xl-8">
                         <div className="row spotlight-group mb-5">
-                            {product?.images.length > 1 && (
+                            {product?.images?.length > 1 && (
                                 <div className="col-auto d-none d-lg-block">
-                                    <div
-                                        className="d-flex flex-column overflow-auto"
-                                        style={{
-                                            maxHeight: '720px',
-                                            gap: '0.75rem',
-                                            paddingRight: '4px',
-                                            overflowY: 'auto',
-                                            scrollbarWidth: 'thin',
-                                        }}
-                                    >
+                                    <div className="product-thumbnails d-flex flex-column overflow-auto">
                                         {product.images.map((img) => (
                                             <button
                                                 key={img.id}
                                                 type="button"
                                                 onClick={() => setActiveImage(img.path)}
                                                 className={`border-0 p-0 bg-transparent rounded overflow-hidden ${
-                                                    activeImage === img.path
-                                                        ? 'opacity-100'
-                                                        : 'opacity-50'
+                                                    activeImage === img.path ? 'opacity-100' : 'opacity-50'
                                                 }`}
-                                                style={{
-                                                    aspectRatio: '3 / 4',
-                                                    width: '100px',
-                                                    maxWidth: '100%',
-                                                }}
                                             >
                                                 <img
                                                     src={img.path}
                                                     alt="thumbnail"
                                                     className="w-100 h-100 object-fit-cover"
-                                                    style={{ display: 'block' }}
                                                 />
                                             </button>
                                         ))}
@@ -250,8 +229,7 @@ const ProductPage: React.FC = () => {
 
                             <div className="col pe-lg-5 pe-xxl-5">
                                 <div
-                                    className="overflow-hidden bg-light rounded-3"
-                                    style={{ aspectRatio: '3 / 4', height: 'auto', cursor: 'zoom-in' }}
+                                    className="product-main-image-wrapper overflow-hidden bg-light rounded-3"
                                     onClick={() => setLightboxOpen(true)}
                                 >
                                     {loading ? (
@@ -273,7 +251,7 @@ const ProductPage: React.FC = () => {
                     <div className="col-12 col-lg-5 col-xl-4 order-lg-1">
                         <div className="sticky-top pt-2">
                             <div className="mb-4">
-                                <h1 className="h2 text-break">{product?.name}</h1>
+                                <h1 className="h2 text-wrap">{product?.name}</h1>
                             </div>
 
                             <div className="fs-3 mb-3">
@@ -292,9 +270,7 @@ const ProductPage: React.FC = () => {
                                     <select
                                         className="form-select"
                                         value={selectedValues[option.code]}
-                                        onChange={(e) =>
-                                            handleOptionChange(option.code, e.target.value)
-                                        }
+                                        onChange={(e) => handleOptionChange(option.code, e.target.value)}
                                     >
                                         {option.values.map((value) => (
                                             <option key={value.code} value={value.code}>
@@ -306,7 +282,7 @@ const ProductPage: React.FC = () => {
                             ))}
 
                             <div className="position-relative my-4">
-                                <form>
+                                <div>
                                     <div className="mb-4">
                                         <label className="form-label">Quantity</label>
                                         <input
@@ -329,7 +305,7 @@ const ProductPage: React.FC = () => {
                                             {isAddToCartLoading ? 'Dodawanie...' : 'Add to cart'}
                                         </button>
                                     </div>
-                                </form>
+                                </div>
                             </div>
 
                             <div className="mb-3">
@@ -341,18 +317,7 @@ const ProductPage: React.FC = () => {
                             </small>
 
                             {showConfirmation && (
-                                <div
-                                    className="alert alert-success alert-dismissible fade show mt-3"
-                                    role="alert"
-                                >
-                                    Produkt został dodany do koszyka!
-                                    <button
-                                        type="button"
-                                        className="btn-close"
-                                        aria-label="Close"
-                                        onClick={() => setShowConfirmation(false)}
-                                    ></button>
-                                </div>
+                                <AddToCartConfirmation onClose={() => setShowConfirmation(false)} />
                             )}
                         </div>
                     </div>
@@ -363,7 +328,7 @@ const ProductPage: React.FC = () => {
                 open={lightboxOpen}
                 close={() => setLightboxOpen(false)}
                 slides={lightboxSlides}
-                index={product?.images.findIndex((img) => img.path === activeImage) || 0}
+                index={lightboxIndex}
             />
         </Layout>
     );
