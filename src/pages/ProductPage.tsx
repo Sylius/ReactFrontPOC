@@ -5,10 +5,10 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import BootstrapAccordion from '../components/Accordion';
 import { formatPrice } from '../utils/price';
 import { useOrder } from '../context/OrderContext';
-import AddToCartConfirmation from '../components/product/AddToCartConfirmation';
 import Skeleton from 'react-loading-skeleton';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
+import { useFlashMessages } from '../context/FlashMessagesContext';
 
 import {
     Product,
@@ -22,6 +22,7 @@ const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
 
 const ProductPage: React.FC = () => {
     const { fetchOrder } = useOrder();
+    const { addMessage } = useFlashMessages();
     const { code } = useParams<{ code: string }>();
 
     const [product, setProduct] = useState<Product | null>(null);
@@ -30,12 +31,11 @@ const ProductPage: React.FC = () => {
     const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
     const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
     const [activeImage, setActiveImage] = useState<string | null>(null);
-    const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [quantity, setQuantity] = useState<number>(1);
-    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [quantity, setQuantity] = useState(1);
 
     const fetchOption = async (url: string): Promise<ProductOption> => {
         const res = await fetch(`${API_URL}${url}`);
@@ -48,14 +48,13 @@ const ProductPage: React.FC = () => {
             })
         );
 
-        return {
-            code: data.code,
-            name: data.name,
-            values,
-        };
+        return { code: data.code, name: data.name, values };
     };
 
-    const fetchVariantByOptions = async (productCode: string, selected: Record<string, string>) => {
+    const fetchVariantByOptions = async (
+        productCode: string,
+        selected: Record<string, string>
+    ) => {
         const optionParams = Object.entries(selected)
             .map(
                 ([optionCode, valueCode]) =>
@@ -74,7 +73,7 @@ const ProductPage: React.FC = () => {
             if (!res.ok) throw new Error('Failed to fetch product attributes');
             const data = await res.json();
             setAttributes(data['hydra:member'] || []);
-        } catch (err: unknown) {
+        } catch (err) {
             console.error('Error while loading product attributes:', err);
         }
     };
@@ -83,11 +82,9 @@ const ProductPage: React.FC = () => {
         try {
             const res = await fetch(`${API_URL}/api/v2/shop/products/${code}`);
             const data = await res.json();
-            setProduct(data);
 
-            if (data.images?.length > 0) {
-                setActiveImage(data.images[0].path);
-            }
+            setProduct(data);
+            if (data.images?.length > 0) setActiveImage(data.images[0].path);
 
             if (data.options?.length) {
                 const fetchedOptions = await Promise.all(data.options.map(fetchOption));
@@ -104,10 +101,8 @@ const ProductPage: React.FC = () => {
                 setVariant(variantData);
             }
 
-            if (data.code) {
-                await fetchProductAttributes(data.code);
-            }
-        } catch (err: unknown) {
+            if (data.code) await fetchProductAttributes(data.code);
+        } catch (err) {
             console.error('Error while loading product data:', err);
             setError('Error while loading product data');
         } finally {
@@ -118,9 +113,7 @@ const ProductPage: React.FC = () => {
     const handleOptionChange = (optionCode: string, valueCode: string) => {
         const updated = { ...selectedValues, [optionCode]: valueCode };
         setSelectedValues(updated);
-        if (product) {
-            fetchVariantByOptions(product.code, updated);
-        }
+        if (product) fetchVariantByOptions(product.code, updated);
     };
 
     const handleAddToCart = async () => {
@@ -132,17 +125,16 @@ const ProductPage: React.FC = () => {
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        productVariant: variant.code,
-                        quantity,
-                    }),
+                    body: JSON.stringify({ productVariant: variant.code, quantity }),
                 }
             );
             if (!response.ok) throw new Error('Failed to add to cart');
+
             fetchOrder();
-            setShowConfirmation(true);
-        } catch (err: unknown) {
+            addMessage('success', 'Product added to cart');
+        } catch (err) {
             console.error(err);
+            addMessage('error', 'Failed to add product to cart');
         } finally {
             setIsAddToCartLoading(false);
         }
@@ -282,29 +274,25 @@ const ProductPage: React.FC = () => {
                             ))}
 
                             <div className="position-relative my-4">
-                                <div>
-                                    <div className="mb-4">
-                                        <label className="form-label">Quantity</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            value={quantity}
-                                            min="1"
-                                            onChange={(e) =>
-                                                setQuantity(parseInt(e.target.value) || 1)
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <button
-                                            type="button"
-                                            className="btn btn-success px-4 py-2"
-                                            onClick={handleAddToCart}
-                                            disabled={isAddToCartLoading || loading}
-                                        >
-                                            {isAddToCartLoading ? 'Adding...' : 'Add to cart'}
-                                        </button>
-                                    </div>
+                                <div className="mb-4">
+                                    <label className="form-label">Quantity</label>
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        value={quantity}
+                                        min="1"
+                                        onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <button
+                                        type="button"
+                                        className="btn btn-success px-4 py-2"
+                                        onClick={handleAddToCart}
+                                        disabled={isAddToCartLoading || loading}
+                                    >
+                                        {isAddToCartLoading ? 'Adding...' : 'Add to cart'}
+                                    </button>
                                 </div>
                             </div>
 
@@ -315,10 +303,6 @@ const ProductPage: React.FC = () => {
                             <small className="text-body-tertiary">
                                 {product?.name.replace(/\s+/g, '_')}
                             </small>
-
-                            {showConfirmation && (
-                                <AddToCartConfirmation onClose={() => setShowConfirmation(false)} />
-                            )}
                         </div>
                     </div>
                 </div>
