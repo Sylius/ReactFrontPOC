@@ -5,7 +5,6 @@ import { Product } from '../types/Product';
 import Breadcrumbs from '../components/Breadcrumbs';
 import ProductCard from '../components/ProductCard';
 import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 
 interface TaxonDetails {
   name: string;

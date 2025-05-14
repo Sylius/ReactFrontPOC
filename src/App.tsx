@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 import ProductPage from "./pages/ProductPage";
 import ProductList from "./pages/ProductList";

@@ -1,15 +1,15 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Default from "../../layouts/Default";
 import AccountLayout from "../../layouts/Account";
 import { useCustomer } from "../../context/CustomerContext";
 import { useQuery } from "@tanstack/react-query";
 import { Order } from "../../types/Order";
 import Skeleton from "react-loading-skeleton";
-import 'react-loading-skeleton/dist/skeleton.css';
 
 const fetchCustomerOrders = async (): Promise<Order[]> => {
     const token = localStorage.getItem("jwtToken");
-    if (!token) throw new Error("Brak tokenu");
+    if (!token) throw new Error("No Token");
 
     const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -18,7 +18,7 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
     });
 
     if (!response.ok) {
-        throw new Error("Błąd pobierania zamówień");
+        throw new Error("Order download error");
     }
 
     const data = await response.json();
@@ -32,7 +32,7 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
                 });
 
                 if (!orderResponse.ok) {
-                    throw new Error("Błąd pobierania pełnego zamówienia");
+                    throw new Error("Full order download error");
                 }
 
                 const fullOrderData = await orderResponse.json();
@@ -93,7 +93,7 @@ const OrderHistoryPage: React.FC = () => {
                         <div className="card-body border-bottom py-3">
                             <div className="d-flex border-bottom pb-3"></div>
                             <div className="table-responsive">
-                                {isLoading && (
+                                {isLoading ? (
                                     <table className="table card-table">
                                         <tbody>
                                         <tr>
@@ -106,11 +106,9 @@ const OrderHistoryPage: React.FC = () => {
                                         </tr>
                                         </tbody>
                                     </table>
-                                )}
-
-                                {isError && <p>Failed to load orders. Please try again later.</p>}
-
-                                {!isLoading && !isError && (
+                                ) : isError ? (
+                                    <p>Failed to load orders. Please try again later.</p>
+                                ) : (
                                     <table className="table card-table table-vcenter text-nowrap datatable">
                                         <thead>
                                         <tr>
@@ -123,8 +121,8 @@ const OrderHistoryPage: React.FC = () => {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {orders.map((order: any) => (
-                                            <tr key={order.id || order.tokenValue} className="item">
+                                        {orders.map((order: Order) => (
+                                            <tr key={order.tokenValue} className="item">
                                                 <td>#{order.number}</td>
                                                 <td>
                                                     {order.createdAt
@@ -143,10 +141,12 @@ const OrderHistoryPage: React.FC = () => {
                                                 <td>${(order.itemsSubtotal / 100).toFixed(2)}</td>
                                                 <td>{order.state}</td>
                                                 <td>
-                                                    <a href={`/account/orders/${order.tokenValue}`}
-                                                       className="btn btn-sm btn-outline-gray">
+                                                    <Link
+                                                        to={`/account/orders/${order.tokenValue}`}
+                                                        className="btn btn-sm btn-outline-gray"
+                                                    >
                                                         Show
-                                                    </a>
+                                                    </Link>
                                                 </td>
                                             </tr>
                                         ))}

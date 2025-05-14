@@ -6,7 +6,7 @@ import BootstrapAccordion from '../components/Accordion';
 import { formatPrice } from '../utils/price';
 import { useOrder } from '../context/OrderContext';
 import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
+
 import {
   Product,
   ProductVariantDetails,

@@ -4,7 +4,6 @@ import AccountLayout from "../../layouts/Account";
 import { useCustomer } from "../../context/CustomerContext";
 import { useFlashMessages } from "../../context/FlashMessagesContext";
 import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 
 const ProfilePage: React.FC = () => {
     const { customer, refetchCustomer } = useCustomer();
