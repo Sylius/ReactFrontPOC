@@ -11,6 +11,7 @@ import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { useFlashMessages } from '../context/FlashMessagesContext';
 import ReviewSummary from '../components/product/ReviewSummary';
+import ReviewSummarySkeleton from '../components/product/ReviewSummarySkeleton';
 import { Product, ProductVariantDetails, ProductOption, ProductOptionValue, ProductAttribute, ProductReview } from '../types/Product';
 
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -173,7 +174,6 @@ const ProductPage: React.FC = () => {
         return (
             <>
                 <ReviewList reviews={reviews} />
-
                 <div className="d-flex flex-wrap gap-3">
                     <a href={`/product/${code}/review/new`} className="btn btn-success px-4 py-2">
                         Add your review
@@ -225,6 +225,7 @@ const ProductPage: React.FC = () => {
 
     if (error) return <div className="text-danger text-center">{error}</div>;
 
+
     return (
         <Layout>
             <div className="container mt-4 mb-5">
@@ -238,10 +239,10 @@ const ProductPage: React.FC = () => {
                 <div className="row g-3 g-lg-5 mb-6">
                     <div className="col-12 col-lg-7 col-xl-8">
                         <div className="row spotlight-group mb-5">
-                            {product?.images?.length > 1 && (
+                            {(product?.images?.length ?? 0) > 1 && (
                                 <div className="col-auto d-none d-lg-block">
                                     <div className="product-thumbnails d-flex flex-column overflow-auto">
-                                        {product.images.map((img) => (
+                                        {product?.images?.map((img) => (
                                             <button
                                                 key={img.id}
                                                 type="button"
@@ -288,9 +289,7 @@ const ProductPage: React.FC = () => {
                                 <h1 className="h2 text-wrap">{product?.name}</h1>
                             </div>
                             {loading ? (
-                                <div className="mb-3">
-                                    <Skeleton width={250} height={24} />
-                                </div>
+                                <ReviewSummarySkeleton />
                             ) : (
                                 product && <ReviewSummary reviews={reviews} productCode={product.code} />
                             )}

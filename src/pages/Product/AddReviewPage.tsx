@@ -4,6 +4,7 @@ import ProductCard from '../../components/ProductCard';
 import { useFlashMessages } from '../../context/FlashMessagesContext';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import Layout from '../../layouts/Default';
+import Skeleton from 'react-loading-skeleton';
 import { Product } from '../../types/Product';
 
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -74,13 +75,17 @@ const AddReviewPage: React.FC = () => {
                         ]}
                     />
 
-                        <div className="col-12 col-md-5 col-lg-4">
-                            {product && <ProductCard product={product} />}
-                        </div>
+                    <div className="col-12 col-md-5 col-lg-4">
+                        {loading ? (
+                            <Skeleton height={400}/>
+                        ) : (
+                            product && <ProductCard product={product}/>
+                        )}
+                    </div>
 
-                        <div className="col-12 col-md-7 col-lg-8">
-                            <h1>Add Your Review</h1>
-                            <form onSubmit={handleSubmit}>
+                    <div className="col-12 col-md-7 col-lg-8">
+                        <h1>Add Your Review</h1>
+                        <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
                                     <label className="form-label d-block">Rating <span className="text-danger">*</span></label>
                                     <div className="star-rating" role="radiogroup" aria-label="Rating">
