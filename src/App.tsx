@@ -16,6 +16,7 @@ import DashboardPage from "./pages/account/DashboardPage";
 import OrderHistoryPage from "./pages/account/OrderHistoryPage";
 import OrderDetailsPage from "./pages/account/OrderDetailsPage";
 import ProfilePage from "./pages/account/ProfilePage.tsx";
+import AddReviewPage from "./pages/Product/AddReviewPage";
 
 import "./assets/scss/main.scss";
 import { OrderProvider } from "./context/OrderContext";
@@ -55,6 +56,7 @@ const App: React.FC = () => {
               />
               <Route path="/account/order-history" element={<OrderHistoryPage />} />
               <Route path="/account/orders/:token" element={<OrderDetailsPage />} />
+              <Route path="/product/:code/review/new" element={<AddReviewPage />} />
             </Routes>
           </FlashMessagesProvider>
         </OrderProvider>

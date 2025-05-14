@@ -5,18 +5,12 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import BootstrapAccordion from '../components/Accordion';
 import { formatPrice } from '../utils/price';
 import { useOrder } from '../context/OrderContext';
+import ReviewList from '../components/product/Reviews';
 import Skeleton from 'react-loading-skeleton';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { useFlashMessages } from '../context/FlashMessagesContext';
-
-import {
-    Product,
-    ProductVariantDetails,
-    ProductOption,
-    ProductOptionValue,
-    ProductAttribute,
-} from '../types/Product';
+import { Product, ProductVariantDetails, ProductOption, ProductOptionValue, ProductAttribute, ProductReview } from '../types/Product';
 
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -29,6 +23,7 @@ const ProductPage: React.FC = () => {
     const [variant, setVariant] = useState<ProductVariantDetails | null>(null);
     const [options, setOptions] = useState<ProductOption[]>([]);
     const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
+    const [reviews, setReviews] = useState<ProductReview[]>([]);
     const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
     const [activeImage, setActiveImage] = useState<string | null>(null);
     const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -40,21 +35,16 @@ const ProductPage: React.FC = () => {
     const fetchOption = async (url: string): Promise<ProductOption> => {
         const res = await fetch(`${API_URL}${url}`);
         const data = await res.json();
-
         const values: ProductOptionValue[] = await Promise.all(
             data.values.map(async (valueUrl: string) => {
                 const res = await fetch(`${API_URL}${valueUrl}`);
                 return await res.json();
             })
         );
-
         return { code: data.code, name: data.name, values };
     };
 
-    const fetchVariantByOptions = async (
-        productCode: string,
-        selected: Record<string, string>
-    ) => {
+    const fetchVariantByOptions = async (productCode: string, selected: Record<string, string>) => {
         const optionParams = Object.entries(selected)
             .map(
                 ([optionCode, valueCode]) =>
@@ -78,14 +68,26 @@ const ProductPage: React.FC = () => {
         }
     };
 
+    const fetchProductReviews = async (reviewRefs: { '@id': string }[]) => {
+        try {
+            const data: ProductReview[] = await Promise.all(
+                reviewRefs.map(async (ref) => {
+                    const res = await fetch(`${API_URL}${ref['@id']}`);
+                    return await res.json();
+                })
+            );
+            setReviews(data);
+        } catch (err) {
+            console.error('Error fetching reviews:', err);
+        }
+    };
+
     const fetchProduct = async () => {
         try {
             const res = await fetch(`${API_URL}/api/v2/shop/products/${code}`);
             const data = await res.json();
-
             setProduct(data);
             if (data.images?.length > 0) setActiveImage(data.images[0].path);
-
             if (data.options?.length) {
                 const fetchedOptions = await Promise.all(data.options.map(fetchOption));
                 setOptions(fetchedOptions);
@@ -100,8 +102,10 @@ const ProductPage: React.FC = () => {
                 const variantData = await res.json();
                 setVariant(variantData);
             }
-
             if (data.code) await fetchProductAttributes(data.code);
+            if (Array.isArray(data.reviews) && data.reviews.length > 0) {
+                await fetchProductReviews(data.reviews);
+            }
         } catch (err) {
             console.error('Error while loading product data:', err);
             setError('Error while loading product data');
@@ -129,7 +133,6 @@ const ProductPage: React.FC = () => {
                 }
             );
             if (!response.ok) throw new Error('Failed to add to cart');
-
             fetchOrder();
             addMessage('success', 'Product added to cart');
         } catch (err) {
@@ -143,6 +146,34 @@ const ProductPage: React.FC = () => {
     useEffect(() => {
         if (code) fetchProduct();
     }, [code]);
+
+    const renderReviews = () => {
+        if (!reviews.length) {
+            return (
+                <>
+                    <div className="alert alert-info">There are no reviews</div>
+                    <a href={`/product/${code}/review/new`} className="btn btn-primary">
+                        Add your review
+                    </a>
+                </>
+            );
+        }
+
+        return (
+            <>
+                <ReviewList reviews={reviews} />
+
+                <div className="d-flex flex-wrap gap-3">
+                    <a href={`/product/${code}/review/new`} className="btn btn-success px-4 py-2">
+                        Add your review
+                    </a>
+                    <a href={`/product/${code}/reviews`} className="btn btn-link">
+                        View more
+                    </a>
+                </div>
+            </>
+        );
+    };
 
     const accordionItems = useMemo(() => {
         if (!product) return [];
@@ -169,11 +200,11 @@ const ProductPage: React.FC = () => {
                 ),
             },
             {
-                title: 'Reviews (0)',
-                content: <p>Reviews will go here...</p>,
+                title: `Reviews (${reviews.length})`,
+                content: renderReviews(),
             },
         ];
-    }, [product, attributes]);
+    }, [product, attributes, reviews]);
 
     const lightboxSlides = product?.images.map((img) => ({ src: img.path })) || [];
     const lightboxIndex = Math.max(
