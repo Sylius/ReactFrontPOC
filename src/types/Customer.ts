@@ -8,7 +8,7 @@ export interface Customer {
   "@context"?: string;
   "@id"?: string;
   "@type"?: string;
-  defaultAddress?: string | null;
+  defaultAddress?: string | { "@id": string } | null;
   user?: ShopUser | null;
   email?: string;
   firstName?: string | null;
