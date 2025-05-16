@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Default from "../../layouts/Default";
 import AccountLayout from "../../layouts/Account";
-import Skeleton from "react-loading-skeleton";
 import { useFlashMessages } from "../../context/FlashMessagesContext";
+import AddressForm from "../../components/account/AddressForm";
 
 interface Country {
     code: string;
@@ -27,7 +27,6 @@ const AddAddressPage: React.FC = () => {
         postcode: "",
         phoneNumber: "",
     });
-
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
@@ -98,117 +97,19 @@ const AddAddressPage: React.FC = () => {
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <div className="row">
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label className="form-label">First name *</label>
-                                    <input
-                                        className="form-control"
-                                        name="firstName"
-                                        value={formData.firstName}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label className="form-label">Last name *</label>
-                                    <input
-                                        className="form-control"
-                                        name="lastName"
-                                        value={formData.lastName}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-12 mb-3">
-                                    <label className="form-label">Company</label>
-                                    <input
-                                        className="form-control"
-                                        name="company"
-                                        value={formData.company}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="col-12 mb-3">
-                                    <label className="form-label">Street address *</label>
-                                    <input
-                                        className="form-control"
-                                        name="street"
-                                        value={formData.street}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-12 mb-3">
-                                    <label className="form-label">Country *</label>
-                                    {loadingCountries ? (
-                                        <Skeleton height={36}/>
-                                    ) : (
-                                        <select
-                                            className="form-select"
-                                            name="countryCode"
-                                            value={formData.countryCode}
-                                            onChange={handleChange}
-                                            required
-                                        >
-                                            <option value="" disabled>Select</option>
-                                            {countries.map((country) => (
-                                                <option key={country.code} value={country.code}>
-                                                    {country.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    )}
-                                </div>
-                                {formData.countryCode && (
-                                    <div className="col-12 mb-3">
-                                        <label className="form-label">Province</label>
-                                        <input
-                                            className="form-control"
-                                            name="provinceName"
-                                            value={formData.provinceName}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                )}
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label className="form-label">City *</label>
-                                    <input
-                                        className="form-control"
-                                        name="city"
-                                        value={formData.city}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-12 col-md-6 mb-3">
-                                    <label className="form-label">Postcode *</label>
-                                    <input
-                                        className="form-control"
-                                        name="postcode"
-                                        value={formData.postcode}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-12 mb-3">
-                                    <label className="form-label">Phone number</label>
-                                    <input
-                                        className="form-control"
-                                        name="phoneNumber"
-                                        value={formData.phoneNumber}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                            </div>
+                            <AddressForm
+                                formData={formData}
+                                countries={countries}
+                                loadingCountries={loadingCountries}
+                                onChange={handleChange}
+                            />
                         </div>
-
 
                         <div className="d-flex gap-2">
                             <button type="submit" className="btn btn-primary" disabled={submitting}>
                                 {submitting ? "Adding..." : "Add"}
                             </button>
-                            <button type="button" className="btn btn-outline-gray"
-                                    onClick={() => navigate("/account/address-book")}>
+                            <button type="button" className="btn btn-outline-gray" onClick={() => navigate("/account/address-book")}>
                                 Cancel
                             </button>
                         </div>

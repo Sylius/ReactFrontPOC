@@ -19,6 +19,8 @@ import ProfilePage from "./pages/account/ProfilePage.tsx";
 import AddressBookPage from "./pages/account/AddressBookPage";
 import AddAddressPage from "./pages/account/AddAddressPage";
 import EditAddressPage from "./pages/account/EditAddressPage";
+import AddReviewPage from "./pages/Product/AddReviewPage";
+import ReviewsListPage from "./pages/Product/ReviewsListPage";
 
 import "./assets/scss/main.scss";
 import { OrderProvider } from "./context/OrderContext";
