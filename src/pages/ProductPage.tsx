@@ -5,17 +5,20 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import BootstrapAccordion from '../components/Accordion';
 import { formatPrice } from '../utils/price';
 import { useOrder } from '../context/OrderContext';
+import ReviewList from '../components/product/Reviews';
 import Skeleton from 'react-loading-skeleton';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { useFlashMessages } from '../context/FlashMessagesContext';
-
+import ReviewSummary from '../components/product/ReviewSummary';
+import ReviewSummarySkeleton from '../components/product/ReviewSummarySkeleton';
 import {
     Product,
     ProductVariantDetails,
     ProductOption,
     ProductOptionValue,
     ProductAttribute,
+    ProductReview,
 } from '../types/Product';
 
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -29,6 +32,8 @@ const ProductPage: React.FC = () => {
     const [variant, setVariant] = useState<ProductVariantDetails | null>(null);
     const [options, setOptions] = useState<ProductOption[]>([]);
     const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
+    const [reviews, setReviews] = useState<ProductReview[]>([]);
+    const [allReviewCount, setAllReviewCount] = useState(0);
     const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
     const [activeImage, setActiveImage] = useState<string | null>(null);
     const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -40,21 +45,16 @@ const ProductPage: React.FC = () => {
     const fetchOption = async (url: string): Promise<ProductOption> => {
         const res = await fetch(`${API_URL}${url}`);
         const data = await res.json();
-
         const values: ProductOptionValue[] = await Promise.all(
             data.values.map(async (valueUrl: string) => {
                 const res = await fetch(`${API_URL}${valueUrl}`);
                 return await res.json();
             })
         );
-
         return { code: data.code, name: data.name, values };
     };
 
-    const fetchVariantByOptions = async (
-        productCode: string,
-        selected: Record<string, string>
-    ) => {
+    const fetchVariantByOptions = async (productCode: string, selected: Record<string, string>) => {
         const optionParams = Object.entries(selected)
             .map(
                 ([optionCode, valueCode]) =>
@@ -70,11 +70,30 @@ const ProductPage: React.FC = () => {
     const fetchProductAttributes = async (productCode: string) => {
         try {
             const res = await fetch(`${API_URL}/api/v2/shop/products/${productCode}/attributes`);
-            if (!res.ok) throw new Error('Failed to fetch product attributes');
             const data = await res.json();
             setAttributes(data['hydra:member'] || []);
         } catch (err) {
-            console.error('Error while loading product attributes:', err);
+            console.error('Error loading attributes:', err);
+        }
+    };
+
+    const fetchProductReviews = async (reviewRefs: { '@id': string }[]) => {
+        try {
+            setAllReviewCount(reviewRefs.length);
+            const data: ProductReview[] = await Promise.all(
+                reviewRefs.map(async (ref) => {
+                    const res = await fetch(`${API_URL}${ref['@id']}`);
+                    return await res.json();
+                })
+            );
+
+            const sorted = data
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                .slice(0, 5);
+
+            setReviews(sorted);
+        } catch (err) {
+            console.error('Error fetching reviews:', err);
         }
     };
 
@@ -82,10 +101,8 @@ const ProductPage: React.FC = () => {
         try {
             const res = await fetch(`${API_URL}/api/v2/shop/products/${code}`);
             const data = await res.json();
-
             setProduct(data);
             if (data.images?.length > 0) setActiveImage(data.images[0].path);
-
             if (data.options?.length) {
                 const fetchedOptions = await Promise.all(data.options.map(fetchOption));
                 setOptions(fetchedOptions);
@@ -100,10 +117,12 @@ const ProductPage: React.FC = () => {
                 const variantData = await res.json();
                 setVariant(variantData);
             }
-
             if (data.code) await fetchProductAttributes(data.code);
+            if (Array.isArray(data.reviews)) {
+                await fetchProductReviews(data.reviews);
+            }
         } catch (err) {
-            console.error('Error while loading product data:', err);
+            console.error('Error loading product:', err);
             setError('Error while loading product data');
         } finally {
             setLoading(false);
@@ -129,7 +148,6 @@ const ProductPage: React.FC = () => {
                 }
             );
             if (!response.ok) throw new Error('Failed to add to cart');
-
             fetchOrder();
             addMessage('success', 'Product added to cart');
         } catch (err) {
@@ -144,6 +162,36 @@ const ProductPage: React.FC = () => {
         if (code) fetchProduct();
     }, [code]);
 
+    const renderReviews = () => {
+        if (!allReviewCount) {
+            return (
+                <>
+                    <div className="alert alert-info">
+                        <div className="fw-bold">Info</div>
+                        There are no reviews
+                    </div>
+                    <a href={`/product/${code}/review/new`} className="btn btn-primary">
+                        Add your review
+                    </a>
+                </>
+            );
+        }
+
+        return (
+            <>
+                <ReviewList reviews={reviews} />
+                <div className="d-flex flex-wrap gap-3">
+                    <a href={`/product/${code}/review/new`} className="btn btn-success px-4 py-2">
+                        Add your review
+                    </a>
+                    <a href={`/product/${code}/reviews`} className="btn btn-link">
+                        View more
+                    </a>
+                </div>
+            </>
+        );
+    };
+
     const accordionItems = useMemo(() => {
         if (!product) return [];
         return [
@@ -153,7 +201,7 @@ const ProductPage: React.FC = () => {
             },
             {
                 title: 'Attributes',
-                content: attributes.length > 0 ? (
+                content: attributes.length ? (
                     <table className="table table-lg table-list">
                         <tbody>
                         {attributes.map((attr) => (
@@ -169,17 +217,14 @@ const ProductPage: React.FC = () => {
                 ),
             },
             {
-                title: 'Reviews (0)',
-                content: <p>Reviews will go here...</p>,
+                title: `Reviews (${allReviewCount})`,
+                content: renderReviews(),
             },
         ];
-    }, [product, attributes]);
+    }, [product, attributes, reviews, allReviewCount]);
 
-    const lightboxSlides = product?.images.map((img) => ({ src: img.path })) || [];
-    const lightboxIndex = Math.max(
-        0,
-        product?.images.findIndex((img) => img.path === activeImage) ?? 0
-    );
+    const lightboxSlides = product?.images?.map((img) => ({ src: img.path })) || [];
+    const lightboxIndex = Math.max(0, product?.images?.findIndex((img) => img.path === activeImage) ?? 0);
 
     if (error) return <div className="text-danger text-center">{error}</div>;
 
@@ -196,10 +241,10 @@ const ProductPage: React.FC = () => {
                 <div className="row g-3 g-lg-5 mb-6">
                     <div className="col-12 col-lg-7 col-xl-8">
                         <div className="row spotlight-group mb-5">
-                            {product?.images?.length > 1 && (
+                            {(product?.images?.length ?? 0) > 1 && (
                                 <div className="col-auto d-none d-lg-block">
                                     <div className="product-thumbnails d-flex flex-column overflow-auto">
-                                        {product.images.map((img) => (
+                                        {product?.images?.map((img) => (
                                             <button
                                                 key={img.id}
                                                 type="button"
@@ -228,7 +273,7 @@ const ProductPage: React.FC = () => {
                                         <Skeleton style={{ width: '100%', height: '100%' }} />
                                     ) : (
                                         <img
-                                            src={activeImage || product?.images[0]?.path}
+                                            src={activeImage || product?.images?.[0]?.path}
                                             alt={product?.name}
                                             className="img-fluid w-100 h-100 object-fit-cover"
                                         />
@@ -245,7 +290,13 @@ const ProductPage: React.FC = () => {
                             <div className="mb-4">
                                 <h1 className="h2 text-wrap">{product?.name}</h1>
                             </div>
-
+                            {loading ? (
+                                <ReviewSummarySkeleton />
+                            ) : (
+                                product && (
+                                    <ReviewSummary reviews={reviews} productCode={product.code} allReviewCount={allReviewCount} />
+                                )
+                            )}
                             <div className="fs-3 mb-3">
                                 {loading ? (
                                     <Skeleton width={100} />
@@ -296,9 +347,7 @@ const ProductPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="mb-3">
-                                {product?.shortDescription || 'No short description'}
-                            </div>
+                            <div className="mb-3">{product?.shortDescription || 'No short description'}</div>
 
                             <small className="text-body-tertiary">
                                 {product?.name.replace(/\s+/g, '_')}

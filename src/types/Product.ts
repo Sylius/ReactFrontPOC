@@ -8,6 +8,7 @@ export interface Product {
     variants: string[];
     images: Image[];
     options?: string[];
+    reviews?: { '@id': string }[];
 }
 
 export interface ProductOption {
@@ -37,4 +38,15 @@ export interface ProductAttribute {
     id: number;
     name: string;
     value: string;
+}
+
+export interface ProductReview {
+    id: number;
+    title: string;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    author?: {
+        firstName: string | null;
+    };
 }

@@ -367,3 +367,37 @@ input.form-check-input:checked {
     }
   }
 }
+
+.review-stars{
+  color: #FFC107;
+}
+
+.star-rating {
+  display: inline-flex;
+  gap: 0.25rem;
+  direction: ltr;
+
+  .star {
+    all: unset;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #ccc;
+    transition: color 0.2s ease;
+  }
+
+  &:hover .star {
+    color: #ffc107;
+  }
+
+  .star:hover ~ .star {
+    color: #ccc !important;
+  }
+
+  .active {
+    color: #ffc107;
+  }
+}
+
+
+
+
