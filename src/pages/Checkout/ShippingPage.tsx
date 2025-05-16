@@ -90,65 +90,71 @@ const ShippingPage: React.FC = () => {
 
               <div className="mb-5">
                 {hasErrors && (
-                  <div className="invalid-feedback d-block">
-                    Please select shipping method.
-                  </div>
-                )}
-                {shippingMethods &&
-                  shippingMethods.map((method: any) => (
-                    <div
-                      key={method.id}
-                      className="card bg-body-tertiary border-0 mb-3"
-                    >
-                      <label className="d-flex gap-3 card-body">
-                        <div className="flex-grow-1">
-                          <div>
-                            <div className="form-check">
-                              <input
-                                type="radio"
-                                id={`shipping-method-${method.id}`}
-                                name="shipping-methods"
-                                required={true}
-                                className="form-check-input"
-                                onChange={() => setShippingMethod(method.code)}
-                                checked={shippingMethod === method.code}
-                                value={method.code}
-                              />
-                              <label
-                                className="form-check-label required"
-                                htmlFor="sylius_shop_checkout_select_shipping_shipments_0_method_0"
-                              >
-                                {method.name}
-                              </label>
-                            </div>
-                          </div>
-
-                          <div className="ps-4">
-                            <small className="text-black-50">
-                              {method.description}
-                            </small>
-                          </div>
-                        </div>
-
-                        <div>{formatPrice(method.price)}</div>
-                      </label>
+                    <div className="invalid-feedback d-block">
+                      Please select shipping method.
                     </div>
-                  ))}
+                )}
+
+                {shippingMethods?.length === 0 && (
+                    <div className="card bg-body-tertiary border-0 mb-3">
+                      <div className="card-body">
+                        <h6 className="text-danger mb-1">Warning</h6>
+                        <p className="mb-0">
+                          There are currently no shipping methods available for your shipping address.
+                        </p>
+                      </div>
+                    </div>
+                )}
+
+                {shippingMethods?.length > 0 &&
+                    shippingMethods.map((method: any) => (
+                        <div key={method.id} className="card bg-body-tertiary border-0 mb-3">
+                          <label className="d-flex gap-3 card-body">
+                            <div className="flex-grow-1">
+                              <div className="form-check">
+                                <input
+                                    type="radio"
+                                    id={`shipping-method-${method.id}`}
+                                    name="shipping-methods"
+                                    required
+                                    className="form-check-input"
+                                    onChange={() => setShippingMethod(method.code)}
+                                    checked={shippingMethod === method.code}
+                                    value={method.code}
+                                />
+                                <label
+                                    className="form-check-label required"
+                                    htmlFor={`shipping-method-${method.id}`}
+                                >
+                                  {method.name}
+                                </label>
+                              </div>
+
+                              <div className="ps-4">
+                                <small className="text-black-50">{method.description}</small>
+                              </div>
+                            </div>
+
+                            <div>{formatPrice(method.price)}</div>
+                          </label>
+                        </div>
+                    ))}
               </div>
+
 
               <div className="d-flex justify-content-between flex-column flex-sm-row gap-2">
                 <Link className="btn btn-light btn-icon" to="/checkout/address">
-                  <IconChevronLeft stroke={2} />
+                  <IconChevronLeft stroke={2}/>
                   Change address
                 </Link>
 
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="btn btn-primary btn-icon"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="btn btn-primary btn-icon"
                 >
                   Next
-                  <IconChevronRight stroke={2} />
+                  <IconChevronRight stroke={2}/>
                 </button>
               </div>
             </form>

@@ -1,10 +1,13 @@
-import React, {useEffect} from "react";
-import Layout from "../../layouts/Default";
-import {useOrder} from "../../context/OrderContext.tsx";
-
+import React, { useEffect } from 'react';
+import Layout from '../../layouts/Default';
+import { useOrder } from '../../context/OrderContext';
+import { useCustomer } from '../../context/CustomerContext';
+import { useNavigate } from 'react-router-dom';
 
 const ThankYouPage: React.FC = () => {
-    const { fetchOrder } = useOrder();
+    const { fetchOrder, order } = useOrder();
+    const { customer } = useCustomer();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchOrder();
@@ -18,19 +21,25 @@ const ThankYouPage: React.FC = () => {
                     You have successfully placed an order.
 
                     <div className="d-flex flex-column flex-lg-row justify-content-center gap-2 mt-4">
-
-                        <a className="btn btn-primary" id="payment-method-page">
-                            Change payment method
-                        </a>
-
-                        <a className="btn btn-secondary" id="create-an-account">
-                            Create an account
-                        </a>
+                        {customer ? (
+                            <a className="btn btn-primary" href="/account/orders">
+                                View order
+                            </a>
+                        ) : (
+                            <>
+                                <a className="btn btn-primary" href="/orderpay">
+                                    Change payment method
+                                </a>
+                                <a className="btn btn-secondary" href="/register">
+                                    Create an account
+                                </a>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
         </Layout>
-    )
+    );
 };
 
 export default ThankYouPage;

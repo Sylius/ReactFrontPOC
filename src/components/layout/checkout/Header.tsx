@@ -1,7 +1,10 @@
-import {Link} from "react-router";
-import React from "react";
+import { Link } from 'react-router-dom';
+import { IconUser } from '@tabler/icons-react';
+import { useCustomer } from '../../../context/CustomerContext';
 
 const Header = () => {
+    const { customer } = useCustomer();
+
     return (
         <div className="bg-white border-bottom py-4">
             <div className="container">
@@ -25,13 +28,22 @@ const Header = () => {
                             </svg>
                         </Link>
                     </div>
-                    <div className="col-12 col-md-auto" data-test-purchaser-name-or-email="">
-                        Checking out as guest
+                    <div className="col-12 col-md-auto d-flex align-items-center gap-2">
+                        {customer ? (
+                            <>
+                                Checking out as <strong>{customer.firstName} {customer.lastName}</strong>
+                            </>
+                        ) : (
+                            <Link to="/login" className="d-flex align-items-center text-decoration-none gap-2">
+                                <IconUser stroke={2} size={16} />
+                                Sign in
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 };
 
 export default Header;
