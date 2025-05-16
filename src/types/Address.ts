@@ -1,15 +1,16 @@
 export interface Address {
-    firstName?: string;
-    lastName?: string;
-    fullName?: string | null;
+    firstName: string;
+    lastName: string;
+    email: string;
+    gender: 'm' | 'f' | 'u';
     phoneNumber?: string | null;
     company?: string | null;
-    countryCode?: string;
+    countryCode: string;
     provinceCode?: string | null;
     provinceName?: string | null;
-    street?: string;
-    city?: string;
-    postcode?: string;
+    street: string;
+    city: string;
+    postcode: string;
     createdAt?: string;
     updatedAt?: string | null;
     id?: number;

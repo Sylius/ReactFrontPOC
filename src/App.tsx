@@ -16,6 +16,9 @@ import DashboardPage from "./pages/account/DashboardPage";
 import OrderHistoryPage from "./pages/account/OrderHistoryPage";
 import OrderDetailsPage from "./pages/account/OrderDetailsPage";
 import ProfilePage from "./pages/account/ProfilePage.tsx";
+import AddressBookPage from "./pages/account/AddressBookPage";
+import AddAddressPage from "./pages/account/AddAddressPage";
+import EditAddressPage from "./pages/account/EditAddressPage";
 import AddReviewPage from "./pages/Product/AddReviewPage";
 import ReviewsListPage from "./pages/Product/ReviewsListPage";
 
@@ -57,6 +60,9 @@ const App: React.FC = () => {
               />
               <Route path="/account/order-history" element={<OrderHistoryPage />} />
               <Route path="/account/orders/:token" element={<OrderDetailsPage />} />
+              <Route path="/account/address-book" element={<AddressBookPage />} />
+              <Route path="/account/address-book/add" element={<AddAddressPage />} />
+              <Route path="/account/address-book/edit/:id" element={<EditAddressPage />} />
               <Route path="/product/:code/review/new" element={<AddReviewPage />} />
               <Route path="/product/:code/reviews" element={<ReviewsListPage />} />
             </Routes>
