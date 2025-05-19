@@ -11,7 +11,7 @@ const fetchProducts = async (): Promise<Product[]> => {
     }/api/v2/shop/products?itemsPerPage=8`
   );
   if (!response.ok) {
-    throw new Error('Problem z pobieraniem produktów');
+    throw new Error('Error while loading products');
   }
 
   const data = await response.json();
@@ -55,9 +55,9 @@ const Homepage: React.FC = () => {
         </div>
       </div>
       <div className="container mb-5">
-        {isLoading && <div className="text-center">Ładowanie produktów...</div>}
+        {isLoading && <div className="text-center">Loading products...</div>}
         {isError && (
-          <div className="text-danger text-center">Błąd: {error.message}</div>
+          <div className="text-danger text-center">Error: {error.message}</div>
         )}
 
         {products && (

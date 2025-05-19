@@ -1,17 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Layout from '../../layouts/Default';
-import { useOrder } from '../../context/OrderContext';
 import { useCustomer } from '../../context/CustomerContext';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const ThankYouPage: React.FC = () => {
-    const { fetchOrder, order } = useOrder();
     const { customer } = useCustomer();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        fetchOrder();
-    }, []);
+    const location = useLocation();
+    const tokenValue = location.state?.tokenValue;
 
     return (
         <Layout>
@@ -21,8 +16,8 @@ const ThankYouPage: React.FC = () => {
                     You have successfully placed an order.
 
                     <div className="d-flex flex-column flex-lg-row justify-content-center gap-2 mt-4">
-                        {customer ? (
-                            <a className="btn btn-primary" href="/account/orders">
+                        {customer && tokenValue ? (
+                            <a className="btn btn-primary" href={`/account/orders/${tokenValue}`}>
                                 View order
                             </a>
                         ) : (

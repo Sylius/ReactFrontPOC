@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CheckoutLayout from '../../layouts/Checkout';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { useOrder } from '../../context/OrderContext';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -8,23 +8,32 @@ import Steps from '../../components/checkout/Steps';
 import GooglePay from '../../components/checkout/payments/GooglePay';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
+interface PaymentMethod {
+  id: number;
+  code: string;
+  name: string;
+  description?: string;
+}
+
 const PaymentPage: React.FC = () => {
   const { order, fetchOrder } = useOrder();
   const navigate = useNavigate();
 
-  const fetchPaymentMethodsFromAPI = async (): Promise<any> => {
+  const fetchPaymentMethodsFromAPI = async (): Promise<PaymentMethod[]> => {
     const response = await fetch(
-        `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/payments/${order?.payments[0].id}/methods`
+        `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem(
+            'orderToken'
+        )}/payments/${order?.payments?.[0]?.id}/methods`
     );
     if (!response.ok) {
       throw new Error('Problem z pobieraniem metod płatności');
     }
 
     const data = await response.json();
-    return data['hydra:member'] || data;
+    return data['hydra:member'] || [];
   };
 
-  const { data: paymentMethods } = useQuery({
+  const { data: paymentMethods } = useQuery<PaymentMethod[]>({
     queryKey: ['payment-methods'],
     queryFn: fetchPaymentMethodsFromAPI,
     enabled: order !== null,
@@ -46,14 +55,14 @@ const PaymentPage: React.FC = () => {
 
     try {
       const response = await fetch(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/payments/${order.payments[0].id}`,
+          `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem(
+              'orderToken'
+          )}/payments/${order?.payments?.[0]?.id}`,
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/merge-patch+json' },
             body: JSON.stringify({
-              paymentMethod: paymentMethod
-                  ? paymentMethod
-                  : order.payments[0].method,
+              paymentMethod: paymentMethod || order?.payments?.[0]?.method,
             }),
           }
       );
@@ -106,46 +115,45 @@ const PaymentPage: React.FC = () => {
                     </div>
                 )}
 
-                {paymentMethods?.length > 0 &&
-                    paymentMethods.map((method: any) => (
-                        <div className="card bg-body-tertiary border-0 mb-3" key={method.id}>
-                          <label className="card-body">
-                            <div>
-                              <div className="form-check">
-                                <input
-                                    type="radio"
-                                    id={`payment-method-${method.id}`}
-                                    name="sylius_shop_checkout_select_payment[payments][0][method]"
-                                    required
-                                    className="form-check-input"
-                                    onChange={() => setPaymentMethod(method.code)}
-                                    checked={paymentMethod === method.code}
-                                    value={method.code}
-                                />
-                                <label
-                                    className="form-check-label required"
-                                    htmlFor={`payment-method-${method.id}`}
-                                >
-                                  {method.name}
-                                </label>
-                              </div>
-                            </div>
-
-                            <div className="ps-4">
-                              <small className="text-black-50">{method.description}</small>
-                            </div>
-                          </label>
+                {paymentMethods?.map((method) => (
+                    <div
+                        className="card bg-body-tertiary border-0 mb-3"
+                        key={method.id}
+                    >
+                      <label className="card-body">
+                        <div>
+                          <div className="form-check">
+                            <input
+                                type="radio"
+                                id={`payment-method-${method.id}`}
+                                name="sylius_shop_checkout_select_payment[payments][0][method]"
+                                required
+                                className="form-check-input"
+                                onChange={() => setPaymentMethod(method.code)}
+                                checked={paymentMethod === method.code}
+                                value={method.code}
+                            />
+                            <label
+                                className="form-check-label required"
+                                htmlFor={`payment-method-${method.id}`}
+                            >
+                              {method.name}
+                            </label>
+                          </div>
                         </div>
-                    ))}
+
+                        <div className="ps-4">
+                          <small className="text-black-50">{method.description}</small>
+                        </div>
+                      </label>
+                    </div>
+                ))}
 
                 <GooglePay submitFunction={handleSubmit} />
               </div>
 
               <div className="d-flex justify-content-between flex-column flex-sm-row gap-2">
-                <Link
-                    className="btn btn-light btn-icon"
-                    to="/checkout/select-shipping"
-                >
+                <Link className="btn btn-light btn-icon" to="/checkout/select-shipping">
                   <IconChevronLeft stroke={2} />
                   Change shipping method
                 </Link>

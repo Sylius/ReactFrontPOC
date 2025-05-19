@@ -46,7 +46,9 @@ const Header: React.FC =  () => {
                                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
                                         aria-label="cart button">
                                     <IconShoppingBag stroke={1.25} size={28} />
-                                    <div className="d-none d-md-block">${formatPrice(order.total)} </div>
+                                    {order && (
+                                        <div className="d-none d-md-block">${formatPrice(order.total)} </div>
+                                    )}
                                 </button>
                             </div>
                         </Link>

@@ -1,5 +1,3 @@
-import {OneOf} from "../../schema/schema";
-
 export interface OrderItem {
     variant: string;
     productName?: string | null;
@@ -16,8 +14,8 @@ export interface AddressInterface {
     firstName?: string;
     lastName?: string;
     fullName?: string | null;
-    phoneNumber?: string | undefined;
-    company?: string | undefined;
+    phoneNumber?: string;
+    company?: string;
     countryCode?: string;
     provinceCode?: string | null;
     provinceName?: string | null;
@@ -28,6 +26,8 @@ export interface AddressInterface {
     updatedAt?: string | null;
     id?: number;
     customer?: string | null;
+    email?: string;
+    gender?: 'm' | 'f' | 'u' | null;
 }
 
 export interface Payment {

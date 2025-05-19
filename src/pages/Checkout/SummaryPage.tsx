@@ -9,11 +9,11 @@ import { OrderItem } from '../../types/Order';
 import { formatPrice } from '../../utils/price';
 import { useNavigate } from 'react-router-dom';
 import Steps from '../../components/checkout/Steps';
-import { useCustomer } from '../../context/CustomerContext';
+
 
 const SummaryPage: React.FC = () => {
   const { order, fetchOrder, setOrderToken } = useOrder();
-  const { customer } = useCustomer();
+
   const navigate = useNavigate();
 
   const [extraNotes, setExtraNotes] = useState<string>('');
@@ -23,24 +23,9 @@ const SummaryPage: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const token = localStorage.getItem('jwtToken');
     const orderToken = localStorage.getItem('orderToken');
 
     try {
-      if (customer && token && orderToken) {
-        await fetch(
-            `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${orderToken}`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/merge-patch+json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ customer: '/api/v2/shop/customers/me' }),
-            }
-        );
-      }
-
       const response = await fetch(
           `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${orderToken}/complete`,
           {
@@ -56,13 +41,16 @@ const SummaryPage: React.FC = () => {
 
       setOrderToken(null);
       localStorage.removeItem('orderToken');
-      navigate('/order/thank-you');
+      navigate('/order/thank-you', {
+        state: { tokenValue: order?.tokenValue },
+      });
     } catch (error) {
       console.error('Error submitting order:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   useEffect(() => {
     fetchOrder();
@@ -73,7 +61,6 @@ const SummaryPage: React.FC = () => {
         <div className="col pt-4 pb-5">
           <div className="mx-auto">
             <Steps activeStep="complete" />
-
             <h1 className="h5 mb-4">Order #{order?.number}</h1>
 
             {order && (
@@ -92,8 +79,6 @@ const SummaryPage: React.FC = () => {
             )}
 
             <form onSubmit={handleSubmit} noValidate>
-              <input type="hidden" name="_method" value="PUT" />
-
               <div className="row">
                 <div className="col-12 col-md-6 mb-3">
                   {order?.billingAddress && (
@@ -111,11 +96,10 @@ const SummaryPage: React.FC = () => {
                 {order?.payments && (
                     <PaymentsCard
                         payment={order?.payments[0]}
-                        total={order?.total}
+                        total={order?.total ?? 0}
                         paymentState={order?.paymentState}
                     />
                 )}
-
                 {order?.shipments && <ShipmentsCard shipment={order?.shipments[0]} />}
               </div>
 
@@ -130,10 +114,9 @@ const SummaryPage: React.FC = () => {
                   </tr>
                   </thead>
                   <tbody>
-                  {order?.items &&
-                      order.items.map((item: OrderItem) => (
-                          <ProductRow orderItem={item} key={item.id} />
-                      ))}
+                  {order?.items?.map((item: OrderItem) => (
+                      <ProductRow orderItem={item} key={item.id} />
+                  ))}
                   </tbody>
                 </table>
               </div>
@@ -142,26 +125,26 @@ const SummaryPage: React.FC = () => {
                 <tbody>
                 <tr>
                   <td className="text-end w-75">Items total:</td>
-                  <td className="text-end">${formatPrice(order.itemsTotal)}</td>
+                  <td className="text-end">${formatPrice(order?.itemsSubtotal ?? 0)}</td>
                 </tr>
                 <tr>
                   <td className="text-end w-75">Taxes total:</td>
                   <td className="text-end">
-                    <div>${formatPrice(order.taxTotal)}</div>
+                    <div>${formatPrice(order?.taxTotal ?? 0)}</div>
                     <small className="text-body-tertiary">Included in price</small>
                   </td>
                 </tr>
                 <tr>
                   <td className="text-end w-75">Discount:</td>
-                  <td className="text-end">${formatPrice(order.orderPromotionTotal)}</td>
+                  <td className="text-end">${formatPrice(order?.orderPromotionTotal ?? 0)}</td>
                 </tr>
                 <tr>
                   <td className="text-end w-75">Shipping total:</td>
-                  <td className="text-end">${formatPrice(order.shippingTotal)}</td>
+                  <td className="text-end">${formatPrice(order?.shippingTotal ?? 0)}</td>
                 </tr>
                 <tr>
                   <td className="h5 text-end border-top pt-4 mt-3">Total:</td>
-                  <td className="h5 text-end border-top pt-4 mt-3">${formatPrice(order.total)}</td>
+                  <td className="h5 text-end border-top pt-4 mt-3">${formatPrice(order?.total ?? 0)}</td>
                 </tr>
                 </tbody>
               </table>

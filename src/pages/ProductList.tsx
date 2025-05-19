@@ -16,6 +16,13 @@ interface TaxonDetails {
   };
 }
 
+interface TaxonAPIResponse {
+  name: string;
+  description: string;
+  code: string;
+  parent?: string;
+}
+
 const ProductList: React.FC = () => {
   const { parentCode, childCode } = useParams<{ parentCode: string; childCode: string }>();
 
@@ -32,7 +39,7 @@ const ProductList: React.FC = () => {
     const response = await fetch(url);
     const data = await response.json();
     const totalItems = data['hydra:totalItems'] || 0;
-    const fetchedProducts = data['hydra:member'] || [];
+    const fetchedProducts: Product[] = data['hydra:member'] || [];
 
     setHasMore(page * 9 < totalItems);
     return fetchedProducts;
@@ -41,11 +48,11 @@ const ProductList: React.FC = () => {
   const fetchTaxonDetails = async (code: string): Promise<TaxonDetails | null> => {
     try {
       const res = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/taxons/${code}`);
-      if (!res.ok) throw new Error('Nie udało się pobrać szczegółów taxona');
-      const data = await res.json();
+      if (!res.ok) throw new Error('Failed to fetch taxon details');
+      const data: TaxonAPIResponse = await res.json();
 
-      let parentData = null;
-      if (data?.parent) {
+      let parentData: TaxonDetails['parent'] = undefined;
+      if (data.parent) {
         const parentRes = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}${data.parent}`);
         if (parentRes.ok) {
           const parentJson = await parentRes.json();
@@ -57,10 +64,13 @@ const ProductList: React.FC = () => {
         name: data.name,
         description: data.description,
         code: data.code,
-        parent: parentData || undefined,
+        parent: parentData,
       };
-    } catch (err) {
-      console.error('Błąd ładowania danych taxona:', err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Error loading taxon data:', err.message);
+        setError(err.message);
+      }
       return null;
     }
   };
@@ -68,7 +78,7 @@ const ProductList: React.FC = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       if (!childCode) {
-        setError('Brak kodu taxona w URL');
+        setError('No taxon code in URL');
         setLoading(false);
         return;
       }
@@ -83,8 +93,12 @@ const ProductList: React.FC = () => {
         setProducts(productsData);
         setTaxonDetails(taxonData);
         setCurrentPage(1);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('Unknown error');
+        }
       } finally {
         setLoading(false);
       }
@@ -103,7 +117,7 @@ const ProductList: React.FC = () => {
       setProducts(prev => [...prev, ...newProducts]);
       setCurrentPage(nextPage);
     } catch (err) {
-      console.error('Błąd przy ładowaniu kolejnych produktów', err);
+      console.error('Error loading more products', err);
     } finally {
       setLoadingMore(false);
     }
@@ -121,14 +135,14 @@ const ProductList: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadMore]);
 
-  if (error) return <div className="text-center text-danger">Błąd: {error}</div>;
+  if (error) return <div className="text-center text-danger">Error: {error}</div>;
 
   return (
       <Layout>
         <div className="container mt-4 mb-5">
           <Breadcrumbs
               paths={[
-                { label: 'Strona główna', url: '/' },
+                { label: 'Home', url: '/' },
                 ...(taxonDetails?.parent
                     ? [{ label: taxonDetails.parent.name, url: `/${taxonDetails.parent.code}` }]
                     : []),
@@ -145,7 +159,7 @@ const ProductList: React.FC = () => {
                   {loading ? <Skeleton /> : taxonDetails?.name || childCode}
                 </h1>
                 <div>
-                  {loading ? <Skeleton count={2} /> : taxonDetails?.description || 'Brak opisu tej kategorii.'}
+                  {loading ? <Skeleton count={2} /> : taxonDetails?.description || 'No description for this category.'}
                 </div>
               </div>
 
