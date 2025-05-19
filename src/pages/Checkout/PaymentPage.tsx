@@ -26,7 +26,7 @@ const PaymentPage: React.FC = () => {
         )}/payments/${order?.payments?.[0]?.id}/methods`
     );
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem metod płatności');
+      throw new Error('Problem with downloading payment methods');
     }
 
     const data = await response.json();
@@ -69,7 +69,7 @@ const PaymentPage: React.FC = () => {
 
       if (!response.ok) {
         setHasErrors(true);
-        throw new Error('Nie udało się wysłać metody płatności');
+        throw new Error('Failed to send payment methods');
       }
 
       await fetchOrder();
