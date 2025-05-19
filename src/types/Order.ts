@@ -41,6 +41,7 @@ export interface Payment {
 }
 
 export interface Shipment {
+    id?: number;
     "@id"?: string;
     "@type"?: string;
     method?: string;

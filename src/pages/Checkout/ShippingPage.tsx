@@ -26,7 +26,7 @@ const ShippingPage: React.FC = () => {
         `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/shipments/${order?.shipments?.[0]?.id}/methods`
     );
     if (!response.ok) {
-      throw new Error('Problem z pobieraniem metod dostawy');
+      throw new Error('Error while downloading shipping method');
     }
 
     const data = await response.json();
@@ -59,7 +59,7 @@ const ShippingPage: React.FC = () => {
 
       if (!response.ok) {
         setHasErrors(true);
-        throw new Error('Nie udało się wysłać metody dostawy');
+        throw new Error('Failed to send delivery method');
       }
 
       navigate('/checkout/select-payment');
