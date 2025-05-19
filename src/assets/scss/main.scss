@@ -398,6 +398,9 @@ input.form-check-input:checked {
   }
 }
 
-
-
-
+.form-select, .form-control{
+  &:focus{
+    box-shadow: none !important;
+    border-color: unset !important;
+  }
+}

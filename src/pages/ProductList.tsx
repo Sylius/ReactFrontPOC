@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import Layout from '../layouts/Default';
 import { Product } from '../types/Product';
 import Breadcrumbs from '../components/Breadcrumbs';
 import ProductCard from '../components/ProductCard';
 import Skeleton from 'react-loading-skeleton';
+import ProductToolbar from '../components/taxons/ProductToolbar';
 
 interface TaxonDetails {
   name: string;
@@ -16,8 +17,16 @@ interface TaxonDetails {
   };
 }
 
+interface TaxonAPIResponse {
+  name: string;
+  description: string;
+  code: string;
+  parent?: string;
+}
+
 const ProductList: React.FC = () => {
   const { parentCode, childCode } = useParams<{ parentCode: string; childCode: string }>();
+  const [searchParams] = useSearchParams();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -27,12 +36,20 @@ const ProductList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [taxonDetails, setTaxonDetails] = useState<TaxonDetails | null>(null);
 
-  const fetchProducts = async (page: number, code: string): Promise<Product[]> => {
-    const url = `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/products?itemsPerPage=9&page=${page}&productTaxons.taxon.code=${code}`;
+  const fetchProducts = async (
+      page: number,
+      code: string,
+      queryParams: string
+  ): Promise<Product[]> => {
+    const baseUrl = `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/products`;
+    const url = `${baseUrl}?itemsPerPage=9&page=${page}&productTaxons.taxon.code=${code}${
+        queryParams ? '&' + queryParams : ''
+    }`;
+
     const response = await fetch(url);
     const data = await response.json();
     const totalItems = data['hydra:totalItems'] || 0;
-    const fetchedProducts = data['hydra:member'] || [];
+    const fetchedProducts: Product[] = data['hydra:member'] || [];
 
     setHasMore(page * 9 < totalItems);
     return fetchedProducts;
@@ -41,11 +58,11 @@ const ProductList: React.FC = () => {
   const fetchTaxonDetails = async (code: string): Promise<TaxonDetails | null> => {
     try {
       const res = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/taxons/${code}`);
-      if (!res.ok) throw new Error('Nie udało się pobrać szczegółów taxona');
-      const data = await res.json();
+      if (!res.ok) throw new Error('Failed to fetch taxon details');
+      const data: TaxonAPIResponse = await res.json();
 
-      let parentData = null;
-      if (data?.parent) {
+      let parentData: TaxonDetails['parent'] = undefined;
+      if (data.parent) {
         const parentRes = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}${data.parent}`);
         if (parentRes.ok) {
           const parentJson = await parentRes.json();
@@ -57,10 +74,13 @@ const ProductList: React.FC = () => {
         name: data.name,
         description: data.description,
         code: data.code,
-        parent: parentData || undefined,
+        parent: parentData,
       };
-    } catch (err) {
-      console.error('Błąd ładowania danych taxona:', err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Error loading taxon data:', err.message);
+        setError(err.message);
+      }
       return null;
     }
   };
@@ -68,7 +88,7 @@ const ProductList: React.FC = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       if (!childCode) {
-        setError('Brak kodu taxona w URL');
+        setError('No taxon code in URL');
         setLoading(false);
         return;
       }
@@ -76,22 +96,26 @@ const ProductList: React.FC = () => {
       setLoading(true);
       try {
         const [productsData, taxonData] = await Promise.all([
-          fetchProducts(1, childCode),
+          fetchProducts(1, childCode, searchParams.toString()),
           fetchTaxonDetails(childCode),
         ]);
 
         setProducts(productsData);
         setTaxonDetails(taxonData);
         setCurrentPage(1);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('Unknown error');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadInitialData();
-  }, [childCode]);
+  }, [childCode, searchParams]);
 
   const loadMore = useCallback(async () => {
     if (loadingMore || !hasMore || !childCode) return;
@@ -99,15 +123,15 @@ const ProductList: React.FC = () => {
     setLoadingMore(true);
     const nextPage = currentPage + 1;
     try {
-      const newProducts = await fetchProducts(nextPage, childCode);
+      const newProducts = await fetchProducts(nextPage, childCode, searchParams.toString());
       setProducts(prev => [...prev, ...newProducts]);
       setCurrentPage(nextPage);
     } catch (err) {
-      console.error('Błąd przy ładowaniu kolejnych produktów', err);
+      console.error('Error loading more products', err);
     } finally {
       setLoadingMore(false);
     }
-  }, [currentPage, childCode, hasMore, loadingMore]);
+  }, [currentPage, childCode, hasMore, loadingMore, searchParams]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -121,14 +145,14 @@ const ProductList: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadMore]);
 
-  if (error) return <div className="text-center text-danger">Błąd: {error}</div>;
+  if (error) return <div className="text-center text-danger">Error: {error}</div>;
 
   return (
       <Layout>
         <div className="container mt-4 mb-5">
           <Breadcrumbs
               paths={[
-                { label: 'Strona główna', url: '/' },
+                { label: 'Home', url: '/' },
                 ...(taxonDetails?.parent
                     ? [{ label: taxonDetails.parent.name, url: `/${taxonDetails.parent.code}` }]
                     : []),
@@ -145,9 +169,11 @@ const ProductList: React.FC = () => {
                   {loading ? <Skeleton /> : taxonDetails?.name || childCode}
                 </h1>
                 <div>
-                  {loading ? <Skeleton count={2} /> : taxonDetails?.description || 'Brak opisu tej kategorii.'}
+                  {loading ? <Skeleton count={2} /> : taxonDetails?.description || 'No description for this category.'}
                 </div>
               </div>
+
+              <ProductToolbar />
 
               <div className="products-grid">
                 {loading
