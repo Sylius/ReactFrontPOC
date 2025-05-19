@@ -42,13 +42,14 @@ const AddressPage: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             const token = localStorage.getItem('jwtToken');
-            if (!token || !customer) return;
 
             try {
                 const [addressesRes, countriesRes] = await Promise.all([
-                    fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }),
+                    token
+                        ? fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                        })
+                        : Promise.resolve({ json: () => ({ 'hydra:member': [] }) }),
                     fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/countries`),
                 ]);
 
@@ -64,7 +65,7 @@ const AddressPage: React.FC = () => {
                 if (!isInitialized.current) {
                     if (order?.billingAddress) {
                         setBillingAddress(order.billingAddress);
-                    } else {
+                    } else if (token && customer) {
                         const defaultAddressId =
                             typeof customer.defaultAddress === 'string'
                                 ? customer.defaultAddress.split('/').pop()
