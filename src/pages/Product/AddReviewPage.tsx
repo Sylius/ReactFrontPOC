@@ -62,6 +62,7 @@ const AddReviewPage: React.FC = () => {
                         }
                     }
 
+                    breadcrumbPaths.push({ label: data.name, url: `/product/${data.code}` });
                     breadcrumbPaths.push({ label: 'Reviews', url: `/product/${data.code}/reviews` });
                     breadcrumbPaths.push({ label: 'Add', url: '#' });
                 }

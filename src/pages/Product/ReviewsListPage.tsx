@@ -70,6 +70,7 @@ const ReviewsListPage: React.FC = () => {
                     }
                 }
 
+                breadcrumbPaths.push({ label: data.name, url: `/product/${data.code}` });
                 breadcrumbPaths.push({ label: 'Reviews', url: '#' });
                 setBreadcrumbs(breadcrumbPaths);
             } catch (err) {
