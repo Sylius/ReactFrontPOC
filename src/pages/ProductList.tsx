@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import Layout from '../layouts/Default';
 import { Product } from '../types/Product';
 import Breadcrumbs from '../components/Breadcrumbs';
 import ProductCard from '../components/ProductCard';
 import Skeleton from 'react-loading-skeleton';
+import ProductToolbar from '../components/taxons/ProductToolbar';
 
 interface TaxonDetails {
   name: string;
@@ -25,6 +26,7 @@ interface TaxonAPIResponse {
 
 const ProductList: React.FC = () => {
   const { parentCode, childCode } = useParams<{ parentCode: string; childCode: string }>();
+  const [searchParams] = useSearchParams();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,8 +36,16 @@ const ProductList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [taxonDetails, setTaxonDetails] = useState<TaxonDetails | null>(null);
 
-  const fetchProducts = async (page: number, code: string): Promise<Product[]> => {
-    const url = `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/products?itemsPerPage=9&page=${page}&productTaxons.taxon.code=${code}`;
+  const fetchProducts = async (
+      page: number,
+      code: string,
+      queryParams: string
+  ): Promise<Product[]> => {
+    const baseUrl = `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/products`;
+    const url = `${baseUrl}?itemsPerPage=9&page=${page}&productTaxons.taxon.code=${code}${
+        queryParams ? '&' + queryParams : ''
+    }`;
+
     const response = await fetch(url);
     const data = await response.json();
     const totalItems = data['hydra:totalItems'] || 0;
@@ -86,7 +96,7 @@ const ProductList: React.FC = () => {
       setLoading(true);
       try {
         const [productsData, taxonData] = await Promise.all([
-          fetchProducts(1, childCode),
+          fetchProducts(1, childCode, searchParams.toString()),
           fetchTaxonDetails(childCode),
         ]);
 
@@ -105,7 +115,7 @@ const ProductList: React.FC = () => {
     };
 
     loadInitialData();
-  }, [childCode]);
+  }, [childCode, searchParams]);
 
   const loadMore = useCallback(async () => {
     if (loadingMore || !hasMore || !childCode) return;
@@ -113,7 +123,7 @@ const ProductList: React.FC = () => {
     setLoadingMore(true);
     const nextPage = currentPage + 1;
     try {
-      const newProducts = await fetchProducts(nextPage, childCode);
+      const newProducts = await fetchProducts(nextPage, childCode, searchParams.toString());
       setProducts(prev => [...prev, ...newProducts]);
       setCurrentPage(nextPage);
     } catch (err) {
@@ -121,7 +131,7 @@ const ProductList: React.FC = () => {
     } finally {
       setLoadingMore(false);
     }
-  }, [currentPage, childCode, hasMore, loadingMore]);
+  }, [currentPage, childCode, hasMore, loadingMore, searchParams]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -162,6 +172,8 @@ const ProductList: React.FC = () => {
                   {loading ? <Skeleton count={2} /> : taxonDetails?.description || 'No description for this category.'}
                 </div>
               </div>
+
+              <ProductToolbar />
 
               <div className="products-grid">
                 {loading
