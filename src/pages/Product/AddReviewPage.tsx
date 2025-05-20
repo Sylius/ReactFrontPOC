@@ -6,6 +6,7 @@ import Breadcrumbs from '../../components/Breadcrumbs';
 import Layout from '../../layouts/Default';
 import Skeleton from 'react-loading-skeleton';
 import { Product } from '../../types/Product';
+import { IconStar } from '@tabler/icons-react';
 
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -120,16 +121,21 @@ const AddReviewPage: React.FC = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
                                 <label className="form-label d-block">Rating <span className="text-danger">*</span></label>
-                                <div className="star-rating" role="radiogroup" aria-label="Rating">
+                                <div className="d-flex gap-2" role="radiogroup" aria-label="Rating">
                                     {[1, 2, 3, 4, 5].map((value) => (
                                         <button
                                             type="button"
                                             key={value}
-                                            className={`fs-1 star ${value <= rating ? 'active' : ''}`}
+                                            className="border-0 bg-transparent p-0"
                                             onClick={() => setRating(value)}
                                             aria-label={`${value} star`}
                                         >
-                                            ★
+                                            <IconStar
+                                                className="review-stars"
+                                                stroke={2}
+                                                size={32}
+                                                fill={value <= rating ? 'currentColor' : 'none'}
+                                            />
                                         </button>
                                     ))}
                                 </div>
