@@ -9,6 +9,9 @@ export interface Product {
     images: Image[];
     options?: string[];
     reviews?: { '@id': string }[];
+    mainTaxon?: string;
+    productTaxons?: string[];
+    defaultVariant?: string;
 }
 
 export interface ProductOption {

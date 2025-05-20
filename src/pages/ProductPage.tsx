@@ -41,6 +41,7 @@ const ProductPage: React.FC = () => {
     const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
+    const [breadcrumbs, setBreadcrumbs] = useState<{ label: string; url: string }[]>([]);
 
     const fetchOption = async (url: string): Promise<ProductOption> => {
         const res = await fetch(`${API_URL}${url}`);
@@ -56,9 +57,8 @@ const ProductPage: React.FC = () => {
 
     const fetchVariantByOptions = async (productCode: string, selected: Record<string, string>) => {
         const optionParams = Object.entries(selected)
-            .map(
-                ([optionCode, valueCode]) =>
-                    `optionValues[]=/api/v2/shop/product-options/${optionCode}/values/${valueCode}`
+            .map(([optionCode, valueCode]) =>
+                `optionValues[]=/api/v2/shop/product-options/${optionCode}/values/${valueCode}`
             )
             .join('&');
         const fullUrl = `${API_URL}/api/v2/shop/product-variants?product=/api/v2/shop/products/${productCode}&${optionParams}`;
@@ -100,9 +100,47 @@ const ProductPage: React.FC = () => {
     const fetchProduct = async () => {
         try {
             const res = await fetch(`${API_URL}/api/v2/shop/products/${code}`);
-            const data = await res.json();
+            const data: Product = await res.json();
             setProduct(data);
+
+            const breadcrumbPaths: { label: string; url: string }[] = [
+                { label: 'Home', url: '/' },
+                { label: 'Category', url: '#' },
+            ];
+
+            if (data.productTaxons?.length) {
+                const visited = new Set<string>();
+
+                for (const productTaxonUrl of data.productTaxons) {
+                    const taxonRes = await fetch(`${API_URL}${productTaxonUrl}`);
+                    const taxonData = await taxonRes.json();
+                    const taxon = await fetch(`${API_URL}${taxonData.taxon}`).then((r) => r.json());
+
+                    const parents: { name: string; code: string }[] = [];
+
+                    if (taxon.parent) {
+                        const parentRes = await fetch(`${API_URL}${taxon.parent}`);
+                        const parent = await parentRes.json();
+                        parents.push({ name: parent.name, code: parent.code });
+                    }
+
+                    parents.push({ name: taxon.name, code: taxon.code });
+
+                    for (const p of parents) {
+                        if (!visited.has(p.code)) {
+                            visited.add(p.code);
+                            breadcrumbPaths.push({ label: p.name, url: `/${p.code}` });
+                        }
+                    }
+                }
+
+                breadcrumbPaths.push({ label: data.name, url: `/product/${data.code}` });
+                console.log('[Breadcrumb taxons]', breadcrumbPaths);
+                setBreadcrumbs(breadcrumbPaths);
+            }
+
             if (data.images?.length > 0) setActiveImage(data.images[0].path);
+
             if (data.options?.length) {
                 const fetchedOptions = await Promise.all(data.options.map(fetchOption));
                 setOptions(fetchedOptions);
@@ -117,6 +155,7 @@ const ProductPage: React.FC = () => {
                 const variantData = await res.json();
                 setVariant(variantData);
             }
+
             if (data.code) await fetchProductAttributes(data.code);
             if (Array.isArray(data.reviews)) {
                 await fetchProductReviews(data.reviews);
@@ -162,36 +201,6 @@ const ProductPage: React.FC = () => {
         if (code) fetchProduct();
     }, [code]);
 
-    const renderReviews = () => {
-        if (!allReviewCount) {
-            return (
-                <>
-                    <div className="alert alert-info">
-                        <div className="fw-bold">Info</div>
-                        There are no reviews
-                    </div>
-                    <a href={`/product/${code}/review/new`} className="btn btn-primary">
-                        Add your review
-                    </a>
-                </>
-            );
-        }
-
-        return (
-            <>
-                <ReviewList reviews={reviews} />
-                <div className="d-flex flex-wrap gap-3">
-                    <a href={`/product/${code}/review/new`} className="btn btn-success px-4 py-2">
-                        Add your review
-                    </a>
-                    <a href={`/product/${code}/reviews`} className="btn btn-link">
-                        View more
-                    </a>
-                </div>
-            </>
-        );
-    };
-
     const accordionItems = useMemo(() => {
         if (!product) return [];
         return [
@@ -218,7 +227,29 @@ const ProductPage: React.FC = () => {
             },
             {
                 title: `Reviews (${allReviewCount})`,
-                content: renderReviews(),
+                content: reviews.length ? (
+                    <>
+                        <ReviewList reviews={reviews} />
+                        <div className="d-flex flex-wrap gap-3">
+                            <a href={`/product/${code}/review/new`} className="btn btn-success px-4 py-2">
+                                Add your review
+                            </a>
+                            <a href={`/product/${code}/reviews`} className="btn btn-link">
+                                View more
+                            </a>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="alert alert-info">
+                            <div className="fw-bold">Info</div>
+                            There are no reviews
+                        </div>
+                        <a href={`/product/${code}/review/new`} className="btn btn-primary">
+                            Add your review
+                        </a>
+                    </>
+                ),
             },
         ];
     }, [product, attributes, reviews, allReviewCount]);
@@ -231,12 +262,7 @@ const ProductPage: React.FC = () => {
     return (
         <Layout>
             <div className="container mt-4 mb-5">
-                <Breadcrumbs
-                    paths={[
-                        { label: 'Home', url: '/' },
-                        { label: product?.name || '...', url: `/product/${code}` },
-                    ]}
-                />
+                <Breadcrumbs paths={breadcrumbs} />
 
                 <div className="row g-3 g-lg-5 mb-6">
                     <div className="col-12 col-lg-7 col-xl-8">

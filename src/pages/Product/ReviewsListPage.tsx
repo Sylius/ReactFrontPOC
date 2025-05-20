@@ -14,12 +14,13 @@ const ReviewsListPage: React.FC = () => {
     const [product, setProduct] = useState<Product | null>(null);
     const [reviews, setReviews] = useState<ProductReview[]>([]);
     const [loading, setLoading] = useState(true);
+    const [breadcrumbs, setBreadcrumbs] = useState<{ label: string; url: string }[]>([]);
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
                 const res = await fetch(`${API_URL}/api/v2/shop/products/${code}`);
-                const data = await res.json();
+                const data: Product = await res.json();
                 setProduct(data);
 
                 if (Array.isArray(data.reviews) && data.reviews.length > 0) {
@@ -36,6 +37,41 @@ const ReviewsListPage: React.FC = () => {
 
                     setReviews(sorted);
                 }
+
+                const breadcrumbPaths: { label: string; url: string }[] = [
+                    { label: 'Home', url: '/' },
+                    { label: 'Category', url: '#' },
+                ];
+
+                if (data.productTaxons?.length) {
+                    const visited = new Set<string>();
+
+                    for (const productTaxonUrl of data.productTaxons) {
+                        const taxonRes = await fetch(`${API_URL}${productTaxonUrl}`);
+                        const taxonData = await taxonRes.json();
+                        const taxon = await fetch(`${API_URL}${taxonData.taxon}`).then((r) => r.json());
+
+                        const parents: { name: string; code: string }[] = [];
+
+                        if (taxon.parent) {
+                            const parentRes = await fetch(`${API_URL}${taxon.parent}`);
+                            const parent = await parentRes.json();
+                            parents.push({ name: parent.name, code: parent.code });
+                        }
+
+                        parents.push({ name: taxon.name, code: taxon.code });
+
+                        for (const p of parents) {
+                            if (!visited.has(p.code)) {
+                                visited.add(p.code);
+                                breadcrumbPaths.push({ label: p.name, url: `/${p.code}` });
+                            }
+                        }
+                    }
+                }
+
+                breadcrumbPaths.push({ label: 'Reviews', url: '#' });
+                setBreadcrumbs(breadcrumbPaths);
             } catch (err) {
                 console.error('Failed to load product or reviews', err);
             } finally {
@@ -49,13 +85,7 @@ const ReviewsListPage: React.FC = () => {
     return (
         <Layout>
             <div className="container mt-4 mb-5">
-                <Breadcrumbs
-                    paths={[
-                        { label: 'Home', url: '/' },
-                        { label: product?.name || 'Product', url: `/product/${code}` },
-                        { label: 'Reviews', url: `/product/${code}/reviews` },
-                    ]}
-                />
+                <Breadcrumbs paths={breadcrumbs} />
 
                 <div className="row">
                     <div className="col-12 col-md-5 col-lg-4">

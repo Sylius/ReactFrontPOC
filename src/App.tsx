@@ -36,6 +36,7 @@ const App: React.FC = () => {
           <FlashMessagesProvider>
             <Routes>
               <Route path="/" element={<Homepage />} />
+              <Route path="/:parentCode" element={<ProductList />} />
               <Route path="/:parentCode/:childCode" element={<ProductList />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout/address" element={<AddressPage />} />
