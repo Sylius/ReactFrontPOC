@@ -15,7 +15,6 @@ const sortOptions = [
 const ProductToolbar: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
-
     const [searchValue, setSearchValue] = useState(() => searchParams.get('translations.name') || '');
     const [sortValue, setSortValue] = useState(() => {
         const found = sortOptions.find(opt => searchParams.toString().includes(opt.value));
