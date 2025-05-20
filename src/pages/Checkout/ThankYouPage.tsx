@@ -1,14 +1,12 @@
-import React, {useEffect} from "react";
-import Layout from "../../layouts/Default";
-import {useOrder} from "../../context/OrderContext.tsx";
-
+import React from 'react';
+import Layout from '../../layouts/Default';
+import { useCustomer } from '../../context/CustomerContext';
+import { useLocation } from 'react-router-dom';
 
 const ThankYouPage: React.FC = () => {
-    const { fetchOrder } = useOrder();
-
-    useEffect(() => {
-        fetchOrder();
-    }, []);
+    const { customer } = useCustomer();
+    const location = useLocation();
+    const tokenValue = location.state?.tokenValue;
 
     return (
         <Layout>
@@ -18,19 +16,25 @@ const ThankYouPage: React.FC = () => {
                     You have successfully placed an order.
 
                     <div className="d-flex flex-column flex-lg-row justify-content-center gap-2 mt-4">
-
-                        <a className="btn btn-primary" id="payment-method-page">
-                            Change payment method
-                        </a>
-
-                        <a className="btn btn-secondary" id="create-an-account">
-                            Create an account
-                        </a>
+                        {customer && tokenValue ? (
+                            <a className="btn btn-primary" href={`/account/orders/${tokenValue}`}>
+                                View order
+                            </a>
+                        ) : (
+                            <>
+                                <a className="btn btn-primary" href="/orderpay">
+                                    Change payment method
+                                </a>
+                                <a className="btn btn-secondary" href="/register">
+                                    Create an account
+                                </a>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
         </Layout>
-    )
+    );
 };
 
 export default ThankYouPage;

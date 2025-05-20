@@ -22,10 +22,10 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
     }
 
     const data = await response.json();
-    const basicOrders = data["hydra:member"] || [];
+    const basicOrders = data["hydra:member"] as Partial<Order>[];
 
     const fullOrders = await Promise.all(
-        basicOrders.map(async (order: any) => {
+        basicOrders.map(async (order) => {
             try {
                 const orderResponse = await fetch(`${baseUrl}/api/v2/shop/orders/${order.tokenValue}`, {
                     headers: { Authorization: `Bearer ${token}` },
@@ -57,7 +57,7 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
                 };
             } catch (error) {
                 console.warn(`Failed to fetch full order for token: ${order.tokenValue}`, error);
-                return order;
+                return order as Order;
             }
         })
     );
