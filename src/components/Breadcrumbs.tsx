@@ -2,11 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 interface BreadcrumbsProps {
-    paths: { label: string; url: string }[];
+    paths?: { label: string; url: string }[];
 }
 
-const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ paths }) => {
-    if (!paths || paths.length === 0) return null;
+const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ paths = [] }) => {
+    if (paths.length === 0) return null;
 
     return (
         <ol className="breadcrumb" aria-label="breadcrumbs">
@@ -15,7 +15,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ paths }) => {
                     key={index}
                     className={`breadcrumb-item fw-normal ${index === paths.length - 1 ? "active" : ""}`}
                 >
-                    {index < paths.length - 1 ? (
+                    {path.url && index < paths.length - 1 ? (
                         <Link to={path.url} className="text-body-tertiary text-break">
                             {path.label}
                         </Link>
