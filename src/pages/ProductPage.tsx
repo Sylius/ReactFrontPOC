@@ -1,5 +1,3 @@
-// src/pages/ProductPage.tsx
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import Slider, { Settings } from 'react-slick';
@@ -44,7 +42,6 @@ interface Association {
     products: Product[];
 }
 
-// wyświetla skeleton dopóki loading, potem prawdziwe asocjacje
 const AssociationsSection: React.FC<{
     associations: Association[];
     loading: boolean;
