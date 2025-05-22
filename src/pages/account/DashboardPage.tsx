@@ -6,6 +6,7 @@ import { useFlashMessages } from "../../context/FlashMessagesContext";
 import { IconPencil, IconLock, IconCheck } from "@tabler/icons-react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
+import { sendVerificationEmail, verifyToken } from "../../services/customerVerification";
 
 const DashboardPage: React.FC = () => {
     const { customer, refetchCustomer } = useCustomer();
@@ -29,35 +30,15 @@ const DashboardPage: React.FC = () => {
         }
 
         setIsVerifying(true);
+        const { success, message } = await sendVerificationEmail(customer.email, window.location.href, jwtToken);
 
-        try {
-            const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
-
-            const dataToSend = {
-                email: customer.email,
-                link: "http://localhost:5173/account/dashboard",
-            };
-
-            const response = await fetch(`${apiUrl}/api/v2/shop/customers/verify`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${jwtToken}`,
-                },
-                body: JSON.stringify(dataToSend),
-            });
-
-            if (response.ok) {
-                addMessage("success", "Verification email sent! Please check your inbox.");
-            } else {
-                const errorData = await response.json();
-                addMessage("error", errorData.message || errorData.detail || "Failed to send verification email.");
-            }
-        } catch {
-            addMessage("error", "An unexpected error occurred. Please try again.");
-        } finally {
-            setIsVerifying(false);
+        if (success) {
+            addMessage("success", "Verification email sent! Please check your inbox.");
+        } else {
+            addMessage("error", message || "Failed to send verification email.");
         }
+
+        setIsVerifying(false);
     };
 
     useEffect(() => {
@@ -68,31 +49,16 @@ const DashboardPage: React.FC = () => {
         verificationAttempted.current = true;
 
         const verify = async () => {
-            try {
-                const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
-                const response = await fetch(`${apiUrl}/api/v2/shop/customers/verify/${tokenFromUrl}`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/merge-patch+json",
-                        Authorization: `Bearer ${jwtToken}`,
-                    },
-                    body: JSON.stringify({}),
-                });
+            const { success, message } = await verifyToken(tokenFromUrl, jwtToken);
 
-                if (response.ok) {
-                    addMessage("success", "Your email has been successfully verified.");
-                    await refetchCustomer();
-                } else {
-                    const errorData = await response.json();
-                    console.error("API Error Response for token verification:", errorData);
-                    addMessage("error", errorData.message || errorData.detail || "Verification failed.");
-                }
-                navigate("/account/dashboard", { replace: true });
-            } catch (error) {
-                console.error("Unexpected error during token verification:", error);
-                addMessage("error", "Unexpected error during token verification. Please try again.");
-                navigate("/account/dashboard", { replace: true });
+            if (success) {
+                addMessage("success", "Your email has been successfully verified.");
+                await refetchCustomer();
+            } else {
+                addMessage("error", message || "Verification failed.");
             }
+
+            navigate("/account/dashboard", { replace: true });
         };
 
         verify();
@@ -154,11 +120,11 @@ const DashboardPage: React.FC = () => {
                                             >
                                                 {isVerifying ? (
                                                     <>
-                                                        <span
-                                                            className="spinner-border spinner-border-sm"
-                                                            role="status"
-                                                            aria-hidden="true"
-                                                        ></span>
+                            <span
+                                className="spinner-border spinner-border-sm"
+                                role="status"
+                                aria-hidden="true"
+                            ></span>
                                                         Sending...
                                                     </>
                                                 ) : (
