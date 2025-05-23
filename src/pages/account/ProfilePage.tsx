@@ -57,7 +57,13 @@ const ProfilePage: React.FC = () => {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
                     },
-                    body: JSON.stringify(formData),
+                    body: JSON.stringify({
+                        ...formData,
+                        user: {
+                            username: formData.email,
+                            enabled: true,
+                        },
+                    }),
                 }
             );
 

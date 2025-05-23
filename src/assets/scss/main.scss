@@ -362,7 +362,7 @@ input.form-check-input:checked {
 }
 .accordion-body{
   tr:last-of-type{
-    th{
+    th, td{
       border: none;
     }
   }
@@ -404,3 +404,28 @@ input.form-check-input:checked {
     border-color: unset !important;
   }
 }
+
+.custom-slick-arrow {
+  width: 94px;
+  height: 48px;
+  background: #1A866B !important;
+  border: 1px solid #22b99a;
+  border-radius: 0.3rem;
+  transition: background-color 0.2s ease;
+  opacity: 0.9;
+  z-index: 1;
+  &:hover{
+    background-color: #43c4a9 !important;
+    border-color: #38c0a4;
+    svg{
+      color: black !important;
+    }
+  }
+  svg{
+    color: white !important;
+  }
+  &:before{
+    display: none;
+  }
+}
+
