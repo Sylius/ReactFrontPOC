@@ -1,10 +1,12 @@
 import { RouteObject } from "react-router-dom";
 import Homepage from "../pages/Homepage";
 import CartPage from "../pages/CartPage";
-import LoginPage from "../pages/account/LoginPage.tsx";
-import RegisterPage from "../pages/account/RegisterPage.tsx";
-import RegisterThankYouPage from "../pages/account/RegisterThankYouPage.tsx";
-import VerificationPage from "../pages/account/VerificationPage.tsx"; //
+import LoginPage from "../pages/account/LoginPage";
+import RegisterPage from "../pages/account/RegisterPage";
+import RegisterThankYouPage from "../pages/account/RegisterThankYouPage";
+import VerificationPage from "../pages/account/VerificationPage";
+import ForgottenPasswordPage from "../pages/account/ForgottenPasswordPage";
+import ResetPasswordPage from "../pages/account/ResetPasswordPage";
 
 export const coreRoutes: RouteObject[] = [
   { path: "/", element: <Homepage /> },
@@ -13,4 +15,6 @@ export const coreRoutes: RouteObject[] = [
   { path: "register", element: <RegisterPage /> },
   { path: "register/thank-you", element: <RegisterThankYouPage /> },
   { path: "verify", element: <VerificationPage /> },
+  { path: "forgotten-password", element: <ForgottenPasswordPage /> },
+  { path: "forgotten-password/reset", element: <ResetPasswordPage /> },
 ];

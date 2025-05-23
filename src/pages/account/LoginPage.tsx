@@ -72,13 +72,13 @@ const LoginPage: React.FC = () => {
                   <div className="mb-5">
                     <div className="field mb-3 required">
                       <label
-                        htmlFor="_username"
-                        className="form-label required"
+                          htmlFor="_username"
+                          className="form-label required"
                       >
-                        Username
+                        Username <span className="text-danger">*</span>
                       </label>
                       <input
-                        type="text"
+                          type="text"
                         id="_username"
                         name="_username"
                         required
@@ -89,13 +89,13 @@ const LoginPage: React.FC = () => {
 
                     <div className="field mb-3 required">
                       <label
-                        htmlFor="_password"
-                        className="form-label required"
+                          htmlFor="_password"
+                          className="form-label required"
                       >
-                        Password
+                        Password <span className="text-danger">*</span>
                       </label>
                       <input
-                        type="password"
+                          type="password"
                         id="_password"
                         name="_password"
                         required
@@ -140,7 +140,7 @@ const LoginPage: React.FC = () => {
                 </form>
 
                 <div className="d-grid">
-                  <a className="btn btn-link" href="/en_US/forgotten-password">
+                  <a className="btn btn-link" href="/forgotten-password">
                     Forgot password?
                   </a>
                 </div>
