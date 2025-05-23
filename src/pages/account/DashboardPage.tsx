@@ -1,21 +1,18 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Default from "../../layouts/Default";
 import AccountLayout from "../../layouts/Account";
 import { useCustomer } from "../../context/CustomerContext";
 import { useFlashMessages } from "../../context/FlashMessagesContext";
 import { IconPencil, IconLock, IconCheck } from "@tabler/icons-react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
-import { sendVerificationEmail, verifyToken } from "../../services/customerVerification";
+import { sendVerificationEmail } from "../../services/customerVerification";
 
 const DashboardPage: React.FC = () => {
-    const { customer, refetchCustomer } = useCustomer();
+    const { customer} = useCustomer();
     const { addMessage } = useFlashMessages();
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
 
-    const [isVerifying, setIsVerifying] = useState(false);
-    const verificationAttempted = useRef(false);
+    const [isSendingVerification, setIsSendingVerification] = useState(false);
 
     const handleVerifyClick = async () => {
         if (!customer?.email) {
@@ -29,40 +26,21 @@ const DashboardPage: React.FC = () => {
             return;
         }
 
-        setIsVerifying(true);
-        const { success, message } = await sendVerificationEmail(customer.email, window.location.href, jwtToken);
+        setIsSendingVerification(true);
+        const { success, message } = await sendVerificationEmail(customer.email, jwtToken);
 
         if (success) {
-            addMessage("success", "Verification email sent! Please check your inbox.");
+            addMessage("success", message || "Verification email sent! Please check your inbox.");
         } else {
             addMessage("error", message || "Failed to send verification email.");
         }
 
-        setIsVerifying(false);
+        setIsSendingVerification(false);
     };
 
     useEffect(() => {
-        const tokenFromUrl = searchParams.get("token");
-        const jwtToken = localStorage.getItem("jwtToken");
-
-        if (!tokenFromUrl || !jwtToken || verificationAttempted.current) return;
-        verificationAttempted.current = true;
-
-        const verify = async () => {
-            const { success, message } = await verifyToken(tokenFromUrl, jwtToken);
-
-            if (success) {
-                addMessage("success", "Your email has been successfully verified.");
-                await refetchCustomer();
-            } else {
-                addMessage("error", message || "Verification failed.");
-            }
-
-            navigate("/account/dashboard", { replace: true });
-        };
-
-        verify();
-    }, [searchParams, addMessage, refetchCustomer, navigate]);
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <Default>
@@ -116,15 +94,15 @@ const DashboardPage: React.FC = () => {
                                                 className="btn btn-sm btn-icon btn-outline-gray text-primary"
                                                 type="button"
                                                 onClick={handleVerifyClick}
-                                                disabled={isVerifying}
+                                                disabled={isSendingVerification}
                                             >
-                                                {isVerifying ? (
+                                                {isSendingVerification ? (
                                                     <>
-                            <span
-                                className="spinner-border spinner-border-sm"
-                                role="status"
-                                aria-hidden="true"
-                            ></span>
+                                                        <span
+                                                            className="spinner-border spinner-border-sm"
+                                                            role="status"
+                                                            aria-hidden="true"
+                                                        ></span>
                                                         Sending...
                                                     </>
                                                 ) : (
