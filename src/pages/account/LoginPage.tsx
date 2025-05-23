@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Default from "../layouts/Default";
+import Default from "../../layouts/Default.tsx";
 import { useNavigate } from "react-router-dom";
-import { useCustomer } from "../context/CustomerContext";
+import { useCustomer } from "../../context/CustomerContext.tsx";
 import { IconLockOpen } from "@tabler/icons-react";
 
 const LoginPage: React.FC = () => {
@@ -158,7 +158,7 @@ const LoginPage: React.FC = () => {
                 <a
                   className="btn btn-link"
                   id="register-here-button"
-                  href="/en_US/register"
+                  href="/register"
                 >
                   Register here
                 </a>
