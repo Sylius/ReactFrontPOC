@@ -4,7 +4,7 @@ import CartPage from "../pages/CartPage";
 import LoginPage from "../pages/account/LoginPage.tsx";
 import RegisterPage from "../pages/account/RegisterPage.tsx";
 import RegisterThankYouPage from "../pages/account/RegisterThankYouPage.tsx";
-import VerificationPage from "../pages/account/VerificationPage.tsx"; // Importujemy nową stronę
+import VerificationPage from "../pages/account/VerificationPage.tsx"; //
 
 export const coreRoutes: RouteObject[] = [
   { path: "/", element: <Homepage /> },
@@ -12,5 +12,5 @@ export const coreRoutes: RouteObject[] = [
   { path: "login", element: <LoginPage /> },
   { path: "register", element: <RegisterPage /> },
   { path: "register/thank-you", element: <RegisterThankYouPage /> },
-  { path: "verify", element: <VerificationPage /> }, // Dodana nowa trasa do weryfikacji
+  { path: "verify", element: <VerificationPage /> },
 ];
