@@ -8,9 +8,11 @@ import AddressBookPage from "../pages/account/AddressBookPage";
 import AddAddressPage from "../pages/account/AddAddressPage";
 import EditAddressPage from "../pages/account/EditAddressPage";
 import ChangePasswordPage from "../pages/account/ChangePasswordPage";
+import RequireAuth from "./guards/RequireAuth.tsx";
 
 export const accountRoutes: RouteObject = {
   path: "account",
+  element: <RequireAuth />,
   children: [
     { path: "dashboard", element: <DashboardPage /> },
     { path: "profile/edit", element: <ProfilePage /> },
