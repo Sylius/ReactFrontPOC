@@ -1,11 +1,40 @@
-🚧 **React Storefront POC for Sylius**
+# Welcome to Remix!
 
-This is a proof-of-concept for a modern Sylius storefront built with React.  
-The goal? To explore how far we can push the experience, performance, and flexibility of a headless Sylius shop with a fully custom frontend.
+- 📖 [Remix docs](https://remix.run/docs)
 
-We’ve focused on rapid prototyping, identifying key integration challenges, and laying the groundwork for a production-ready solution.  
-Powered by curiosity, driven by real-world use cases. Ready for the next step.
+## Development
 
-🔗 **Demo**: [https://react-demo.sylius.com](https://react-demo.sylius.com)
+Run the dev server:
 
-⚠️ **Warning**: This is an experimental project and not production-ready. Use it for learning, exploration, and as a base for further development.
+```shellscript
+npm run dev
+```
+
+## Deployment
+
+First, build your app for production:
+
+```sh
+npm run build
+```
+
+Then run the app in production mode:
+
+```sh
+npm start
+```
+
+Now you'll need to pick a host to deploy it to.
+
+### DIY
+
+If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
+
+Make sure to deploy the output of `npm run build`
+
+- `build/server`
+- `build/client`
+
+## Styling
+
+This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
