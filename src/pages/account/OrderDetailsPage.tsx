@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Default from "../../layouts/Default";
 import AccountLayout from "../../layouts/Account";
 import Address from "../../components/Address";
@@ -9,9 +9,11 @@ import ProductRow from "../../components/order/ProductRow";
 import { OrderItem, Order } from "../../types/Order";
 import { formatPrice } from "../../utils/price";
 import Skeleton from "react-loading-skeleton";
+import { IconCreditCard } from '@tabler/icons-react';
 
 const OrderDetailsPage: React.FC = () => {
     const { token } = useParams<{ token: string }>();
+    const navigate = useNavigate();
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -26,7 +28,7 @@ const OrderDetailsPage: React.FC = () => {
                     headers: { Authorization: `Bearer ${tokenJwt}` },
                 });
 
-                if (!orderRes.ok) throw new Error("Błąd pobierania zamówienia");
+                if (!orderRes.ok) throw new Error("Error while downloading order data");
                 const data = await orderRes.json();
 
                 if (data.payments?.[0]?.['@id']) {
@@ -76,6 +78,18 @@ const OrderDetailsPage: React.FC = () => {
                     <div className="col-12 col-md-9 pt-4">
                         <h1 className="h5 mb-4">Order #{order?.number}</h1>
 
+                        <div className="d-flex justify-content-end align-items-center mb-3">
+                            {order?.paymentState === 'awaiting_payment' && (
+                                <button
+                                    className="btn btn-primary btn-icon"
+                                    onClick={() => navigate(`/account/orders/${order?.tokenValue}/pay`)}
+                                >
+                                    <IconCreditCard size={20} className="me-2" />
+                                    Pay
+                                </button>
+                            )}
+                        </div>
+
                         <div className="card border-0 bg-body-tertiary mb-3">
                             <div className="card-body d-flex flex-column gap-1">
                                 <div className="row">
@@ -107,12 +121,12 @@ const OrderDetailsPage: React.FC = () => {
                             <div className="row">
                                 <div className="col-md-6 mb-3">
                                     {order?.billingAddress && (
-                                        <Address sectionName="Billing address" address={order.billingAddress} />
+                                        <Address sectionName="Billing address" address={order.billingAddress}/>
                                     )}
                                 </div>
                                 <div className="col-md-6 mb-3">
                                     {order?.shippingAddress && (
-                                        <Address sectionName="Shipping address" address={order.shippingAddress} />
+                                        <Address sectionName="Shipping address" address={order.shippingAddress}/>
                                     )}
                                 </div>
                             </div>
@@ -133,7 +147,7 @@ const OrderDetailsPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {order?.shipments?.[0] && <ShipmentsCard shipment={order.shipments[0]} />}
+                        {order?.shipments?.[0] && <ShipmentsCard shipment={order.shipments[0]}/>}
 
                         <div className="table-responsive mt-4">
                             <table className="table table-borderless align-middle">
@@ -147,7 +161,7 @@ const OrderDetailsPage: React.FC = () => {
                                 </thead>
                                 <tbody>
                                 {order?.items?.map((item: OrderItem) => (
-                                    <ProductRow key={item.id} orderItem={item} />
+                                    <ProductRow key={item.id} orderItem={item}/>
                                 ))}
                                 </tbody>
                             </table>

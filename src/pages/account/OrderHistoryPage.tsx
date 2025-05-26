@@ -6,6 +6,7 @@ import { useCustomer } from "../../context/CustomerContext";
 import { useQuery } from "@tanstack/react-query";
 import { Order } from "../../types/Order";
 import Skeleton from "react-loading-skeleton";
+import { IconCreditCard } from "@tabler/icons-react";
 
 const fetchCustomerOrders = async (): Promise<Order[]> => {
     const token = localStorage.getItem("jwtToken");
@@ -91,7 +92,6 @@ const OrderHistoryPage: React.FC = () => {
 
                     <div className="card">
                         <div className="card-body border-bottom py-3">
-                            <div className="d-flex border-bottom pb-3"></div>
                             <div className="table-responsive">
                                 {isLoading ? (
                                     <table className="table card-table">
@@ -117,20 +117,16 @@ const OrderHistoryPage: React.FC = () => {
                                             <th>Ship to</th>
                                             <th>Total</th>
                                             <th>State</th>
-                                            <th>Actions</th>
+                                            <th className="text-center">Actions</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {orders.map((order: Order) => (
-                                            <tr key={order.tokenValue} className="item">
+                                            <tr key={order.tokenValue}>
                                                 <td>#{order.number}</td>
                                                 <td>
                                                     {order.createdAt
-                                                        ? new Date(order.createdAt).toLocaleDateString('en-GB', {
-                                                            year: 'numeric',
-                                                            month: '2-digit',
-                                                            day: '2-digit',
-                                                        })
+                                                        ? new Date(order.createdAt).toLocaleDateString('en-GB')
                                                         : '-'}
                                                 </td>
                                                 <td>
@@ -140,13 +136,22 @@ const OrderHistoryPage: React.FC = () => {
                                                 </td>
                                                 <td>${(order.itemsSubtotal / 100).toFixed(2)}</td>
                                                 <td>{order.state}</td>
-                                                <td>
+                                                <td className="d-flex gap-2 flex-wrap justify-content-center">
                                                     <Link
                                                         to={`/account/orders/${order.tokenValue}`}
                                                         className="btn btn-sm btn-outline-gray"
                                                     >
                                                         Show
                                                     </Link>
+                                                    {(order.state !== "completed" && order.paymentState === "awaiting_payment") && (
+                                                        <Link
+                                                            to={`/account/orders/${order.tokenValue}/pay`}
+                                                            className="btn btn-sm btn-outline-gray d-flex align-items-center gap-1"
+                                                        >
+                                                            <IconCreditCard size={18} />
+                                                            Pay
+                                                        </Link>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
