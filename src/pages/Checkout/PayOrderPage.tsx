@@ -1,3 +1,4 @@
+// src/pages/Checkout/PayOrderPage.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Default from '../../layouts/Default';
@@ -14,99 +15,98 @@ interface PaymentMethod {
 }
 
 const PayOrderPage: React.FC = () => {
-    const { token } = useParams();
+    const { token } = useParams<{ token: string }>();
     const navigate = useNavigate();
-
     const [order, setOrder] = useState<Order | null>(null);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [selectedMethod, setSelectedMethod] = useState('');
     const [createdAt, setCreatedAt] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const jwt = localStorage.getItem('jwtToken') ?? null;
 
     useEffect(() => {
         const fetchOrder = async () => {
+            const baseUrl = import.meta.env.VITE_REACT_APP_API_URL!;
+            const headers: Record<string, string> = {};
+            if (jwt) headers.Authorization = `Bearer ${jwt}`;
+
+            if (!token) {
+                setLoading(false);
+                return;
+            }
+
             try {
-                const jwt = localStorage.getItem('jwtToken');
-                const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
-
-                if (!jwt || !token) return;
-
-                const orderRes = await fetch(`${baseUrl}/api/v2/shop/orders/${token}`, {
-                    headers: { Authorization: `Bearer ${jwt}` },
-                });
+                const orderRes = await fetch(`${baseUrl}/api/v2/shop/orders/${token}`, { headers });
                 if (!orderRes.ok) throw new Error('Failed to load order');
-                const orderData: Order = await orderRes.json();
-                setOrder(orderData);
+                const ord: Order = await orderRes.json();
+                setOrder(ord);
 
-                const payment = orderData.payments?.[0];
-                if (!payment?.id) throw new Error('No payment ID found');
+                const payment = ord.payments?.[0];
+                let list: PaymentMethod[] = [];
 
-                const methodsRes = await fetch(
-                    `${baseUrl}/api/v2/shop/orders/${token}/payments/${payment.id}/methods`,
-                    { headers: { Authorization: `Bearer ${jwt}` } }
-                );
-                const methodsData = await methodsRes.json();
-                let list = methodsData['hydra:member'] || [];
-
-                if (list.length === 0) {
-                    const fallbackRes = await fetch(`${baseUrl}/api/v2/shop/payment-methods`, {
-                        headers: { Authorization: `Bearer ${jwt}` },
-                    });
-                    const fallbackData = await fallbackRes.json();
-                    list = fallbackData['hydra:member'] || [];
+                if (payment?.id) {
+                    const methodsRes = await fetch(
+                        `${baseUrl}/api/v2/shop/orders/${token}/payments/${payment.id}/methods`,
+                        { headers }
+                    );
+                    if (methodsRes.ok) {
+                        const data = await methodsRes.json();
+                        list = data['hydra:member'] || [];
+                    }
+                    if (list.length === 0) {
+                        const fallbackRes = await fetch(`${baseUrl}/api/v2/shop/payment-methods`, { headers });
+                        const fallbackData = await fallbackRes.json();
+                        list = fallbackData['hydra:member'] || [];
+                    }
                 }
 
                 setPaymentMethods(list);
                 if (list.length > 0) setSelectedMethod(list[0].code);
 
-                if (payment['@id']) {
-                    const fullPaymentRes = await fetch(`${baseUrl}${payment['@id']}`, {
-                        headers: { Authorization: `Bearer ${jwt}` },
-                    });
+                if (jwt && ord.payments?.[0]?.['@id']) {
+                    const fullPaymentRes = await fetch(`${baseUrl}${ord.payments[0]['@id']}`, { headers });
                     if (fullPaymentRes.ok) {
                         const fullPayment = await fullPaymentRes.json();
-                        setCreatedAt(fullPayment.createdAt);
+                        setCreatedAt(fullPayment.createdAt ?? null);
+                    } else {
+                        console.error('Could not fetch full payment for date');
                     }
                 }
-            } catch (err) {
-                console.error('🔥 Error during fetchOrder:', err);
+            } catch (error: unknown) {
+                console.error('Error fetching order or methods:', error);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchOrder();
-    }, [token]);
+    }, [token, jwt]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!order || !order.payments?.[0]?.id) return;
+        if (!order?.payments?.[0]?.id || !token) {
+            return;
+        }
 
         setSubmitting(true);
-        try {
-            const jwt = localStorage.getItem('jwtToken');
-            const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+        const baseUrl = import.meta.env.VITE_REACT_APP_API_URL!;
+        const headers: Record<string, string> = { 'Content-Type': 'application/merge-patch+json' };
+        if (jwt) headers.Authorization = `Bearer ${jwt}`;
 
+        try {
             const res = await fetch(
                 `${baseUrl}/api/v2/shop/orders/${token}/payments/${order.payments[0].id}`,
                 {
                     method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/merge-patch+json',
-                        Authorization: `Bearer ${jwt}`,
-                    },
+                    headers,
                     body: JSON.stringify({ paymentMethod: selectedMethod }),
                 }
             );
-
-            if (!res.ok) throw new Error('❌ Failed to set payment method');
-
-            navigate('/order/thank-you', {
-                state: { tokenValue: token },
-            });
-        } catch (err) {
-            console.error('🔥 Error submitting payment method:', err);
+            if (!res.ok) throw new Error('Failed to set payment method');
+            navigate('/order/thank-you', { state: { tokenValue: token } });
+        } catch (error: unknown) {
+            console.error('Error setting payment method:', error);
         } finally {
             setSubmitting(false);
         }
@@ -123,7 +123,14 @@ const PayOrderPage: React.FC = () => {
                         {loading ? (
                             <Skeleton width={250} />
                         ) : (
-                            `${createdAt ? new Date(createdAt).toLocaleString('en-GB') : '-'} • $${((order?.total ?? 0) / 100).toFixed(2)} • ${order?.items?.length ?? 0} items`
+                            <>
+                                {createdAt && (
+                                    <>
+                                        {new Date(createdAt).toLocaleString('en-GB')} •{' '}
+                                    </>
+                                )}
+                                ${((order?.total ?? 0) / 100).toFixed(2)} • {order?.items?.length ?? 0} items
+                            </>
                         )}
                     </p>
 

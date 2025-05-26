@@ -22,6 +22,6 @@ export const thankYouRoute: RouteObject = {
 };
 
 export const payOrderRoute: RouteObject = {
-  path: "account/orders/:token/pay",
+  path: "order/:token/pay",
   element: <PayOrderPage />,
 };

@@ -1,12 +1,12 @@
-import React from 'react';
-import Layout from '../../layouts/Default';
-import { useCustomer } from '../../context/CustomerContext';
-import { useLocation, Link } from 'react-router-dom';
+import React from "react";
+import Layout from "../../layouts/Default";
+import { useCustomer } from "../../context/CustomerContext";
+import { useLocation, Link } from "react-router-dom";
 
 const ThankYouPage: React.FC = () => {
     const { customer } = useCustomer();
     const location = useLocation();
-    const tokenValue = location.state?.tokenValue || localStorage.getItem('orderToken'); // <--- poprawka
+    const tokenValue = location.state?.tokenValue;
 
     return (
         <Layout>
@@ -27,9 +27,9 @@ const ThankYouPage: React.FC = () => {
                                         Change payment method
                                     </Link>
                                 )}
-                                <Link className="btn btn-secondary" to="/register">
+                                    <Link className="btn btn-secondary" to="/register">
                                     Create an account
-                                </Link>
+                                    </Link>
                             </>
                         )}
                     </div>
