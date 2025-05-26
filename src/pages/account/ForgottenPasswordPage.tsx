@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Default from "../../layouts/Default.tsx";
 import { useNavigate } from "react-router-dom";
 import { useFlashMessages } from "../../context/FlashMessagesContext.tsx";
-import { IconLockOpen } from "@tabler/icons-react";
+import AuthLeftPanel from "../../components/account/AuthLeftPanel";
 
 const ForgottenPasswordPage: React.FC = () => {
     const [email, setEmail] = useState("");
@@ -49,23 +49,7 @@ const ForgottenPasswordPage: React.FC = () => {
         <Default>
             <div className="container my-auto">
                 <div className="row my-4">
-                    <div className="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-6 offset-lg-0 order-lg-0">
-                        <div className="d-flex flex-column justify-content-center align-items-center bg-light rounded-4 h-100 p-3">
-                            <div className="text-center">
-                                <div className="mb-3">
-                                    <IconLockOpen stroke={2} size={144} color={"#e8eaed"} />
-                                </div>
-                                <h2>Don't have an account?</h2>
-                                <a
-                                    className="btn btn-link"
-                                    id="register-here-button"
-                                    href="/register"
-                                >
-                                    Register here
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    <AuthLeftPanel />
 
                     <div className="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-6 offset-lg-0 col-xl-4 offset-xl-1 order-lg-1">
                         <div className="d-flex justify-content-center align-items-center h-100 px-3">
