@@ -71,4 +71,7 @@ export interface Order {
     items?: OrderItem[];
     localeCode?: string;
     paymentState?: string;
+    promotionCoupon?: {
+        code: string;
+    } | null;
 }
