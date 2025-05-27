@@ -29,7 +29,7 @@ const AddressBookPage: React.FC = () => {
         try {
             const token = localStorage.getItem("jwtToken");
             const res = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses`,
+                `${window.ENV?.API_URL}/api/v2/shop/addresses`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -53,7 +53,7 @@ const AddressBookPage: React.FC = () => {
         try {
             const token = localStorage.getItem("jwtToken");
             const res = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses/${id}`,
+                `${window.ENV?.API_URL}/api/v2/shop/addresses/${id}`,
                 {
                     method: "DELETE",
                     headers: {

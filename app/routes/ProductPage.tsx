@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import Slider, { Settings } from 'react-slick';
-import { PrevArrow, NextArrow } from '../components/Arrow';
+import { PrevArrow, NextArrow } from '~/components/Arrow';
 import Layout from '../layouts/Default';
 import Breadcrumbs from '../components/Breadcrumbs';
 import BootstrapAccordion from '../components/Accordion';
 import ProductCard from '../components/ProductCard';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { formatPrice } from '../utils/price';
-import { useOrder } from '../context/OrderContext';
-import { useFlashMessages } from '../context/FlashMessagesContext';
+import { formatPrice } from '~/utils/price';
+import { useOrder } from '~/context/OrderContext';
+import { useFlashMessages } from '~/context/FlashMessagesContext';
 import ReviewList from '../components/product/Reviews';
 import ReviewSummary from '../components/product/ReviewSummary';
 import ReviewSummarySkeleton from '../components/product/ReviewSummarySkeleton';
@@ -25,9 +25,7 @@ import {
     ProductOptionValue,
     ProductAttribute,
     ProductReview,
-} from '../types/Product';
-
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
+} from '~/types/Product';
 
 interface ApiProduct extends Product {
     productTaxons?: string[];
@@ -119,6 +117,8 @@ const ProductPage: React.FC = () => {
     const [associationsLoading, setAssociationsLoading] = useState(false);
 
     const fetchOption = async (url: string): Promise<ProductOption> => {
+        const API_URL = window.ENV?.API_URL;
+
         const res = await fetch(`${API_URL}${url}`);
         const data = await res.json();
         const values: ProductOptionValue[] = await Promise.all(
@@ -131,6 +131,8 @@ const ProductPage: React.FC = () => {
         prodCode: string,
         sel: Record<string, string>
     ) => {
+        const API_URL = window.ENV?.API_URL;
+
         const params = Object.entries(sel)
             .map(
                 ([opt, val]) =>
@@ -145,6 +147,8 @@ const ProductPage: React.FC = () => {
     };
 
     const fetchProductAttributes = async (prodCode: string) => {
+        const API_URL = window.ENV?.API_URL;
+
         try {
             const res = await fetch(
                 `${API_URL}/api/v2/shop/products/${prodCode}/attributes`
@@ -157,6 +161,8 @@ const ProductPage: React.FC = () => {
     };
 
     const fetchProductReviews = async (refs: { '@id': string }[]) => {
+        const API_URL = window.ENV?.API_URL;
+
         setAllReviewCount(refs.length);
         const data: ProductReview[] = await Promise.all(
             refs.map((ref) =>
@@ -174,6 +180,8 @@ const ProductPage: React.FC = () => {
     };
 
     const fetchAssociations = async (urls: string[]) => {
+        const API_URL = window.ENV?.API_URL;
+
         setAssociationsLoading(true);
         try {
             const list = await Promise.all(
@@ -199,6 +207,8 @@ const ProductPage: React.FC = () => {
     };
 
     const fetchProduct = async () => {
+        const API_URL = window.ENV?.API_URL;
+
         setLoading(true);
         setError(null);
 
@@ -277,6 +287,8 @@ const ProductPage: React.FC = () => {
     };
 
     const handleAddToCart = async () => {
+        const API_URL = window.ENV?.API_URL;
+
         if (!variant) return;
         setIsAddToCartLoading(true);
         try {

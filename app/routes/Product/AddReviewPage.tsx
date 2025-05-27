@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import ProductCard from '../../components/ProductCard';
-import { useFlashMessages } from '../../context/FlashMessagesContext';
-import Breadcrumbs from '../../components/Breadcrumbs';
-import Layout from '../../layouts/Default';
+import ProductCard from '~/components/ProductCard';
+import { useFlashMessages } from '~/context/FlashMessagesContext';
+import Breadcrumbs from '~/components/Breadcrumbs';
+import Layout from '~/layouts/Default';
 import Skeleton from 'react-loading-skeleton';
-import { Product } from '../../types/Product';
+import { Product } from '~/types/Product';
 import { IconStar } from '@tabler/icons-react';
 
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
-
 const AddReviewPage: React.FC = () => {
+    const API_URL = window.ENV?.API_URL;
+
     const { code } = useParams<{ code: string }>();
     const navigate = useNavigate();
     const { addMessage } = useFlashMessages();

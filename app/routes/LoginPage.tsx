@@ -19,7 +19,7 @@ const LoginPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/customers/token`,
+        `${window.ENV?.API_URL}/api/v2/shop/customers/token`,
         {
           method: "POST",
           headers: {

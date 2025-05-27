@@ -23,7 +23,7 @@ const ShippingPage: React.FC = () => {
 
   const fetchShippingMethodsFromAPI = async (): Promise<ShippingMethod[]> => {
     const response = await fetch(
-        `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/shipments/${order?.shipments?.[0]?.id}/methods`
+        `${window.ENV?.API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/shipments/${order?.shipments?.[0]?.id}/methods`
     );
     if (!response.ok) {
       throw new Error('Error while downloading shipping method');
@@ -49,7 +49,7 @@ const ShippingPage: React.FC = () => {
 
     try {
       const response = await fetch(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/shipments/${order?.shipments?.[0]?.id}`,
+          `${window.ENV?.API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/shipments/${order?.shipments?.[0]?.id}`,
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/merge-patch+json' },

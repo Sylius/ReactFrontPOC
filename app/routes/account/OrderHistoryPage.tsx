@@ -11,7 +11,7 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
     const token = localStorage.getItem("jwtToken");
     if (!token) throw new Error("No Token");
 
-    const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+    const baseUrl = window.ENV?.API_URL;
 
     const response = await fetch(`${baseUrl}/api/v2/shop/orders`, {
         headers: { Authorization: `Bearer ${token}` },

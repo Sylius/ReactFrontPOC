@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Taxon, TaxonChild } from '../../types/Taxon';
+import { Taxon, TaxonChild } from '~/types/Taxon';
 import { IconChevronDown } from '@tabler/icons-react';
 
 const Navbar: React.FC = () => {

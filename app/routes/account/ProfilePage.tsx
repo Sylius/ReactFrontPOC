@@ -50,7 +50,7 @@ const ProfilePage: React.FC = () => {
         e.preventDefault();
         try {
             const res = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}${customer?.["@id"]}`,
+                `${window.ENV?.API_URL}${customer?.["@id"]}`,
                 {
                     method: "PUT",
                     headers: {

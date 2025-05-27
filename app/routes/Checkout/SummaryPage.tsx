@@ -27,7 +27,7 @@ const SummaryPage: React.FC = () => {
 
     try {
       const response = await fetch(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${orderToken}/complete`,
+          `${window.ENV?.API_URL}/api/v2/shop/orders/${orderToken}/complete`,
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/merge-patch+json' },

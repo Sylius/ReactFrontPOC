@@ -13,6 +13,7 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import("bootstrap/dist/css/bootstrap.css");
 import "./assets/scss/main.scss";
 import {CustomerProvider} from "~/context/CustomerContext";
+import {FlashMessagesProvider} from "~/context/FlashMessagesContext";
 
 const queryClient = new QueryClient();
 
@@ -63,7 +64,9 @@ export default function App() {
         <QueryClientProvider client={queryClient}>
           <CustomerProvider>
             <OrderProvider>
-              <Outlet />
+              <FlashMessagesProvider>
+                <Outlet />
+              </FlashMessagesProvider>
             </OrderProvider>
           </CustomerProvider>
         </QueryClientProvider>

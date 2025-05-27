@@ -17,7 +17,7 @@ interface ShipmentsCardProps {
 const ShipmentsCard: React.FC<ShipmentsCardProps> = ({ shipment }) => {
   const fetchShippingMethodFromAPI = async (): Promise<ShippingMethod> => {
     const response = await fetch(
-        `${import.meta.env.VITE_REACT_APP_API_URL}${shipment.method}`
+        `${window.ENV?.API_URL}${shipment.method}`
     );
     if (!response.ok) {
       throw new Error('Error downloading shipping method');

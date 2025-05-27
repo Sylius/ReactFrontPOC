@@ -21,7 +21,7 @@ const OrderDetailsPage: React.FC = () => {
                 const tokenJwt = localStorage.getItem("jwtToken");
                 if (!tokenJwt || !token) return;
 
-                const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+                const baseUrl = window.ENV?.API_URL;
                 const orderRes = await fetch(`${baseUrl}/api/v2/shop/orders/${token}`, {
                     headers: { Authorization: `Bearer ${tokenJwt}` },
                 });

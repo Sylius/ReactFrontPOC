@@ -32,7 +32,7 @@ const AddAddressPage: React.FC = () => {
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/countries`);
+                const res = await fetch(`${window.ENV?.API_URL}/api/v2/shop/countries`);
                 const data = await res.json();
                 setCountries(data["hydra:member"] || []);
             } catch (error) {
@@ -58,7 +58,7 @@ const AddAddressPage: React.FC = () => {
             const token = localStorage.getItem("jwtToken");
             if (!token) throw new Error("Missing token");
 
-            const res = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses`, {
+            const res = await fetch(`${window.ENV?.API_URL}/api/v2/shop/addresses`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

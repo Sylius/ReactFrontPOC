@@ -2,13 +2,13 @@ import React from 'react';
 import Layout from '../layouts/Default';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import ProductRow from '../components/cart/ProductRow';
-import { Order, OrderItem } from '../types/Order';
-import { formatPrice } from '../utils/price';
+import { Order, OrderItem } from '~/types/Order';
+import { formatPrice } from '~/utils/price';
 import { Link } from 'react-router-dom';
 
 const fetchCart = async (): Promise<Order> => {
   const response = await fetch(
-      `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}`
+      `${window.ENV?.API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}`
   );
   if (!response.ok) {
     throw new Error('Failed to fetch cart');
@@ -20,7 +20,7 @@ const fetchCart = async (): Promise<Order> => {
 
 const removeCartItem = async (id: number): Promise<void> => {
   const response = await fetch(
-      `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
+      `${window.ENV?.API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
       { method: 'DELETE' }
   );
   if (!response.ok) throw new Error('Failed to remove item from cart');
@@ -33,7 +33,7 @@ interface UpdateCartItemPayload {
 
 const updateCartItem = async ({ id, quantity }: UpdateCartItemPayload): Promise<void> => {
   const response = await fetch(
-      `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
+      `${window.ENV?.API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items/${id}`,
       {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/merge-patch+json' },

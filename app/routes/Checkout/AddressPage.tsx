@@ -46,11 +46,11 @@ const AddressPage: React.FC = () => {
             try {
                 const [addressesRes, countriesRes] = await Promise.all([
                     token
-                        ? fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses`, {
+                        ? fetch(`${window.ENV?.API_URL}/api/v2/shop/addresses`, {
                             headers: { Authorization: `Bearer ${token}` },
                         })
                         : Promise.resolve({ json: () => ({ 'hydra:member': [] }) }),
-                    fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/countries`),
+                    fetch(`${window.ENV?.API_URL}/api/v2/shop/countries`),
                 ]);
 
                 const addressData = await addressesRes.json();
@@ -115,7 +115,7 @@ const AddressPage: React.FC = () => {
 
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}`,
+                `${window.ENV?.API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}`,
                 {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },

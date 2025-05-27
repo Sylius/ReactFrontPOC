@@ -39,37 +39,37 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children, breadcrumbs }) 
                 Dashboard
               </Link>
 
-              <a
+              <Link
                 className="d-flex align-items-center gap-2 py-1 link-reset"
-                href="/account/profile/edit"
+                to="/account/profile/edit"
               >
                 <IconUser stroke={1.25} size={28} />
                 Personal information
-              </a>
+              </Link>
 
-              <a
+              <Link
                 className="d-flex align-items-center gap-2 py-1 link-reset"
-                href="/account/change-password"
+                to="/account/change-password"
               >
                 <IconLock stroke={1.25} size={28} />
                 Change password
-              </a>
+              </Link>
 
-              <a
+              <Link
                 className="d-flex align-items-center gap-2 py-1 link-reset"
-                href="/account/address-book/"
+                to="/account/address-book/"
               >
                 <IconBook stroke={1.25} size={28} />
                 Address book
-              </a>
+              </Link>
 
-              <a
+              <Link
                 className="d-flex align-items-center gap-2 py-1 link-reset"
-                href="/account/order-history"
+                to="/account/order-history"
               >
                 <IconShoppingCart stroke={1.25} size={28} />
                 Order history
-              </a>
+              </Link>
             </div>
           </div>
         </div>

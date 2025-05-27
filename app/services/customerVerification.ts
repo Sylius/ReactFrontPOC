@@ -1,10 +1,10 @@
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
-
 export const sendVerificationEmail = async (
     email: string,
     link: string,
     jwtToken: string
 ): Promise<{ success: boolean; message?: string }> => {
+    const API_URL = window.ENV?.API_URL;
+
     try {
         const response = await fetch(`${API_URL}/api/v2/shop/customers/verify`, {
             method: "POST",
@@ -33,6 +33,8 @@ export const verifyToken = async (
     token: string,
     jwtToken: string
 ): Promise<{ success: boolean; message?: string }> => {
+    const API_URL = window.ENV?.API_URL;
+
     try {
         const response = await fetch(`${API_URL}/api/v2/shop/customers/verify/${token}`, {
             method: "PATCH",

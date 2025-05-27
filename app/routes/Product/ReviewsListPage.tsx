@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Layout from '../../layouts/Default';
-import Breadcrumbs from '../../components/Breadcrumbs';
-import ProductCard from '../../components/ProductCard';
-import Reviews from '../../components/product/Reviews';
-import { Product, ProductReview } from '../../types/Product';
+import Layout from '~/layouts/Default';
+import Breadcrumbs from '~/components/Breadcrumbs';
+import ProductCard from '~/components/ProductCard';
+import Reviews from '~/components/product/Reviews';
+import { Product, ProductReview } from '~/types/Product';
 import Skeleton from 'react-loading-skeleton';
 
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
-
 const ReviewsListPage: React.FC = () => {
+    const API_URL = window.ENV?.API_URL;
+
     const { code } = useParams<{ code: string }>();
     const [product, setProduct] = useState<Product | null>(null);
     const [reviews, setReviews] = useState<ProductReview[]>([]);

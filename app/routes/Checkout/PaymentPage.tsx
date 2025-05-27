@@ -21,7 +21,7 @@ const PaymentPage: React.FC = () => {
 
   const fetchPaymentMethodsFromAPI = async (): Promise<PaymentMethod[]> => {
     const response = await fetch(
-        `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem(
+        `${window.ENV?.API_URL}/api/v2/shop/orders/${localStorage.getItem(
             'orderToken'
         )}/payments/${order?.payments?.[0]?.id}/methods`
     );
@@ -55,7 +55,7 @@ const PaymentPage: React.FC = () => {
 
     try {
       const response = await fetch(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem(
+          `${window.ENV?.API_URL}/api/v2/shop/orders/${localStorage.getItem(
               'orderToken'
           )}/payments/${order?.payments?.[0]?.id}`,
           {

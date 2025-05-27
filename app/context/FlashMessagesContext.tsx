@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import FlashMessages from "../components/layout/FlashMessages.tsx";
+import FlashMessages from "~/components/layout/FlashMessages";
 
 type FlashMessageType = "success" | "error" | "info" | "warning";
 

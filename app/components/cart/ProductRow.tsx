@@ -22,7 +22,7 @@ const ProductRow: React.FC<ProductRowProps> = ({
 
   const fetchVariant = async (): Promise<any> => {
     const response = await fetch(
-      `${import.meta.env.VITE_REACT_APP_API_URL}${orderItem.variant}`
+      `${window.ENV?.API_URL}${orderItem.variant}`
     );
     if (!response.ok) {
       throw new Error('Problem z pobieraniem wariantu');
@@ -38,7 +38,7 @@ const ProductRow: React.FC<ProductRowProps> = ({
 
   const fetchProduct = async (): Promise<any> => {
     const response = await fetch(
-      `${import.meta.env.VITE_REACT_APP_API_URL}${variant.product}`
+      `${window.ENV?.API_URL}${variant.product}`
     );
     if (!response.ok) {
       throw new Error('Problem z pobieraniem produktu');

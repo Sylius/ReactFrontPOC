@@ -25,7 +25,7 @@ const ChangePasswordPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_REACT_APP_API_URL}${customer && customer["@id"]}/password`,
+        `${window.ENV?.API_URL}${customer && customer["@id"]}/password`,
         {
           method: "PUT",
           headers: {

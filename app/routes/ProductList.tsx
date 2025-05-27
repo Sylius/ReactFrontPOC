@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import Layout from '../layouts/Default';
-import { Product } from '../types/Product';
-import Breadcrumbs from '../components/Breadcrumbs';
-import ProductCard from '../components/ProductCard';
+import Layout from '~/layouts/Default';
+import { Product } from '~/types/Product';
+import Breadcrumbs from '~/components/Breadcrumbs';
+import ProductCard from '~/components/ProductCard';
 import Skeleton from 'react-loading-skeleton';
-import ProductToolbar from '../components/taxons/ProductToolbar';
+import ProductToolbar from '~/components/taxons/ProductToolbar';
 
 interface TaxonDetails {
     name: string;
@@ -35,7 +35,7 @@ const ProductList: React.FC = () => {
     const [parentTaxon, setParentTaxon] = useState<{ name: string; code: string } | null>(null);
 
     const taxonCode = childCode || parentCode;
-    const API = import.meta.env.VITE_REACT_APP_API_URL;
+    const API = window.ENV?.API_URL;
 
     const fetchProducts = async (page: number, code: string, queryParams: string): Promise<Product[]> => {
         const baseUrl = `${API}/api/v2/shop/products`;

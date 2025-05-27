@@ -36,7 +36,7 @@ const EditAddressPage: React.FC = () => {
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/countries`);
+                const res = await fetch(`${window.ENV?.API_URL}/api/v2/shop/countries`);
                 const data = await res.json();
                 setCountries(data["hydra:member"] || []);
             } catch (error) {
@@ -50,7 +50,7 @@ const EditAddressPage: React.FC = () => {
             try {
                 const token = localStorage.getItem("jwtToken");
                 const res = await fetch(
-                    `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses/${id}`,
+                    `${window.ENV?.API_URL}/api/v2/shop/addresses/${id}`,
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }
@@ -92,7 +92,7 @@ const EditAddressPage: React.FC = () => {
         try {
             const token = localStorage.getItem("jwtToken");
             const res = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses/${id}`,
+                `${window.ENV?.API_URL}/api/v2/shop/addresses/${id}`,
                 {
                     method: "PUT",
                     headers: {

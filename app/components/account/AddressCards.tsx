@@ -26,7 +26,7 @@ const AddressCards: React.FC<AddressCardsProps> = ({
         try {
             const token = localStorage.getItem("jwtToken");
             const response = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}${customer["@id"]}`,
+                `${window.ENV?.API_URL}${customer["@id"]}`,
                 {
                     method: "PUT",
                     headers: {
