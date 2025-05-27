@@ -120,11 +120,6 @@ const CartPage: React.FC = () => {
   const isCouponApplied = !!order?.orderPromotionTotal && order.orderPromotionTotal !== 0;
   const displayCouponCode = order?.promotionCoupon?.code ?? activeCouponCode;
 
-  // DEBUG LOGS
-  console.log('displayCouponCode:', displayCouponCode);
-  console.log('order.promotionCoupon?.code:', order?.promotionCoupon?.code);
-  console.log('activeCouponCode (from context):', activeCouponCode);
-
   return (
       <Layout>
         <div className="container mt-4 mb-5">

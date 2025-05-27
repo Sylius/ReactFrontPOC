@@ -66,6 +66,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 return fetchOrderFromAPI();
             }
         },
+        refetchOnWindowFocus: false,
     });
 
     const updateMutation = useMutation({
