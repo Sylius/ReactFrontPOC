@@ -3,7 +3,10 @@
   <component name="MaterialThemeProjectNewConfig">
     <option name="metadata">
       <MTProjectMetadataState>
-        <option name="userId" value="7a54b647:194d4bd21e7:-7ffd" />
+        <option name="migrated" value="$ESLINT_USE_FLAT_CONFIG$" />
+        <option name="pristineConfig" value="false" />
+        <option name="userId" value="58a73af3:1874afa1047:-8000" />
+        <option name="version" value="8.4.1" />
       </MTProjectMetadataState>
     </option>
   </component>

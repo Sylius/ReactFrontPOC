@@ -3,11 +3,36 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration,
+  ScrollRestoration, useLoaderData,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
+import {json, LinksFunction, LoaderFunction} from "@remix-run/node";
 
-import "./tailwind.css";
+import {BootstrapLoader} from "~/components/helpers/BootstrapLoader";
+import {OrderProvider} from "~/context/OrderContext";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import("bootstrap/dist/css/bootstrap.css");
+import "./assets/scss/main.scss";
+import {CustomerProvider} from "~/context/CustomerContext";
+
+const queryClient = new QueryClient();
+
+export const loader: LoaderFunction = async () => {
+  return json({
+    ENV: {
+      API_URL: process.env.PUBLIC_API_URL,
+    },
+  });
+};
+
+function EnvironmentScript({ env }: { env: Record<string, string | undefined> }) {
+  return (
+      <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(env)};`,
+          }}
+      />
+  );
+}
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -22,7 +47,9 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export default function App() {
+  const data = useLoaderData<{ ENV: Record<string, string> }>();
+
   return (
     <html lang="en">
       <head>
@@ -32,14 +59,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <BootstrapLoader />
+        <QueryClientProvider client={queryClient}>
+          <CustomerProvider>
+            <OrderProvider>
+              <Outlet />
+            </OrderProvider>
+          </CustomerProvider>
+        </QueryClientProvider>
         <ScrollRestoration />
         <Scripts />
+        <EnvironmentScript env={data.ENV} />
       </body>
     </html>
   );
-}
-
-export default function App() {
-  return <Outlet />;
 }
