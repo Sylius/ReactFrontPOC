@@ -1,33 +1,39 @@
-import React from 'react';
-import Layout from '../../layouts/Default';
-import { useCustomer } from '../../context/CustomerContext';
-import { useLocation } from 'react-router-dom';
+import React from "react";
+import Layout from "~/layouts/Default";
+import { useCustomer } from "~/context/CustomerContext";
+import { useSearchParams, useLocation, Link } from "@remix-run/react";
 
-const ThankYouPage: React.FC = () => {
+export default function ThankYouPage() {
     const { customer } = useCustomer();
+    const [searchParams] = useSearchParams();
     const location = useLocation();
-    const tokenValue = location.state?.tokenValue;
+
+    const tokenFromQuery = searchParams.get("token");
+    const tokenFromState = (location.state as any)?.tokenValue;
+    const token = tokenFromQuery ?? tokenFromState;
 
     return (
         <Layout>
             <div className="container text-center my-auto">
                 <div className="row flex-column my-4">
                     <h1 className="h2">Thank you!</h1>
-                    You have successfully placed an order.
+                    <p>You have successfully placed an order.</p>
 
                     <div className="d-flex flex-column flex-lg-row justify-content-center gap-2 mt-4">
-                        {customer && tokenValue ? (
-                            <a className="btn btn-primary" href={`/account/orders/${tokenValue}`}>
+                        {customer && token ? (
+                            <Link to={`/account/orders/${token}`} className="btn btn-primary">
                                 View order
-                            </a>
+                            </Link>
                         ) : (
                             <>
-                                <a className="btn btn-primary" href="/orderpay">
-                                    Change payment method
-                                </a>
-                                <a className="btn btn-secondary" href="/register">
+                                {token && (
+                                    <Link to={`/order/${token}/pay`} className="btn btn-primary">
+                                        Change payment method
+                                    </Link>
+                                )}
+                                <Link to="/register" className="btn btn-secondary">
                                     Create an account
-                                </a>
+                                </Link>
                             </>
                         )}
                     </div>
@@ -35,6 +41,4 @@ const ThankYouPage: React.FC = () => {
             </div>
         </Layout>
     );
-};
-
-export default ThankYouPage;
+}
