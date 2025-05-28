@@ -43,6 +43,7 @@ const Sidebar: React.FC = () => {
                     </tr>
 
                     {isCouponApplied && (
+
                         <tr>
                             <td>Discount:</td>
                             <td className="text-end ">
