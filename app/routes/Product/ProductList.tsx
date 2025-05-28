@@ -35,9 +35,10 @@ const ProductList: React.FC = () => {
     const [parentTaxon, setParentTaxon] = useState<{ name: string; code: string } | null>(null);
 
     const taxonCode = childCode || parentCode;
-    const API = window.ENV?.API_URL;
 
     const fetchProducts = async (page: number, code: string, queryParams: string): Promise<Product[]> => {
+        const API = window.ENV?.API_URL;
+
         const baseUrl = `${API}/api/v2/shop/products`;
         const url = `${baseUrl}?itemsPerPage=9&page=${page}&productTaxons.taxon.code=${code}${
             queryParams ? '&' + queryParams : ''
@@ -53,6 +54,8 @@ const ProductList: React.FC = () => {
     };
 
     const fetchTaxonDetails = async (code: string): Promise<TaxonDetails | null> => {
+        const API = window.ENV?.API_URL;
+
         const res = await fetch(`${API}/api/v2/shop/taxons/${code}`);
         if (!res.ok) return null;
         const data = await res.json();

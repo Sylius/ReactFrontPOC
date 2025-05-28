@@ -24,11 +24,13 @@ export default defineConfig({
           route("/", "routes/Homepage.tsx");
           route("/login", "routes/LoginPage.tsx");
           route("/cart", "routes/CartPage.tsx");
-          route("/product/:code", "routes/ProductPage.tsx");
 
           // Product
           route("/product/:code/review/new", "routes/Product/AddReviewPage.tsx");
           route("/product/:code/reviews", "routes/Product/ReviewsListPage.tsx");
+          route("/:parentCode", "routes/Product/ProductListSingleUrl.tsx");
+          route("/:parentCode/:childCode", "routes/Product/ProductList.tsx");
+          route("/product/:code", "routes/Product/ProductPage.tsx");
 
           // Checkout
           route("/checkout/address", "routes/Checkout/AddressPage.tsx");
