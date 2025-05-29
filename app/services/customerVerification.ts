@@ -1,12 +1,17 @@
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
-const FRONTEND_URL = import.meta.env.VITE_REACT_APP_FRONTEND_URL;
+const getApiUrl = (): string => {
+    if (typeof window !== "undefined" && window.ENV?.API_URL) {
+        return window.ENV.API_URL;
+    }
+    throw new Error("API_URL is not defined in window.ENV");
+};
 
 export const sendVerificationEmail = async (
     email: string,
     jwtToken: string
 ): Promise<{ success: boolean; message?: string }> => {
     try {
-        const verificationFrontendUrl = `${FRONTEND_URL}/verify`;
+        const API_URL = getApiUrl();
+        const verificationFrontendUrl = "/verify";
 
         const response = await fetch(`${API_URL}/api/v2/shop/customers/verify`, {
             method: "POST",
@@ -21,9 +26,7 @@ export const sendVerificationEmail = async (
         let data: any = {};
         try {
             data = text ? JSON.parse(text) : {};
-        } catch {
-            // ignore non-JSON responses
-        }
+        } catch {}
 
         if (response.ok) {
             return {
@@ -56,6 +59,7 @@ export const verifyToken = async (
     jwtToken?: string
 ): Promise<{ success: boolean; message?: string }> => {
     try {
+        const API_URL = getApiUrl();
         const headers: HeadersInit = {
             "Content-Type": "application/merge-patch+json",
         };
@@ -76,9 +80,7 @@ export const verifyToken = async (
         let data: any = {};
         try {
             data = text ? JSON.parse(text) : {};
-        } catch {
-            // empty or non-JSON, ignore
-        }
+        } catch {}
 
         if (response.ok) {
             return {

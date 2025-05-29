@@ -15,7 +15,7 @@ interface ActionData {
     };
 }
 
-const API_URL = process.env.PUBLIC_API_URL || import.meta.env.VITE_REACT_APP_API_URL;
+const API_URL = process.env.PUBLIC_API_URL;
 
 export const action: ActionFunction = async ({ request }) => {
     const form = await request.formData();

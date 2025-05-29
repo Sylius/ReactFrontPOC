@@ -1,10 +1,8 @@
-// app/routes/account/VerificationPage.tsx
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "@remix-run/react";
 import Default from "~/layouts/Default";
 import { useFlashMessages } from "~/context/FlashMessagesContext";
 import { useCustomer } from "~/context/CustomerContext";
-import { verifyToken } from "~/services/customerVerification";
 
 export default function VerificationPage() {
     const [searchParams] = useSearchParams();
@@ -29,28 +27,54 @@ export default function VerificationPage() {
             setStatus("pending");
             setMessage("Verifying your email address...");
 
-            const jwtToken = localStorage.getItem("jwtToken") || "";
-            let result;
+            const jwtToken = typeof window !== "undefined" ? localStorage.getItem("jwtToken") || "" : "";
+            const API_URL = window.ENV?.API_URL;
+            if (!API_URL) {
+                console.error("API_URL is not defined in window.ENV");
+                setStatus("error");
+                setMessage("Configuration error: API URL not set.");
+                return;
+            }
+
             try {
-                result = await verifyToken(token!, jwtToken);
+                const headers: HeadersInit = {
+                    "Content-Type": "application/merge-patch+json",
+                };
+                if (jwtToken) {
+                    headers.Authorization = `Bearer ${jwtToken}`;
+                }
+
+                const response = await fetch(
+                    `${API_URL}/api/v2/shop/customers/verify/${token}`,
+                    {
+                        method: "PATCH",
+                        headers,
+                        body: JSON.stringify({}),
+                    }
+                );
+
+                const text = await response.text();
+                let data: any = {};
+                try {
+                    data = text ? JSON.parse(text) : {};
+                } catch {}
+
+                if (response.ok) {
+                    setStatus("success");
+                    setMessage(data.message || "Your email has been successfully verified!");
+                    addMessage("success", "Email verified. You can now log in or continue using your account.");
+                    await refetchCustomer();
+                } else {
+                    const msg = data.message || data.detail || "Email verification failed. The link might be expired or invalid.";
+                    setStatus("error");
+                    setMessage(msg);
+                    addMessage("error", msg);
+                }
             } catch (err: unknown) {
                 console.error("Verification error:", err);
                 setStatus("error");
                 setMessage("An unexpected error occurred during verification. Please try again.");
                 addMessage("error", "An unexpected error occurred during verification. Please try again.");
-                return;
-            }
-            const { success, message: msg } = result;
-
-            if (success) {
-                setStatus("success");
-                setMessage(msg || "Your email has been successfully verified!");
-                addMessage("success", "Email verified. You can now log in or continue using your account.");
-                await refetchCustomer();
-            } else {
-                setStatus("error");
-                setMessage(msg || "Email verification failed. The link might be expired or invalid.");
-                addMessage("error", msg || "Email verification failed.");
             }
         }
 
@@ -58,7 +82,9 @@ export default function VerificationPage() {
     }, [searchParams, addMessage, refetchCustomer]);
 
     useEffect(() => {
-        window.scrollTo(0, 0);
+        if (typeof window !== "undefined") {
+            window.scrollTo(0, 0);
+        }
     }, []);
 
     return (

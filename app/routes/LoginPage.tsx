@@ -5,6 +5,13 @@ import { useCustomer } from "~/context/CustomerContext";
 import { useFlashMessages } from "~/context/FlashMessagesContext";
 import AuthLeftPanel from "~/components/account/AuthLeftPanel";
 
+const getApiUrl = (): string => {
+    if (typeof window !== "undefined" && window.ENV?.API_URL) {
+        return window.ENV.API_URL;
+    }
+    return "";
+};
+
 export default function LoginPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -12,6 +19,11 @@ export default function LoginPage() {
     const { refetchCustomer } = useCustomer();
     const resetRequestedShown = useRef(false);
     const resetSuccessShown = useRef(false);
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (!resetRequestedShown.current && searchParams.get("resetRequested")) {
@@ -35,27 +47,22 @@ export default function LoginPage() {
         }
     }, [searchParams, addMessage, navigate]);
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
-
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/customers/token`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password }),
-                }
-            );
-            const data: { token: string; customer: string; message?: string } =
-                await response.json();
+            const apiUrl = getApiUrl();
+            if (!apiUrl) throw new Error("API URL is not configured");
+
+            const response = await fetch(`${apiUrl}/api/v2/shop/customers/token`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data: { token: string; customer: string; message?: string } = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.message || "Invalid credentials");
@@ -77,7 +84,6 @@ export default function LoginPage() {
         <Default>
             <div className="container my-auto">
                 <div className="row my-4">
-                    {/* Login form */}
                     <div className="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-6 offset-lg-0 col-xl-4 offset-xl-1 order-lg-1">
                         <div className="d-flex justify-content-center align-items-center h-100 px-3">
                             <div className="w-100 py-lg-5 mb-5 my-lg-5">

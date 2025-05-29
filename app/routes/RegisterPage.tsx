@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@remix-run/react";
 import Default from "~/layouts/Default";
 import { IconUserPlus } from "@tabler/icons-react";
@@ -13,8 +13,6 @@ interface FieldErrors {
     phoneNumber?: string;
     [key: string]: string | undefined;
 }
-
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
 
 export default function RegisterPage() {
     const [firstName, setFirstName] = useState("");
@@ -51,7 +49,9 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            // Include phoneNumber and password per Sylius schema
+            const API_URL = window.ENV?.API_URL;
+            if (!API_URL) throw new Error("API URL not configured.");
+
             const payload = {
                 firstName,
                 lastName,
@@ -60,18 +60,21 @@ export default function RegisterPage() {
                 password,
                 subscribedToNewsletter: subscribeNewsletter,
             };
+
             const response = await fetch(`${API_URL}/api/v2/shop/customers`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Accept": "application/json",
+                    Accept: "application/json",
                 },
                 body: JSON.stringify(payload),
             });
 
             const text = await response.text();
             let data: any = {};
-            try { data = text ? JSON.parse(text) : {}; } catch {}
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch {}
 
             if (!response.ok) {
                 if (data.violations) {
@@ -82,10 +85,7 @@ export default function RegisterPage() {
                     setErrors(apiErrors);
                     addMessage("error", "Registration failed. Please fix the highlighted errors.");
                 } else {
-                    addMessage(
-                        "error",
-                        data["hydra:description"] || data.message || "Registration error."
-                    );
+                    addMessage("error", data["hydra:description"] || data.message || "Registration error.");
                 }
                 return;
             }
@@ -106,7 +106,7 @@ export default function RegisterPage() {
                     <div className="col-12 col-md-8 col-lg-6">
                         <h1 className="h2 mb-1">Create a new customer account</h1>
                         <p className="mb-4">
-                            Have an account already?{' '}
+                            Have an account already?{" "}
                             <Link to="/login" className="link-reset">
                                 Sign in here.
                             </Link>

@@ -22,7 +22,12 @@ export default defineConfig({
         return defineRoutes((route) => {
           // Core
           route("/", "routes/Homepage.tsx");
-          route("/login", "routes/account/LoginPage.tsx");
+          route("/login", "routes/LoginPage.tsx");
+          route("/register", "routes/RegisterPage.tsx");
+          route("/register/thank-you", "routes/RegisterThankYouPage.tsx");
+          route("/forgotten-password", "routes/ForgottenPasswordPage.tsx");
+          route("/forgotten-password/reset", "routes/ResetPasswordPage.tsx");
+          route("/verify", "routes/VerificationPage.tsx");
           route("/cart", "routes/CartPage.tsx");
           route("/product/:code", "routes/ProductPage.tsx");
 
@@ -38,13 +43,6 @@ export default defineConfig({
           route("/order/thank-you", "routes/Checkout/ThankYouPage.tsx");
 
           // Account
-          route("/register", "routes/account/RegisterPage.tsx");
-          route("/register/thank-you", "routes/account/RegisterThankYouPage.tsx");
-          route("/forgotten-password/reset", "routes/account/ResetPasswordPage.tsx");
-          route("/forgotten-password", "routes/account/ForgottenPasswordPage.tsx");
-
-          route("/verify", "routes/account/VerificationPage.tsx");
-
           route("/account/dashboard", "routes/account/DashboardPage.tsx");
           route("/account/profile/edit", "routes/account/ProfilePage.tsx");
           route("/account/change-password", "routes/account/ChangePasswordPage.tsx");
