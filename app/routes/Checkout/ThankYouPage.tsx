@@ -27,7 +27,7 @@ export default function ThankYouPage() {
                         ) : (
                             <>
                                 {token && (
-                                    <Link to={`/order/${token}/pay`} className="btn btn-primary">
+                                    <Link to={`/account/orders/${token}/pay`} className="btn btn-primary">
                                         Change payment method
                                     </Link>
                                 )}

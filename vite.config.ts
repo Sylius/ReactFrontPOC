@@ -36,7 +36,6 @@ export default defineConfig({
           route("/checkout/select-shipping", "routes/Checkout/ShippingPage.tsx");
           route("/checkout/select-payment", "routes/Checkout/PaymentPage.tsx");
           route("/checkout/complete", "routes/Checkout/SummaryPage.tsx");
-          // fragment "/checkout/pay" usuwamy na rzecz parametryzowanego pod Account
 
           route("/order/thank-you", "routes/Checkout/ThankYouPage.tsx");
 
@@ -46,7 +45,6 @@ export default defineConfig({
           route("/account/change-password", "routes/account/ChangePasswordPage.tsx");
           route("/account/order-history", "routes/account/OrderHistoryPage.tsx");
           route("/account/orders/:token", "routes/account/OrderDetailsPage.tsx");
-          // jedyny wpis, który ładuje PayOrderPage z tokenem
           route("/account/orders/:token/pay", "routes/Checkout/PayOrderPage.tsx");
           route("/account/address-book", "routes/account/AddressBookPage.tsx");
           route("/account/address-book/add", "routes/account/AddAddressPage.tsx");

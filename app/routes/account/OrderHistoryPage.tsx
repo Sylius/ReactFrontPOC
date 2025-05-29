@@ -12,7 +12,8 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
     const token = localStorage.getItem('jwtToken');
     if (!token) throw new Error('No Token');
 
-    const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+    if (!window.ENV?.API_URL) throw new Error("API_URL is not defined");
+    const baseUrl = window.ENV.API_URL;
     const response = await fetch(`${baseUrl}/api/v2/shop/orders`, {
         headers: { Authorization: `Bearer ${token}` },
     });
@@ -30,23 +31,7 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
                 );
                 if (!orderRes.ok) throw new Error('Full order download error');
                 const fullOrder = await orderRes.json();
-
-                let createdAt: string | undefined;
-                if (fullOrder.payments?.[0]?.['@id']) {
-                    const payRes = await fetch(
-                        `${baseUrl}${fullOrder.payments[0]['@id']}`,
-                        { headers: { Authorization: `Bearer ${token}` } }
-                    );
-                    if (payRes.ok) {
-                        const payData = await payRes.json();
-                        createdAt = payData.createdAt;
-                    }
-                }
-
-                return {
-                    ...fullOrder,
-                    createdAt: createdAt ?? undefined,
-                } as Order;
+                return fullOrder as Order;
             } catch {
                 return order as Order;
             }

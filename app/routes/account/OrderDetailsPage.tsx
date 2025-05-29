@@ -28,7 +28,8 @@ export default function OrderDetailsPage() {
                     return;
                 }
 
-                const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
+                if (!window.ENV?.API_URL) throw new Error("API_URL is not defined");
+                const baseUrl = window.ENV.API_URL;
                 const res = await fetch(`${baseUrl}/api/v2/shop/orders/${token}`, {
                     headers: { Authorization: `Bearer ${jwt}` },
                 });
