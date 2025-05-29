@@ -1,3 +1,4 @@
+// src/pages/checkout/AddressPage.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import CheckoutLayout from '../../layouts/Checkout';
 import { AddressInterface } from '../../types/Order';
@@ -25,7 +26,7 @@ const emptyAddress: AddressInterface = {
 
 const AddressPage: React.FC = () => {
     const { customer } = useCustomer();
-    const { order, fetchOrder } = useOrder();
+    const { order, fetchOrder, activeCouponCode } = useOrder();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
@@ -36,19 +37,18 @@ const AddressPage: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [addresses, setAddresses] = useState<AddressInterface[]>([]);
     const [countries, setCountries] = useState<Country[]>([]);
-
     const isInitialized = useRef(false);
 
     useEffect(() => {
         const fetchData = async () => {
             const token = localStorage.getItem('jwtToken');
-
             try {
                 const [addressesRes, countriesRes] = await Promise.all([
                     token
-                        ? fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses`, {
-                            headers: { Authorization: `Bearer ${token}` },
-                        })
+                        ? fetch(
+                            `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/addresses`,
+                            { headers: { Authorization: `Bearer ${token}` } }
+                        )
                         : Promise.resolve({ json: () => ({ 'hydra:member': [] }) }),
                     fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/countries`),
                 ]);
@@ -70,25 +70,23 @@ const AddressPage: React.FC = () => {
                             typeof customer.defaultAddress === 'string'
                                 ? customer.defaultAddress.split('/').pop()
                                 : customer.defaultAddress?.['@id']?.split('/').pop();
-
-                        const defaultAddress = addressItems.find(addr => String(addr.id) === defaultAddressId);
+                        const defaultAddress = addressItems.find(
+                            addr => String(addr.id) === defaultAddressId
+                        );
                         if (defaultAddress) {
                             setBillingAddress({ ...defaultAddress });
                         }
                     }
-
                     if (order?.shippingAddress) {
                         setUseDifferentShipping(true);
                         setShippingAddress(order.shippingAddress);
                     }
-
                     isInitialized.current = true;
                 }
             } catch (error) {
                 console.error('Error loading addresses or countries', error);
             }
         };
-
         fetchData();
     }, [customer, order]);
 
@@ -102,8 +100,7 @@ const AddressPage: React.FC = () => {
     const handleAddressSelect =
         (setter: React.Dispatch<React.SetStateAction<AddressInterface>>) =>
             (e: React.ChangeEvent<HTMLSelectElement>) => {
-                const selectedId = e.target.value;
-                const selected = addresses.find(addr => String(addr.id) === selectedId);
+                const selected = addresses.find(addr => String(addr.id) === e.target.value);
                 if (selected) {
                     setter({ ...selected });
                 }
@@ -115,7 +112,9 @@ const AddressPage: React.FC = () => {
 
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}`,
+                `${import.meta.env.VITE_REACT_APP_API_URL}/api/v2/shop/orders/${localStorage.getItem(
+                    'orderToken'
+                )}`,
                 {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -123,13 +122,11 @@ const AddressPage: React.FC = () => {
                         email: customer?.email ?? email,
                         billingAddress,
                         shippingAddress: useDifferentShipping ? shippingAddress : billingAddress,
-                        couponCode: null,
+                        couponCode: activeCouponCode,
                     }),
                 }
             );
-
             if (!response.ok) throw new Error('Failed to submit order');
-
             await fetchOrder();
             navigate('/checkout/select-shipping');
         } catch (err) {
@@ -150,10 +147,12 @@ const AddressPage: React.FC = () => {
                     <select className="form-select" onChange={handleAddressSelect(setAddress)}>
                         <option value="">Select address from my book</option>
                         {addresses.map(addr => {
-                            const countryName = countries.find(c => c.code === addr.countryCode)?.name || addr.countryCode;
+                            const countryName =
+                                countries.find(c => c.code === addr.countryCode)?.name || addr.countryCode;
                             return (
                                 <option key={addr.id} value={addr.id}>
-                                    {addr.firstName} {addr.lastName}, {addr.street}, {addr.city} {addr.postcode}, {countryName}
+                                    {addr.firstName} {addr.lastName}, {addr.street}, {addr.city}{' '}
+                                    {addr.postcode}, {countryName}
                                 </option>
                             );
                         })}
@@ -164,27 +163,56 @@ const AddressPage: React.FC = () => {
             <div className="row">
                 <div className="col-md-6 mb-3">
                     <label className="form-label required">First name</label>
-                    <input name="firstName" className="form-control" required value={address.firstName} onChange={handleChange(setAddress)} />
+                    <input
+                        name="firstName"
+                        className="form-control"
+                        required
+                        value={address.firstName}
+                        onChange={handleChange(setAddress)}
+                    />
                 </div>
                 <div className="col-md-6 mb-3">
                     <label className="form-label required">Last name</label>
-                    <input name="lastName" className="form-control" required value={address.lastName} onChange={handleChange(setAddress)} />
+                    <input
+                        name="lastName"
+                        className="form-control"
+                        required
+                        value={address.lastName}
+                        onChange={handleChange(setAddress)}
+                    />
                 </div>
             </div>
 
             <div className="mb-3">
                 <label className="form-label">Company</label>
-                <input name="company" className="form-control" value={address.company} onChange={handleChange(setAddress)} />
+                <input
+                    name="company"
+                    className="form-control"
+                    value={address.company}
+                    onChange={handleChange(setAddress)}
+                />
             </div>
 
             <div className="mb-3">
                 <label className="form-label required">Street address</label>
-                <input name="street" className="form-control" required value={address.street} onChange={handleChange(setAddress)} />
+                <input
+                    name="street"
+                    className="form-control"
+                    required
+                    value={address.street}
+                    onChange={handleChange(setAddress)}
+                />
             </div>
 
             <div className="mb-3">
                 <label className="form-label required">Country</label>
-                <select name="countryCode" className="form-select" required value={address.countryCode} onChange={handleChange(setAddress)}>
+                <select
+                    name="countryCode"
+                    className="form-select"
+                    required
+                    value={address.countryCode}
+                    onChange={handleChange(setAddress)}
+                >
                     <option value="">Select</option>
                     {countries.map(country => (
                         <option key={country.code} value={country.code}>
@@ -196,17 +224,34 @@ const AddressPage: React.FC = () => {
 
             <div className="mb-3">
                 <label className="form-label required">City</label>
-                <input name="city" className="form-control" required value={address.city} onChange={handleChange(setAddress)} />
+                <input
+                    name="city"
+                    className="form-control"
+                    required
+                    value={address.city}
+                    onChange={handleChange(setAddress)}
+                />
             </div>
 
             <div className="mb-3">
                 <label className="form-label required">Postcode</label>
-                <input name="postcode" className="form-control" required value={address.postcode} onChange={handleChange(setAddress)} />
+                <input
+                    name="postcode"
+                    className="form-control"
+                    required
+                    value={address.postcode}
+                    onChange={handleChange(setAddress)}
+                />
             </div>
 
             <div className="mb-4">
                 <label className="form-label">Phone number</label>
-                <input name="phoneNumber" className="form-control" value={address.phoneNumber} onChange={handleChange(setAddress)} />
+                <input
+                    name="phoneNumber"
+                    className="form-control"
+                    value={address.phoneNumber}
+                    onChange={handleChange(setAddress)}
+                />
             </div>
         </>
     );
@@ -227,7 +272,7 @@ const AddressPage: React.FC = () => {
                                 required
                                 className="form-control"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={e => setEmail(e.target.value)}
                             />
                         </div>
                     )}

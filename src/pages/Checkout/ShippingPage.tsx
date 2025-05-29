@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import CheckoutLayout from '../../layouts/Checkout';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useOrder } from '../../context/OrderContext';
 import { useQuery } from '@tanstack/react-query';
 import { formatPrice } from '../../utils/price';
-import { useNavigate } from 'react-router-dom';
 import Steps from '../../components/checkout/Steps';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
@@ -20,6 +18,10 @@ interface ShippingMethod {
 const ShippingPage: React.FC = () => {
   const { order } = useOrder();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log('[ShippingPage useEffect] Order:', order);
+  }, [order]);
 
   const fetchShippingMethodsFromAPI = async (): Promise<ShippingMethod[]> => {
     const response = await fetch(
@@ -46,6 +48,8 @@ const ShippingPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    console.log('[ShippingPage handleSubmit] Order:', order);
 
     try {
       const response = await fetch(
@@ -75,7 +79,6 @@ const ShippingPage: React.FC = () => {
         <div className="col-12 col-lg-7 pt-4 pb-5">
           <div>
             <Steps activeStep="shipping" />
-
             <div className="pe-lg-6">
               <form
                   name="sylius_shop_checkout_select_shipping"
@@ -84,7 +87,6 @@ const ShippingPage: React.FC = () => {
                   onSubmit={handleSubmit}
               >
                 <input type="hidden" name="_method" value="PUT" />
-
                 <h5 className="mb-4">Shipment #1</h5>
 
                 <div className="mb-5">
@@ -127,12 +129,10 @@ const ShippingPage: React.FC = () => {
                                 {method.name}
                               </label>
                             </div>
-
                             <div className="ps-4">
                               <small className="text-black-50">{method.description}</small>
                             </div>
                           </div>
-
                           <div>{formatPrice(method.price)}</div>
                         </label>
                       </div>
@@ -144,7 +144,6 @@ const ShippingPage: React.FC = () => {
                     <IconChevronLeft stroke={2} />
                     Change address
                   </Link>
-
                   <button
                       type="submit"
                       disabled={isSubmitting}

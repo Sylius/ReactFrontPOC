@@ -1,3 +1,5 @@
+// src/context/OrderContext.tsx
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
@@ -16,6 +18,8 @@ interface OrderContextType {
     isFetching: boolean;
     orderToken: string | null;
     setOrderToken: (token: string | null) => void;
+    activeCouponCode: string | null;
+    setActiveCouponCode: (code: string | null) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -24,6 +28,19 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [orderToken, setOrderToken] = useState<string | null>(
         localStorage.getItem('orderToken') ?? null
     );
+
+    const [activeCouponCode, setActiveCouponCodeState] = useState<string | null>(() => {
+        return localStorage.getItem('activeCouponCode') || null;
+    });
+
+    const setActiveCouponCode = (code: string | null) => {
+        if (code) {
+            localStorage.setItem('activeCouponCode', code);
+        } else {
+            localStorage.removeItem('activeCouponCode');
+        }
+        setActiveCouponCodeState(code);
+    };
 
     const {
         data: order,
@@ -49,6 +66,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 return fetchOrderFromAPI();
             }
         },
+        refetchOnWindowFocus: false,
     });
 
     const updateMutation = useMutation({
@@ -66,6 +84,19 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             localStorage.setItem('orderToken', orderToken);
         }
     }, [orderToken]);
+
+    useEffect(() => {
+        if (order?.promotionCoupon?.code) {
+            setActiveCouponCode(order.promotionCoupon.code);
+        } else if (order?.orderPromotionTotal !== 0 && !order?.promotionCoupon?.code) {
+            const storedCode = localStorage.getItem('activeCouponCode');
+            if (storedCode) {
+                setActiveCouponCodeState(storedCode);
+            }
+        } else {
+            setActiveCouponCode(null);
+        }
+    }, [order?.promotionCoupon?.code, order?.orderPromotionTotal]);
 
     const updateOrderItem = (id: number, quantity: number) => {
         updateMutation.mutate({ id, quantity });
@@ -85,6 +116,8 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 isFetching,
                 orderToken,
                 setOrderToken,
+                activeCouponCode,
+                setActiveCouponCode,
             }}
         >
             {children}
