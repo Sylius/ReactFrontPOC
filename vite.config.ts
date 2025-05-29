@@ -23,6 +23,11 @@ export default defineConfig({
           // Core
           route("/", "routes/Homepage.tsx");
           route("/login", "routes/LoginPage.tsx");
+          route("/register", "routes/RegisterPage.tsx");
+          route("/register/thank-you", "routes/RegisterThankYouPage.tsx");
+          route("/forgotten-password", "routes/ForgottenPasswordPage.tsx");
+          route("/forgotten-password/reset", "routes/ResetPasswordPage.tsx");
+          route("/verify", "routes/VerificationPage.tsx");
           route("/cart", "routes/CartPage.tsx");
 
           // Product
