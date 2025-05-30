@@ -70,9 +70,9 @@ const UserNavigation: React.FC = () => {
                             </Link>
 
                             <small className="text-black-50 px-1">|</small>
-                            <a href="/en_US/register" className="link-reset" id="register-page-button">
+                            <Link to="/register" className="link-reset" id="register-page-button">
                                 Register
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
