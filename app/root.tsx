@@ -3,17 +3,25 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration, useLoaderData,
+  ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
-import {json, LinksFunction, LoaderFunction} from "@remix-run/node";
+import {
+  json,
+  type LinksFunction,
+  type LoaderFunction,
+} from "@remix-run/node";
 
-import {BootstrapLoader} from "~/components/helpers/BootstrapLoader";
-import {OrderProvider} from "~/context/OrderContext";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import { BootstrapLoader } from "~/components/helpers/BootstrapLoader";
+import { OrderProvider } from "~/context/OrderContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CustomerProvider } from "~/context/CustomerContext";
+import { FlashMessagesProvider } from "~/context/FlashMessagesContext";
+
 import("bootstrap/dist/css/bootstrap.css");
 import "./assets/scss/main.scss";
-import {CustomerProvider} from "~/context/CustomerContext";
-import {FlashMessagesProvider} from "~/context/FlashMessagesContext";
+
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
@@ -51,8 +59,18 @@ export const links: LinksFunction = () => [
 export default function App() {
   const data = useLoaderData<{ ENV: Record<string, string> }>();
 
+  useEffect(() => {
+    const token = localStorage.getItem("orderToken");
+    if (token) {
+      fetch("/api/sync-cart", {
+        method: "POST",
+        body: token,
+      });
+    }
+  }, []);
+
   return (
-    <html lang="en">
+      <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -60,20 +78,20 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <BootstrapLoader />
-        <QueryClientProvider client={queryClient}>
-          <CustomerProvider>
-            <OrderProvider>
-              <FlashMessagesProvider>
-                <Outlet />
-              </FlashMessagesProvider>
-            </OrderProvider>
-          </CustomerProvider>
-        </QueryClientProvider>
-        <ScrollRestoration />
-        <Scripts />
-        <EnvironmentScript env={data.ENV} />
+      <BootstrapLoader />
+      <QueryClientProvider client={queryClient}>
+        <CustomerProvider>
+          <OrderProvider>
+            <FlashMessagesProvider>
+              <Outlet />
+            </FlashMessagesProvider>
+          </OrderProvider>
+        </CustomerProvider>
+      </QueryClientProvider>
+      <ScrollRestoration />
+      <Scripts />
+      <EnvironmentScript env={data.ENV} />
       </body>
-    </html>
+      </html>
   );
 }

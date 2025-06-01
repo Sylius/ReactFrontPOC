@@ -1,98 +1,107 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import {
-    pickupCart,
-    fetchOrderFromAPI,
-    updateOrderItemAPI,
-    removeOrderItemAPI,
-} from '~/api/orderApi';
-import { Order } from '~/types/Order';
+    pickupCartClient,
+    fetchOrderFromAPIClient,
+    updateOrderItemAPIClient,
+    removeOrderItemAPIClient,
+} from "~/api/order.client";
+import type { Order } from "~/types/Order";
 
 interface OrderContextType {
     order: Order | null;
-    fetchOrder: () => void;
-    updateOrderItem: (id: number, quantity: number) => void;
-    removeOrderItem: (id: number) => void;
     isFetching: boolean;
     orderToken: string | null;
     setOrderToken: (token: string | null) => void;
+    updateOrderItem: (id: number, quantity: number) => void;
+    removeOrderItem: (id: number) => void;
+    activeCouponCode: string | null;
+    setActiveCouponCode: (code: string | null) => void;
+    fetchOrder: () => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const queryClient = useQueryClient();
     const [orderToken, setOrderToken] = useState<string | null>(null);
+    const [activeCouponCode, setActiveCouponCode] = useState<string | null>(null);
     const [tokenLoaded, setTokenLoaded] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem('orderToken');
+        const token = localStorage.getItem("orderToken");
         if (token) setOrderToken(token);
         setTokenLoaded(true);
     }, []);
 
-    const {
-        data: order,
-        refetch,
-        isFetching,
-    } = useQuery({
-        queryKey: ['order'],
+    const orderQuery = useQuery<Order, Error>({
+        queryKey: ["order"],
         enabled: tokenLoaded,
         queryFn: async () => {
-            if (!orderToken) {
-                const newToken = await pickupCart();
-                setOrderToken(newToken);
-                localStorage.setItem('orderToken', newToken);
-                return fetchOrderFromAPI(newToken);
+            let token = orderToken;
+            if (!token) {
+                token = await pickupCartClient();
+                setOrderToken(token);
+                localStorage.setItem("orderToken", token);
             }
-
-            try {
-                return await fetchOrderFromAPI(localStorage.getItem('orderToken') || '');
-            } catch (error) {
-                console.warn('Invalid token, creating new cart...', error);
-                const newToken = await pickupCart();
-                setOrderToken(newToken);
-                localStorage.setItem('orderToken', newToken);
-                return fetchOrderFromAPI(newToken);
-            }
+            return await fetchOrderFromAPIClient(token, true);
         },
     });
 
+    useEffect(() => {
+        const data = orderQuery.data;
+        if (data) {
+            if (data.promotionCoupon?.code) {
+                setActiveCouponCode(data.promotionCoupon.code);
+            } else if (data.orderPromotionTotal !== 0) {
+                setActiveCouponCode("__USED__");
+            } else {
+                setActiveCouponCode(null);
+            }
+        }
+    }, [orderQuery.data]);
+
     const updateMutation = useMutation({
-        mutationFn: updateOrderItemAPI,
-        onSuccess: () => refetch(),
+        mutationFn: (vars: { id: number; quantity: number; token: string }) =>
+            updateOrderItemAPIClient(vars),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["order"] }),
     });
 
     const removeMutation = useMutation({
-        mutationFn: removeOrderItemAPI,
-        onSuccess: () => refetch(),
+        mutationFn: (vars: { id: number; token: string }) => removeOrderItemAPIClient(vars),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["order"] }),
     });
 
     useEffect(() => {
-        if (orderToken && typeof window !== 'undefined') {
-            localStorage.setItem('orderToken', orderToken);
+        if (orderToken) {
+            localStorage.setItem("orderToken", orderToken);
         }
     }, [orderToken]);
 
     const updateOrderItem = (id: number, quantity: number) => {
-        const token = localStorage.getItem('orderToken');
-        token && updateMutation.mutate({ id, quantity, token });
+        if (!orderToken) return;
+        updateMutation.mutate({ id, quantity, token: orderToken });
     };
 
     const removeOrderItem = (id: number) => {
-        const token = localStorage.getItem('orderToken');
-        token && removeMutation.mutate({id, token});
+        if (!orderToken) return;
+        removeMutation.mutate({ id, token: orderToken });
     };
+
+    if (!tokenLoaded) return null;
 
     return (
         <OrderContext.Provider
             value={{
-                order: order ?? null,
-                fetchOrder: refetch,
-                updateOrderItem,
-                removeOrderItem,
-                isFetching,
+                order: orderQuery.data ?? null,
+                isFetching: orderQuery.isFetching,
                 orderToken,
                 setOrderToken,
+                updateOrderItem,
+                removeOrderItem,
+                activeCouponCode,
+                setActiveCouponCode,
+                fetchOrder: orderQuery.refetch,
             }}
         >
             {children}
@@ -103,7 +112,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 export const useOrder = (): OrderContextType => {
     const context = useContext(OrderContext);
     if (!context) {
-        throw new Error('useOrder must be used within an OrderProvider');
+        throw new Error("useOrder must be used within an OrderProvider");
     }
     return context;
 };
