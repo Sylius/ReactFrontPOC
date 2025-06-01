@@ -51,7 +51,7 @@ const Sidebar: React.FC = () => {
                     {hasDiscount && (
                         <tr>
                             <td>Discount:</td>
-                            <td className="text-end">
+                            <td className="text-end text-success">
                                 -${formatPrice(Math.abs(order.orderPromotionTotal!))}
                             </td>
                         </tr>
