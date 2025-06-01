@@ -1,4 +1,3 @@
-import { json, redirect } from '@remix-run/node';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import { useState } from 'react';
 import CheckoutLayout from '~/layouts/Checkout';

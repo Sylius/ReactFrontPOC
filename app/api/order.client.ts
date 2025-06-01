@@ -1,4 +1,3 @@
-// ~/api/order.client.ts
 import type { Order, OrderItem } from "~/types/Order";
 import type { Product, ProductVariantDetails } from "~/types/Product";
 
