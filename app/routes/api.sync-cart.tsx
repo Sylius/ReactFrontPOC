@@ -1,4 +1,3 @@
-// app/routes/api.sync-cart.tsx
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { orderTokenCookie } from "~/utils/cookies";
 
