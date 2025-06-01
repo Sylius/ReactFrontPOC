@@ -1,5 +1,3 @@
-// ~/routes/cart.tsx
-
 import {
   json,
   redirect,
