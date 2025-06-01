@@ -25,17 +25,17 @@ const emptyAddress: AddressInterface = {
 
 const AddressPage: React.FC = () => {
     const { customer } = useCustomer();
-    const { order, fetchOrder } = useOrder();
+    const { order, fetchOrder, activeCouponCode } = useOrder();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
     const [billingAddress, setBillingAddress] = useState<AddressInterface>(emptyAddress);
     const [shippingAddress, setShippingAddress] = useState<AddressInterface>(emptyAddress);
     const [useDifferentShipping, setUseDifferentShipping] = useState(false);
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [addresses, setAddresses] = useState<AddressInterface[]>([]);
     const [countries, setCountries] = useState<Country[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const isInitialized = useRef(false);
 
@@ -56,41 +56,45 @@ const AddressPage: React.FC = () => {
                 const addressData = await addressesRes.json();
                 const countryData = await countriesRes.json();
 
-                const addressItems = addressData['hydra:member'] as AddressInterface[];
-                const countryItems = countryData['hydra:member'] as Country[];
-
-                setAddresses(addressItems);
-                setCountries(countryItems);
-
-                if (!isInitialized.current) {
-                    if (order?.billingAddress) {
-                        setBillingAddress(order.billingAddress);
-                    } else if (token && customer) {
-                        const defaultAddressId =
-                            typeof customer.defaultAddress === 'string'
-                                ? customer.defaultAddress.split('/').pop()
-                                : customer.defaultAddress?.['@id']?.split('/').pop();
-
-                        const defaultAddress = addressItems.find(addr => String(addr.id) === defaultAddressId);
-                        if (defaultAddress) {
-                            setBillingAddress({ ...defaultAddress });
-                        }
-                    }
-
-                    if (order?.shippingAddress) {
-                        setUseDifferentShipping(true);
-                        setShippingAddress(order.shippingAddress);
-                    }
-
-                    isInitialized.current = true;
-                }
+                setAddresses(addressData['hydra:member']);
+                setCountries(countryData['hydra:member']);
             } catch (error) {
                 console.error('Error loading addresses or countries', error);
             }
         };
 
         fetchData();
-    }, [customer, order]);
+    }, []);
+
+    useEffect(() => {
+        if (!order || isInitialized.current) return;
+
+        console.log('[AddressPage] Order:', order);
+        console.log('[AddressPage] promotionCoupon:', order?.promotionCoupon);
+        console.log('[AddressPage] orderPromotionTotal:', order?.orderPromotionTotal);
+
+        if (order.billingAddress) {
+            setBillingAddress(order.billingAddress);
+        } else if (customer) {
+            const defaultAddressId =
+                typeof customer.defaultAddress === 'string'
+                    ? customer.defaultAddress.split('/').pop()
+                    : customer.defaultAddress?.['@id']?.split('/').pop();
+
+            const defaultAddress = addresses.find(addr => String(addr.id) === defaultAddressId);
+            if (defaultAddress) {
+                setBillingAddress({ ...defaultAddress });
+            }
+        }
+
+        if (order.shippingAddress) {
+            setUseDifferentShipping(true);
+            setShippingAddress(order.shippingAddress);
+        }
+
+        isInitialized.current = true;
+        setLoading(false);
+    }, [order, customer, addresses]);
 
     const handleChange =
         (setter: React.Dispatch<React.SetStateAction<AddressInterface>>) =>
@@ -123,7 +127,7 @@ const AddressPage: React.FC = () => {
                         email: customer?.email ?? email,
                         billingAddress,
                         shippingAddress: useDifferentShipping ? shippingAddress : billingAddress,
-                        couponCode: null,
+                        couponCode: activeCouponCode !== '__USED__' ? activeCouponCode : undefined, // ⬅️ zachowujemy kupon
                     }),
                 }
             );
@@ -215,67 +219,71 @@ const AddressPage: React.FC = () => {
         <CheckoutLayout>
             <div className="col pt-4 pb-5">
                 <Steps activeStep="address" />
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4 h2">Address</div>
+                {loading ? (
+                    <div className="text-center py-5">Loading...</div>
+                ) : (
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-4 h2">Address</div>
 
-                    {!customer && (
+                        {!customer && (
+                            <div className="mb-4">
+                                <label className="form-label required">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    required
+                                    className="form-control"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+                        )}
+
                         <div className="mb-4">
-                            <label className="form-label required">Email</label>
+                            <div className="h4 mb-4">Billing address</div>
+                            {renderAddressForm(billingAddress, setBillingAddress)}
+                        </div>
+
+                        <div className="form-check form-switch mb-4">
                             <input
-                                type="email"
-                                name="email"
-                                required
-                                className="form-control"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={useDifferentShipping}
+                                onChange={() =>
+                                    setUseDifferentShipping(prev => {
+                                        const next = !prev;
+                                        if (next && !shippingAddress.firstName) {
+                                            setShippingAddress({ ...billingAddress });
+                                        }
+                                        return next;
+                                    })
+                                }
+                                id="differentShipping"
                             />
+                            <label className="form-check-label" htmlFor="differentShipping">
+                                Use different address for shipping?
+                            </label>
                         </div>
-                    )}
 
-                    <div className="mb-4">
-                        <div className="h4 mb-4">Billing address</div>
-                        {renderAddressForm(billingAddress, setBillingAddress)}
-                    </div>
+                        {useDifferentShipping && (
+                            <div className="mb-4">
+                                <div className="h4 mb-4">Shipping address</div>
+                                {renderAddressForm(shippingAddress, setShippingAddress)}
+                            </div>
+                        )}
 
-                    <div className="form-check form-switch mb-4">
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            checked={useDifferentShipping}
-                            onChange={() =>
-                                setUseDifferentShipping(prev => {
-                                    const next = !prev;
-                                    if (next && !shippingAddress.firstName) {
-                                        setShippingAddress({ ...billingAddress });
-                                    }
-                                    return next;
-                                })
-                            }
-                            id="differentShipping"
-                        />
-                        <label className="form-check-label" htmlFor="differentShipping">
-                            Use different address for shipping?
-                        </label>
-                    </div>
-
-                    {useDifferentShipping && (
-                        <div className="mb-4">
-                            <div className="h4 mb-4">Shipping address</div>
-                            {renderAddressForm(shippingAddress, setShippingAddress)}
+                        <div className="d-flex justify-content-between flex-column flex-sm-row gap-2">
+                            <Link className="btn btn-light btn-icon" to="/">
+                                <IconChevronLeft stroke={2} />
+                                Back to store
+                            </Link>
+                            <button type="submit" className="btn btn-primary btn-icon" disabled={isSubmitting}>
+                                Next
+                                <IconChevronRight stroke={2} />
+                            </button>
                         </div>
-                    )}
-
-                    <div className="d-flex justify-content-between flex-column flex-sm-row gap-2">
-                        <Link className="btn btn-light btn-icon" to="/">
-                            <IconChevronLeft stroke={2} />
-                            Back to store
-                        </Link>
-                        <button type="submit" className="btn btn-primary btn-icon" disabled={isSubmitting}>
-                            Next
-                            <IconChevronRight stroke={2} />
-                        </button>
-                    </div>
-                </form>
+                    </form>
+                )}
             </div>
         </CheckoutLayout>
     );
