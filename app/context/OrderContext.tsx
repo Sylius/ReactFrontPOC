@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import React, { createContext, useContext, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     pickupCartClient,
     fetchOrderFromAPIClient,
@@ -24,19 +24,14 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const queryClient = useQueryClient();
-    const [orderToken, setOrderToken] = useState<string | null>(null);
+    const [orderToken, setOrderToken] = useState<string | null>(
+        typeof window !== "undefined" ? localStorage.getItem("orderToken") : null
+    );
     const [activeCouponCode, setActiveCouponCode] = useState<string | null>(null);
-    const [tokenLoaded, setTokenLoaded] = useState(false);
-
-    useEffect(() => {
-        const token = localStorage.getItem("orderToken");
-        if (token) setOrderToken(token);
-        setTokenLoaded(true);
-    }, []);
 
     const orderQuery = useQuery<Order, Error>({
         queryKey: ["order"],
-        enabled: tokenLoaded,
+        enabled: !!orderToken,
         queryFn: async () => {
             let token = orderToken;
             if (!token) {
@@ -47,19 +42,6 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             return await fetchOrderFromAPIClient(token, true);
         },
     });
-
-    useEffect(() => {
-        const data = orderQuery.data;
-        if (data) {
-            if (data.promotionCoupon?.code) {
-                setActiveCouponCode(data.promotionCoupon.code);
-            } else if (data.orderPromotionTotal !== 0) {
-                setActiveCouponCode("__USED__");
-            } else {
-                setActiveCouponCode(null);
-            }
-        }
-    }, [orderQuery.data]);
 
     const updateMutation = useMutation({
         mutationFn: (vars: { id: number; quantity: number; token: string }) =>
@@ -72,7 +54,20 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["order"] }),
     });
 
-    useEffect(() => {
+    React.useEffect(() => {
+        const data = orderQuery.data;
+        if (data) {
+            if (data.promotionCoupon?.code) {
+                setActiveCouponCode(data.promotionCoupon.code);
+            } else if (data.orderPromotionTotal !== 0) {
+                setActiveCouponCode("__USED__");
+            } else {
+                setActiveCouponCode(null);
+            }
+        }
+    }, [orderQuery.data]);
+
+    React.useEffect(() => {
         if (orderToken) {
             localStorage.setItem("orderToken", orderToken);
         }
@@ -87,8 +82,6 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (!orderToken) return;
         removeMutation.mutate({ id, token: orderToken });
     };
-
-    if (!tokenLoaded) return null;
 
     return (
         <OrderContext.Provider
