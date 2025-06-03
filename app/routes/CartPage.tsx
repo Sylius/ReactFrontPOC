@@ -25,8 +25,20 @@ import ProductRow from "~/components/cart/ProductRow";
 import ProductsList from "~/components/ProductsList";
 import { formatPrice } from "~/utils/price";
 import { IconTrash } from "@tabler/icons-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useOrder } from "~/context/OrderContext";
+import FlashMessages from "~/components/layout/FlashMessages";
+import {
+  getFlashSession,
+  commitFlashSession,
+} from "~/utils/flashSession";
+import type { OrderItem } from "~/types/Order";
+
+type FlashMessage = {
+  id: string;
+  type: "success" | "error" | "info" | "warning";
+  content: string;
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookieHeader = request.headers.get("Cookie");
@@ -38,11 +50,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     fetchCartSuggestions(),
   ]);
 
+  const flash = await getFlashSession(cookieHeader);
+  const rawMessages = flash.get("messages");
+  const messages = rawMessages ? JSON.parse(rawMessages) : [];
+
   return json(
-      { order, token, products },
+      { order, token, products, messages },
       {
         headers: {
-          "Set-Cookie": await orderTokenCookie.serialize(token),
+          "Set-Cookie": await commitFlashSession(flash),
         },
       }
   );
@@ -58,35 +74,99 @@ export async function action({ request }: ActionFunctionArgs) {
   const quantity = Number(form.get("quantity"));
   const couponCode = form.get("couponCode")?.toString() ?? null;
 
+  const flash = await getFlashSession(cookieHeader);
+
   try {
     if (intent === "update" && id && quantity >= 0) {
       await updateOrderItemAPI({ id, quantity, token });
     }
+
     if (intent === "remove" && id) {
       await removeOrderItemAPI({ id, token });
     }
+
     if (intent === "coupon:add" && couponCode) {
       try {
         await applyCouponCode(token, couponCode);
-        return redirect(`/cart?appliedCoupon=${encodeURIComponent(couponCode)}`);
+        flash.flash(
+            "messages",
+            JSON.stringify([
+              {
+                id: "coupon-success",
+                type: "success",
+                content: "Coupon applied successfully",
+              },
+            ])
+        );
+        return redirect(`/cart?appliedCoupon=${encodeURIComponent(couponCode)}`, {
+          headers: {
+            "Set-Cookie": await commitFlashSession(flash),
+          },
+        });
       } catch (e) {
-        console.error("Invalid coupon error:", e);
-        return redirect("/cart?error=Invalid+coupon");
+        flash.flash(
+            "messages",
+            JSON.stringify([
+              {
+                id: "coupon-error",
+                type: "error",
+                content: "Invalid coupon code",
+              },
+            ])
+        );
+        return redirect("/cart", {
+          headers: {
+            "Set-Cookie": await commitFlashSession(flash),
+          },
+        });
       }
     }
+
     if (intent === "coupon:remove") {
       await removeCouponCode(token);
-      return redirect("/cart");
+      flash.flash(
+          "messages",
+          JSON.stringify([
+            {
+              id: "coupon-removed",
+              type: "info",
+              content: "Coupon has been removed.",
+            },
+          ])
+      );
+      return redirect("/cart", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(flash),
+        },
+      });
     }
   } catch (e) {
-    console.error("Cart action error:", e);
+    flash.flash(
+        "messages",
+        JSON.stringify([
+          {
+            id: "cart-error",
+            type: "error",
+            content: "An unexpected error occurred",
+          },
+        ])
+    );
+    return redirect("/cart", {
+      headers: {
+        "Set-Cookie": await commitFlashSession(flash),
+      },
+    });
   }
 
-  return redirect("/cart");
+  return redirect("/cart", {
+    headers: {
+      "Set-Cookie": await commitFlashSession(flash),
+    },
+  });
 }
 
 export default function CartPage() {
-  const { order, products } = useLoaderData<typeof loader>();
+  const { order, products, messages } = useLoaderData<typeof loader>();
   const { fetchOrder } = useOrder();
   const fetcher = useFetcher();
   const items = order.items ?? [];
@@ -94,39 +174,30 @@ export default function CartPage() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const couponFromQuery = searchParams.get("appliedCoupon");
-  const error = searchParams.get("error");
 
-  const isCouponActive = order.orderPromotionTotal < 0;
-  const couponCode =
-      order.promotionCoupon?.code ??
-      (isCouponActive ? localStorage.getItem("appliedCouponCode") : "") ??
-      "";
+  const couponCode = order.promotionCoupon?.code ?? "";
+  const isCouponActive = !!couponCode;
+
+  const [flashMessages, setFlashMessages] = useState<FlashMessage[]>(messages || []);
 
   useEffect(() => {
-    if (order.promotionCoupon?.code || isCouponActive) {
-      localStorage.setItem(
-          "appliedCouponCode",
-          order.promotionCoupon?.code ?? "__USED__"
-      );
-    } else {
-      localStorage.removeItem("appliedCouponCode");
-
-      const url = new URL(window.location.href);
-      if (url.searchParams.has("appliedCoupon")) {
-        url.searchParams.delete("appliedCoupon");
-        window.history.replaceState({}, "", url.toString());
-      }
-    }
-  }, [order.promotionCoupon, order.orderPromotionTotal]);
-
-  useEffect(() => {
-    if (couponFromQuery) {
+    if (couponFromQuery || !couponCode) {
       fetchOrder();
     }
-  }, [couponFromQuery]);
+  }, [couponFromQuery, couponCode]);
+
+  useEffect(() => {
+    setFlashMessages(messages || []);
+  }, [messages]);
 
   return (
       <Layout>
+        <FlashMessages
+            messages={flashMessages}
+            removeMessage={(id) =>
+                setFlashMessages((prev) => prev.filter((msg) => msg.id !== id))
+            }
+        />
         <div className="container mt-4 mb-5">
           <div className="mb-5">
             <h1>Your shopping cart</h1>
@@ -145,15 +216,15 @@ export default function CartPage() {
                     <table className="table align-middle">
                       <thead>
                       <tr>
-                        <th style={{ width: "1px" }}></th>
+                        <th></th>
                         <th>Item</th>
-                        <th style={{ width: "90px" }} className="text-end text-nowrap">Unit price</th>
-                        <th style={{ minWidth: "70px", width: "110px" }} className="text-end">Qty</th>
-                        <th style={{ width: "90px" }} className="text-end">Total</th>
+                        <th className="text-end text-nowrap">Unit price</th>
+                        <th className="text-end">Qty</th>
+                        <th className="text-end">Total</th>
                       </tr>
                       </thead>
                       <tbody>
-                      {items.map((item: any) => (
+                      {items.map((item: OrderItem) => (
                           <ProductRow key={item.id} item={item} fetcher={fetcher} />
                       ))}
                       </tbody>
@@ -162,17 +233,12 @@ export default function CartPage() {
 
                   <div className="mb-4">
                     <div className="p-4 bg-light">
-                      {error && <div className="alert alert-danger mb-3">{error}</div>}
-
                       {couponCode && isCouponActive ? (
-                          <fetcher.Form
-                              method="post"
-                              className="card d-flex flex-row justify-content-between align-items-center w-100 py-1 px-3"
-                          >
+                          <fetcher.Form method="post" className="card d-flex flex-row justify-content-between align-items-center w-100 py-1 px-3">
                             <div className="d-flex flex-wrap">
                               <span className="me-2">Applied coupon:</span>
                               <span className="badge d-flex align-items-center text-bg-secondary">
-                          {couponCode === "__USED__" ? "Coupon applied" : couponCode}
+                          {couponCode}
                         </span>
                             </div>
                             <button
@@ -212,7 +278,10 @@ export default function CartPage() {
                         onClick={() => {
                           items.forEach((item) => {
                             if (item.id !== undefined) {
-                              fetcher.submit({ id: item.id, _intent: "remove" }, { method: "post" });
+                              fetcher.submit(
+                                  { id: item.id, _intent: "remove" },
+                                  { method: "post" }
+                              );
                             }
                           });
                         }}
@@ -232,7 +301,7 @@ export default function CartPage() {
                     {!!order.orderPromotionTotal && (
                         <div className="hstack gap-2 mb-2">
                           <div>Discount:</div>
-                          <div className="ms-auto text-end">{formatPrice(order.orderPromotionTotal)}</div>
+                          <div className="ms-auto text-end">${formatPrice(order.orderPromotionTotal)}</div>
                         </div>
                     )}
                     <div className="hstack gap-2 mb-2">
