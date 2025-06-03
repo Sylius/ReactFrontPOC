@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
-import Default from "../../layouts/Default";
-import AccountLayout from "../../layouts/Account";
-import { useCustomer } from "../../context/CustomerContext";
-import { useFlashMessages } from "../../context/FlashMessagesContext";
+import { useEffect, useState, useRef } from "react";
+import { Link, useSearchParams, useNavigate } from "@remix-run/react";
+import Default from "~/layouts/Default";
+import AccountLayout from "~/layouts/Account";
+import { useCustomer } from "~/context/CustomerContext";
+import { useFlashMessages } from "~/context/FlashMessagesContext";
 import { IconPencil, IconLock, IconCheck } from "@tabler/icons-react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
-import { sendVerificationEmail, verifyToken } from "../../services/customerVerification";
+import { sendVerificationEmail, verifyToken } from "~/services/customerVerification";
 
-const DashboardPage: React.FC = () => {
+export default function DashboardPage() {
     const { customer, refetchCustomer } = useCustomer();
     const { addMessage } = useFlashMessages();
     const [searchParams] = useSearchParams();
@@ -30,10 +30,10 @@ const DashboardPage: React.FC = () => {
         }
 
         setIsVerifying(true);
-        const { success, message } = await sendVerificationEmail(customer.email, window.location.href, jwtToken);
+        const { success, message } = await sendVerificationEmail(customer.email, jwtToken);
 
         if (success) {
-            addMessage("success", "Verification email sent! Please check your inbox.");
+            addMessage("success", message || "Verification email sent! Please check your inbox.");
         } else {
             addMessage("error", message || "Failed to send verification email.");
         }
@@ -52,7 +52,7 @@ const DashboardPage: React.FC = () => {
             const { success, message } = await verifyToken(tokenFromUrl, jwtToken);
 
             if (success) {
-                addMessage("success", "Your email has been successfully verified.");
+                addMessage("success", message || "Your email has been successfully verified.");
                 await refetchCustomer();
             } else {
                 addMessage("error", message || "Verification failed.");
@@ -144,6 +144,4 @@ const DashboardPage: React.FC = () => {
             </AccountLayout>
         </Default>
     );
-};
-
-export default DashboardPage;
+}

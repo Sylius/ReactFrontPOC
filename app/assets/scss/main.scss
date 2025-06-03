@@ -406,8 +406,8 @@ input.form-check-input:checked {
 }
 
 .custom-slick-arrow {
-  width: 94px;
-  height: 48px;
+  width: 94px !important;
+  height: 48px !important;
   background: #1A866B !important;
   border: 1px solid #22b99a;
   border-radius: 0.3rem;
