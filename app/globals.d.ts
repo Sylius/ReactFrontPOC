@@ -1,5 +1,5 @@
 interface Window {
-    ENV?: {
+    ENV: {
         API_URL?: string;
         JWT?: string;
     };
