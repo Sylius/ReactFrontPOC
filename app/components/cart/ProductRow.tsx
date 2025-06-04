@@ -7,14 +7,37 @@ import { IconX } from "@tabler/icons-react";
 interface Props {
     item: OrderItem;
     fetcher: ReturnType<typeof useFetcher>;
+    fetchOrder: () => void; // 🔥 dodane
 }
 
-export default function ProductRow({ item, fetcher }: Props) {
+export default function ProductRow({ item, fetcher, fetchOrder }: Props) {
     const [qty, setQty] = useState(item.quantity ?? 1);
     const variant = typeof item.variant === "object" ? item.variant : null;
     const product = variant?.product;
     const image = product?.images?.[0]?.path ?? "";
     const productUrl = product?.code ? `/product/${product.code}` : "#";
+
+    const handleRemove = () => {
+        fetcher.submit(
+            new URLSearchParams({ id: String(item.id), _intent: "remove" }),
+            { method: "post" }
+        );
+        setTimeout(fetchOrder, 50); // ✅ odświeżenie orderu po usunięciu
+    };
+
+    const handleQtyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newQty = Number(e.target.value);
+        setQty(newQty);
+        fetcher.submit(
+            new URLSearchParams({
+                id: String(item.id),
+                quantity: String(newQty),
+                _intent: "update",
+            }),
+            { method: "post" }
+        );
+        setTimeout(fetchOrder, 50); // ✅ odświeżenie orderu po zmianie ilości
+    };
 
     return (
         <tr>
@@ -22,12 +45,7 @@ export default function ProductRow({ item, fetcher }: Props) {
                 <button
                     className="btn btn-sm btn-transparent px-2"
                     type="button"
-                    onClick={() =>
-                        fetcher.submit(
-                            new URLSearchParams({ id: String(item.id), _intent: "remove" }),
-                            { method: "post" }
-                        )
-                    }
+                    onClick={handleRemove}
                 >
                     <IconX stroke={2} />
                 </button>
@@ -68,17 +86,7 @@ export default function ProductRow({ item, fetcher }: Props) {
                     className="form-control text-end"
                     min={1}
                     value={qty}
-                    onChange={(e) => {
-                        setQty(Number(e.target.value));
-                        fetcher.submit(
-                            new URLSearchParams({
-                                id: String(item.id),
-                                quantity: e.target.value,
-                                _intent: "update",
-                            }),
-                            { method: "post" }
-                        );
-                    }}
+                    onChange={handleQtyChange}
                 />
             </td>
 

@@ -1,15 +1,15 @@
 import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useLoaderData,
+    Links,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+    useLoaderData,
 } from "@remix-run/react";
 import {
-  json,
-  type LinksFunction,
-  type LoaderFunction,
+    json,
+    type LinksFunction,
+    type LoaderFunction,
 } from "@remix-run/node";
 
 import { BootstrapLoader } from "~/components/helpers/BootstrapLoader";
@@ -26,72 +26,85 @@ import { useEffect } from "react";
 const queryClient = new QueryClient();
 
 export const loader: LoaderFunction = async () => {
-  return json({
-    ENV: {
-      API_URL: process.env.PUBLIC_API_URL,
-    },
-  });
+    return json({
+        ENV: {
+            API_URL: process.env.PUBLIC_API_URL,
+        },
+    });
 };
 
 function EnvironmentScript({ env }: { env: Record<string, string | undefined> }) {
-  return (
-      <script
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(env)};`,
-          }}
-      />
-  );
+    return (
+        <script
+            dangerouslySetInnerHTML={{
+                __html: `window.ENV = ${JSON.stringify(env)};`,
+            }}
+        />
+    );
 }
 
 export const links: LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+    },
+    {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    },
 ];
 
 export default function App() {
-  const data = useLoaderData<{ ENV: Record<string, string> }>();
+    const data = useLoaderData<{ ENV: Record<string, string> }>();
 
-  useEffect(() => {
-    const token = localStorage.getItem("orderToken");
-    if (token) {
-      fetch("/api/sync-cart", {
-        method: "POST",
-        body: token,
-      });
-    }
-  }, []);
+    useEffect(() => {
+        const token = localStorage.getItem("orderToken");
+        const apiUrl = window.ENV?.API_URL;
 
-  return (
-      <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-      <BootstrapLoader />
-      <QueryClientProvider client={queryClient}>
-        <CustomerProvider>
-          <OrderProvider>
-            <FlashMessagesProvider>
-              <Outlet />
-            </FlashMessagesProvider>
-          </OrderProvider>
-        </CustomerProvider>
-      </QueryClientProvider>
-      <ScrollRestoration />
-      <Scripts />
-      <EnvironmentScript env={data.ENV} />
-      </body>
-      </html>
-  );
+        if (!token && apiUrl) {
+            fetch(`${apiUrl}/api/v2/shop/orders`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.tokenValue) {
+                        localStorage.setItem("orderToken", data.tokenValue);
+                    }
+                });
+        } else if (token) {
+            fetch("/api/sync-cart", {
+                method: "POST",
+                body: token,
+            });
+        }
+    }, []);
+
+    return (
+        <html lang="en">
+        <head>
+            <meta charSet="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <Meta />
+            <Links />
+        </head>
+        <body>
+        <BootstrapLoader />
+        <QueryClientProvider client={queryClient}>
+            <CustomerProvider>
+                <OrderProvider>
+                    <FlashMessagesProvider>
+                        <Outlet />
+                    </FlashMessagesProvider>
+                </OrderProvider>
+            </CustomerProvider>
+        </QueryClientProvider>
+        <ScrollRestoration />
+        <Scripts />
+        <EnvironmentScript env={data.ENV} />
+        </body>
+        </html>
+    );
 }

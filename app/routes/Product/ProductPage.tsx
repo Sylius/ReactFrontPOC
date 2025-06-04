@@ -293,9 +293,7 @@ const ProductPage: React.FC = () => {
         setIsAddToCartLoading(true);
         try {
             const resp = await fetch(
-                `${API_URL}/api/v2/shop/orders/${localStorage.getItem(
-                    'orderToken'
-                )}/items`,
+                `${API_URL}/api/v2/shop/orders/${localStorage.getItem('orderToken')}/items`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -303,11 +301,11 @@ const ProductPage: React.FC = () => {
                 }
             );
             if (!resp.ok) throw new Error('add to cart failed');
-            fetchOrder();
-            addMessage('success', 'Product added to cart');
+            fetchOrder(); // 🔄 ważne: odświeżenie danych zamówienia
+            addMessage('success', 'Product added to cart'); // ✅ sukces
         } catch (e) {
             console.error('add to cart error', e);
-            addMessage('error', 'Failed to add product to cart');
+            addMessage('error', 'Failed to add product to cart'); // ❌ błąd
         } finally {
             setIsAddToCartLoading(false);
         }

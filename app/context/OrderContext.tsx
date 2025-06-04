@@ -41,6 +41,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             }
             return await fetchOrderFromAPIClient(token, true);
         },
+        refetchOnWindowFocus: false, // ✅ wyłącza refetch po powrocie na zakładkę
     });
 
     const updateMutation = useMutation({

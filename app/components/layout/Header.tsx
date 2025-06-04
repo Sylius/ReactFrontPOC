@@ -4,10 +4,15 @@ import { useOrder } from "../../context/OrderContext";
 import { formatPrice } from "../../utils/price";
 import UserNavigation from "./header/UserNavigation";
 import { IconMenu2, IconShoppingBag } from "@tabler/icons-react";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const Header: React.FC = () => {
     const { order, isFetching } = useOrder();
-    const showTotal = typeof order?.total === "number" && !isFetching;
+
+    const displayTotal = !isFetching && order && order.items?.length && typeof order.total === 'number' && order.total > 0
+        ? order.total
+        : 0;
 
     return (
         <div className="border-bottom py-4">
@@ -42,9 +47,11 @@ const Header: React.FC = () => {
                                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
                                         aria-label="cart button">
                                     <IconShoppingBag stroke={1.25} size={28} />
-                                    {showTotal && (
-                                        <div className="d-none d-md-block">${formatPrice(order.total)}</div>
-                                    )}
+                                    <div className="d-none d-md-block">
+                                        {isFetching
+                                            ? <Skeleton width={40} height={24} />
+                                            : `$${formatPrice(displayTotal)}`}
+                                    </div>
                                 </button>
                             </div>
                         </Link>

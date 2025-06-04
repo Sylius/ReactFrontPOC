@@ -225,7 +225,7 @@ export default function CartPage() {
                       </thead>
                       <tbody>
                       {items.map((item: OrderItem) => (
-                          <ProductRow key={item.id} item={item} fetcher={fetcher} />
+                          <ProductRow key={item.id} item={item} fetcher={fetcher} fetchOrder={fetchOrder} />
                       ))}
                       </tbody>
                     </table>
