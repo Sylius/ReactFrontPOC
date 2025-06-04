@@ -1,3 +1,4 @@
+// vite.config.ts
 import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -42,6 +43,7 @@ export default defineConfig({
           route("/checkout/select-shipping", "routes/Checkout/ShippingPage.tsx");
           route("/checkout/select-payment", "routes/Checkout/PaymentPage.tsx");
           route("/checkout/complete", "routes/Checkout/SummaryPage.tsx");
+
           route("/order/thank-you", "routes/Checkout/ThankYouPage.tsx");
 
           // Account
@@ -50,6 +52,7 @@ export default defineConfig({
           route("/account/change-password", "routes/account/ChangePasswordPage.tsx");
           route("/account/order-history", "routes/account/OrderHistoryPage.tsx");
           route("/account/orders/:token", "routes/account/OrderDetailsPage.tsx");
+          route("/account/orders/:token/pay", "routes/Checkout/PayOrderPage.tsx");
           route("/account/address-book", "routes/account/AddressBookPage.tsx");
           route("/account/address-book/add", "routes/account/AddAddressPage.tsx");
           route("/account/address-book/edit/:id", "routes/account/EditAddressPage.tsx");
@@ -60,7 +63,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
+      "@tabler/icons-react": "@tabler/icons-react/dist/esm/icons/index.mjs",
     },
   },
 });
