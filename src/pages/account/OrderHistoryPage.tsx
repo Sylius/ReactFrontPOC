@@ -1,62 +1,51 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import Default from "../../layouts/Default";
-import AccountLayout from "../../layouts/Account";
-import { useCustomer } from "../../context/CustomerContext";
-import { useQuery } from "@tanstack/react-query";
-import { Order } from "../../types/Order";
-import Skeleton from "react-loading-skeleton";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Default from '../../layouts/Default';
+import AccountLayout from '../../layouts/Account';
+import { useCustomer } from '../../context/CustomerContext';
+import { useQuery } from '@tanstack/react-query';
+import { Order } from '../../types/Order';
+import Skeleton from 'react-loading-skeleton';
+import { IconCreditCard } from '@tabler/icons-react';
 
 const fetchCustomerOrders = async (): Promise<Order[]> => {
-    const token = localStorage.getItem("jwtToken");
-    if (!token) throw new Error("No Token");
+    const token = localStorage.getItem('jwtToken');
+    if (!token) throw new Error('No Token');
 
     const baseUrl = import.meta.env.VITE_REACT_APP_API_URL;
-
     const response = await fetch(`${baseUrl}/api/v2/shop/orders`, {
         headers: { Authorization: `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-        throw new Error("Order download error");
-    }
+    if (!response.ok) throw new Error('Order download error');
 
     const data = await response.json();
-    const basicOrders = data["hydra:member"] as Partial<Order>[];
+    const basicOrders = data['hydra:member'] as Partial<Order>[];
 
     const fullOrders = await Promise.all(
         basicOrders.map(async (order) => {
             try {
-                const orderResponse = await fetch(`${baseUrl}/api/v2/shop/orders/${order.tokenValue}`, {
+                const orderRes = await fetch(`${baseUrl}/api/v2/shop/orders/${order.tokenValue}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                if (!orderRes.ok) throw new Error('Full order download error');
+                const fullOrder = await orderRes.json();
 
-                if (!orderResponse.ok) {
-                    throw new Error("Full order download error");
-                }
-
-                const fullOrderData = await orderResponse.json();
-
-                let createdAt: string | undefined = undefined;
-
-                if (fullOrderData.payments && fullOrderData.payments.length > 0) {
-                    const paymentUrl = fullOrderData.payments[0]["@id"];
-                    const paymentResponse = await fetch(`${baseUrl}${paymentUrl}`, {
+                let createdAt: string | undefined;
+                if (fullOrder.payments?.[0]?.['@id']) {
+                    const payRes = await fetch(`${baseUrl}${fullOrder.payments[0]['@id']}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
-
-                    if (paymentResponse.ok) {
-                        const paymentData = await paymentResponse.json();
-                        createdAt = paymentData.createdAt;
+                    if (payRes.ok) {
+                        const payData = await payRes.json();
+                        createdAt = payData.createdAt;
                     }
                 }
 
                 return {
-                    ...fullOrderData,
+                    ...fullOrder,
                     createdAt: createdAt ?? undefined,
-                };
-            } catch (error) {
-                console.warn(`Failed to fetch full order for token: ${order.tokenValue}`, error);
+                } as Order;
+            } catch {
                 return order as Order;
             }
         })
@@ -67,9 +56,8 @@ const fetchCustomerOrders = async (): Promise<Order[]> => {
 
 const OrderHistoryPage: React.FC = () => {
     const { customer } = useCustomer();
-
     const { data: orders = [], isLoading, isError } = useQuery<Order[]>({
-        queryKey: ["customerOrders", customer?.email],
+        queryKey: ['customerOrders', customer?.email],
         queryFn: fetchCustomerOrders,
         enabled: !!customer,
     });
@@ -78,20 +66,19 @@ const OrderHistoryPage: React.FC = () => {
         <Default>
             <AccountLayout
                 breadcrumbs={[
-                    { label: "Home", url: "/" },
-                    { label: "My account", url: "/account/dashboard" },
-                    { label: "Order History", url: "/account/order-history" },
+                    { label: 'Home', url: '/' },
+                    { label: 'My account', url: '/account/dashboard' },
+                    { label: 'Order History', url: '/account/order-history' },
                 ]}
             >
                 <div className="col-12 col-md-9">
                     <div className="mb-4">
                         <h1>Order history</h1>
-                        Browse your orders from the past
+                        Browse your past orders
                     </div>
 
                     <div className="card">
                         <div className="card-body border-bottom py-3">
-                            <div className="d-flex border-bottom pb-3"></div>
                             <div className="table-responsive">
                                 {isLoading ? (
                                     <table className="table card-table">
@@ -117,20 +104,16 @@ const OrderHistoryPage: React.FC = () => {
                                             <th>Ship to</th>
                                             <th>Total</th>
                                             <th>State</th>
-                                            <th>Actions</th>
+                                            <th className="text-center">Actions</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {orders.map((order: Order) => (
-                                            <tr key={order.tokenValue} className="item">
+                                        {orders.map((order) => (
+                                            <tr key={order.tokenValue}>
                                                 <td>#{order.number}</td>
                                                 <td>
                                                     {order.createdAt
-                                                        ? new Date(order.createdAt).toLocaleDateString('en-GB', {
-                                                            year: 'numeric',
-                                                            month: '2-digit',
-                                                            day: '2-digit',
-                                                        })
+                                                        ? new Date(order.createdAt).toLocaleDateString('en-GB')
                                                         : '-'}
                                                 </td>
                                                 <td>
@@ -140,13 +123,22 @@ const OrderHistoryPage: React.FC = () => {
                                                 </td>
                                                 <td>${(order.itemsSubtotal / 100).toFixed(2)}</td>
                                                 <td>{order.state}</td>
-                                                <td>
+                                                <td className="d-flex gap-2 flex-wrap justify-content-center">
                                                     <Link
                                                         to={`/account/orders/${order.tokenValue}`}
                                                         className="btn btn-sm btn-outline-gray"
                                                     >
                                                         Show
                                                     </Link>
+                                                    {order.state !== 'completed' && order.paymentState === 'awaiting_payment' && (
+                                                        <Link
+                                                            to={`/account/orders/${order.tokenValue}/pay`}
+                                                            className="btn btn-sm btn-outline-gray d-flex align-items-center gap-1"
+                                                        >
+                                                            <IconCreditCard size={18} />
+                                                            Pay
+                                                        </Link>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}

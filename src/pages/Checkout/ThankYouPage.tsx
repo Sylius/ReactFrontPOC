@@ -1,7 +1,7 @@
-import React from 'react';
-import Layout from '../../layouts/Default';
-import { useCustomer } from '../../context/CustomerContext';
-import { useLocation } from 'react-router-dom';
+import React from "react";
+import Layout from "../../layouts/Default";
+import { useCustomer } from "../../context/CustomerContext";
+import { useLocation, Link } from "react-router-dom";
 
 const ThankYouPage: React.FC = () => {
     const { customer } = useCustomer();
@@ -17,17 +17,19 @@ const ThankYouPage: React.FC = () => {
 
                     <div className="d-flex flex-column flex-lg-row justify-content-center gap-2 mt-4">
                         {customer && tokenValue ? (
-                            <a className="btn btn-primary" href={`/account/orders/${tokenValue}`}>
+                            <Link className="btn btn-primary" to={`/account/orders/${tokenValue}`}>
                                 View order
-                            </a>
+                            </Link>
                         ) : (
                             <>
-                                <a className="btn btn-primary" href="/orderpay">
-                                    Change payment method
-                                </a>
-                                <a className="btn btn-secondary" href="/register">
+                                {tokenValue && (
+                                    <Link className="btn btn-primary" to={`/order/${tokenValue}/pay`}>
+                                        Change payment method
+                                    </Link>
+                                )}
+                                    <Link className="btn btn-secondary" to="/register">
                                     Create an account
-                                </a>
+                                    </Link>
                             </>
                         )}
                     </div>
