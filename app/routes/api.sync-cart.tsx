@@ -1,5 +1,5 @@
 import { json, type ActionFunctionArgs } from "@remix-run/node";
-import { orderTokenCookie } from "~/utils/cookies";
+import { orderTokenCookie } from "~/utils/cookies.server"; // ⛔ NIE .client – musi być .server
 
 export async function action({ request }: ActionFunctionArgs) {
     const token = await request.text();

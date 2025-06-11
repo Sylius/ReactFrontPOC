@@ -15,7 +15,7 @@ import Steps from "~/components/checkout/Steps";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { useCustomer } from "~/context/CustomerContext";
 import { useOrder } from "~/context/OrderContext";
-import { orderTokenCookie } from "~/utils/cookies";
+import { orderTokenCookie } from "~/utils/cookies.server"; // ✅ POPRAWNY dla loadera i action
 import { fetchOrderFromAPI } from "~/api/order.server";
 import type { AddressInterface, Order } from "~/types/Order";
 import type { Customer } from "~/types/Customer";

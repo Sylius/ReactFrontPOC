@@ -14,7 +14,7 @@ import { useOrder } from "~/context/OrderContext";
 import Steps from "~/components/checkout/Steps";
 import { formatPrice } from "~/utils/price";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import { orderTokenCookie } from "~/utils/cookies";
+import { orderTokenCookie } from "~/utils/cookies.server"; // ✅ POPRAWNY dla loadera i action
 import { fetchOrderFromAPI } from "~/api/order.server";
 
 interface ShippingMethod {

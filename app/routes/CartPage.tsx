@@ -1,3 +1,5 @@
+// ~/routes/CartPage.tsx
+
 import {
   json,
   redirect,
@@ -11,7 +13,7 @@ import {
   Link,
 } from "@remix-run/react";
 import Layout from "~/layouts/Default";
-import { orderTokenCookie } from "~/utils/cookies";
+import { orderTokenCookie } from "~/utils/cookies.server";
 import {
   pickupCart,
   fetchOrderFromAPI,
@@ -43,7 +45,13 @@ type FlashMessage = {
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookieHeader = request.headers.get("Cookie");
   let token = await orderTokenCookie.parse(cookieHeader);
-  if (!token) token = await pickupCart();
+  if (typeof token !== "string") token = token?.token ?? token ?? "";
+
+  let newToken = false;
+  if (!token) {
+    token = await pickupCart();
+    newToken = true;
+  }
 
   const [order, products] = await Promise.all([
     fetchOrderFromAPI(token, true),
@@ -54,19 +62,26 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const rawMessages = flash.get("messages");
   const messages = rawMessages ? JSON.parse(rawMessages) : [];
 
-  return json(
-      { order, token, products, messages },
-      {
-        headers: {
-          "Set-Cookie": await commitFlashSession(flash),
-        },
-      }
-  );
+  const headers: HeadersInit = {};
+  const cookies: string[] = [];
+
+  if (newToken) {
+    cookies.push(await orderTokenCookie.serialize(token));
+  }
+
+  cookies.push(await commitFlashSession(flash));
+
+  if (cookies.length > 0) {
+    headers["Set-Cookie"] = cookies as unknown as string;
+  }
+
+  return json({ order, token, products, messages }, { headers });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const cookieHeader = request.headers.get("Cookie");
-  const token = (await orderTokenCookie.parse(cookieHeader)) ?? "";
+  const parsed = await orderTokenCookie.parse(cookieHeader);
+  const token = typeof parsed === "string" ? parsed : parsed?.token ?? "";
   const form = await request.formData();
 
   const intent = form.get("_intent");
@@ -225,7 +240,12 @@ export default function CartPage() {
                       </thead>
                       <tbody>
                       {items.map((item: OrderItem) => (
-                          <ProductRow key={item.id} item={item} fetcher={fetcher} fetchOrder={fetchOrder} />
+                          <ProductRow
+                              key={item.id}
+                              item={item}
+                              fetcher={fetcher}
+                              fetchOrder={fetchOrder}
+                          />
                       ))}
                       </tbody>
                     </table>

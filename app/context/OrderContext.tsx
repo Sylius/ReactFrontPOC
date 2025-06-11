@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     pickupCartClient,
@@ -22,10 +22,16 @@ interface OrderContextType {
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
+const getCookieToken = () => {
+    if (typeof document === "undefined") return null;
+    const match = document.cookie.match(/(^| )orderToken=([^;]+)/);
+    return match ? decodeURIComponent(match[2]) : null;
+};
+
 export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const queryClient = useQueryClient();
     const [orderToken, setOrderToken] = useState<string | null>(
-        typeof window !== "undefined" ? localStorage.getItem("orderToken") : null
+        typeof window !== "undefined" ? getCookieToken() : null
     );
     const [activeCouponCode, setActiveCouponCode] = useState<string | null>(null);
 
@@ -37,11 +43,12 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             if (!token) {
                 token = await pickupCartClient();
                 setOrderToken(token);
-                localStorage.setItem("orderToken", token);
+                document.cookie = `orderToken=${token}; path=/; max-age=2592000; SameSite=Lax`;
             }
+            if (!token) throw new Error("Missing order token");
             return await fetchOrderFromAPIClient(token, true);
         },
-        refetchOnWindowFocus: false, // ✅ wyłącza refetch po powrocie na zakładkę
+        refetchOnWindowFocus: false,
     });
 
     const updateMutation = useMutation({
@@ -51,11 +58,12 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
 
     const removeMutation = useMutation({
-        mutationFn: (vars: { id: number; token: string }) => removeOrderItemAPIClient(vars),
+        mutationFn: (vars: { id: number; token: string }) =>
+            removeOrderItemAPIClient(vars),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["order"] }),
     });
 
-    React.useEffect(() => {
+    useEffect(() => {
         const data = orderQuery.data;
         if (data) {
             if (data.promotionCoupon?.code) {
@@ -67,12 +75,6 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             }
         }
     }, [orderQuery.data]);
-
-    React.useEffect(() => {
-        if (orderToken) {
-            localStorage.setItem("orderToken", orderToken);
-        }
-    }, [orderToken]);
 
     const updateOrderItem = (id: number, quantity: number) => {
         if (!orderToken) return;
