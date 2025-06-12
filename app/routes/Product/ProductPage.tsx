@@ -287,7 +287,13 @@ const ProductPage: React.FC = () => {
                 try {
                     const token = await pickupCartClient();
                     console.log("🛒 Created cart token (client):", token);
-                    setOrderToken(token); // ⬅️ z OrderContext
+                    setOrderToken(token); // z OrderContext
+
+                    // 🆕 sync z serwerem Remix (cookie)
+                    await fetch("/api/sync-cart", {
+                        method: "POST",
+                        body: token,
+                    });
                 } catch (e) {
                     console.error("❌ Failed to pickup cart on product page", e);
                 }

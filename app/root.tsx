@@ -18,8 +18,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CustomerProvider } from "~/context/CustomerContext";
 import { FlashMessagesProvider } from "~/context/FlashMessagesContext";
 
-import("bootstrap/dist/css/bootstrap.css");
-import "./assets/scss/main.scss";
+import bootstrapStylesHref from "bootstrap/dist/css/bootstrap.css?url";
+import mainStylesHref from "./assets/scss/main.scss?url";
 
 import { useEffect } from "react";
 
@@ -44,6 +44,8 @@ function EnvironmentScript({ env }: { env: Record<string, string | undefined> })
 }
 
 export const links: LinksFunction = () => [
+    { rel: "stylesheet", href: bootstrapStylesHref },
+    { rel: "stylesheet", href: mainStylesHref },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     {
         rel: "preconnect",
